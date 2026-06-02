@@ -1,0 +1,70 @@
+\chapter[INTRODUÇÃO]{INTRODUÇÃO}
+
+A transformação digital na indústria, impulsionada pelo conceito de Indústria 4.0, vem redefinindo sistemas de produção ao integrar tecnologias avançadas de informação e comunicação aos processos industriais. Essa quarta revolução industrial caracteriza-se pela incorporação de sensores inteligentes, computação em nuvem, big data, inteligência artificial, robótica e outras inovações às fábricas, com o objetivo de criar operações mais conectadas, automatizadas e inteligentes. Conceitos como manufatura inteligente e produção orientada por dados tornaram-se centrais, visando aumentar a eficiência, reduzir custos e melhorar a qualidade de produtos e processos \cite{DURAIVELU20221825, ABDALLAH20210821}. As empresas têm ampliado o uso de sistemas baseados em Internet das Coisas Industrial (IIoT) como parte desse movimento, buscando maior confiabilidade e competitividade por meio da conectividade ubíqua de dispositivos e da análise de dados em tempo real \cite{DURAIVELU20221825}.
+
+Implementar essa visão, contudo, traz desafios significativos, especialmente no que tange à arquitetura de automação industrial. A integração de múltiplas tecnologias heterogêneas (equipamentos legados, redes industriais, plataformas de TI) exige alto grau de interoperabilidade e flexibilidade. Isso implica novos requisitos para os sistemas de controle industrial, como maior descentralização, modularidade e autonomia, características que as arquiteturas tradicionais hierárquicas não conseguem suprir completamente \cite{CAMPANELLI201547}. Em outras palavras, há uma demanda crescente por controle distribuído, no qual a tomada de decisão e a execução do controle estejam espalhadas por diversos dispositivos inteligentes na planta, em vez de concentradas em um único controlador central. Atender a essa demanda requer repensar modelos de desenvolvimento de software industrial e adotar padrões que suportem tal distribuição de forma padronizada e reconfigurável \cite{CAMPANELLI201547}.
+
+Uma das respostas a essa necessidade foi a criação do padrão IEC 61499, desenvolvido pela Comissão Eletrotécnica Internacional para prover um modelo de referência de sistemas de controle distribuído baseado em blocos funcionais. O IEC 61499 define uma linguagem de modelagem específica de domínio para desenvolvimento de aplicações de controle distribuído, estendendo o padrão IEC 61131-3 (utilizado em CLPs convencionais) com melhor encapsulamento de componentes de software, formato independente de fornecedor e simplificação da comunicação controlador-a-controlador \cite{HOLM2005, VYATKIN122011}. Em essência, suas funcionalidades de distribuição e suporte à reconfiguração dinâmica fornecem a infraestrutura necessária para viabilizar aplicações industriais inteligentes conforme preconiza a Indústria 4.0 e a IIoT \cite{VYATKIN122011, INDUSTRIALETHERNET61499}. Assim, arquiteturas baseadas em IEC 61499 permitem conceber sistemas nos quais múltiplos dispositivos executam, de forma coordenada, partes de uma mesma aplicação de controle, contribuindo para uma manufatura mais flexível e adaptável.
+
+Paralelamente a essas evoluções na camada de controle, o domínio de Tecnologia da Informação (TI) tem assistido ao amadurecimento de ferramentas de virtualização e gerenciamento de aplicativos em larga escala. Em especial, a conteinerização de aplicações (por meio de plataformas como Docker) e as plataformas de orquestração de contêineres se tornaram o padrão em infraestruturas de TI. O uso de contêineres permite empacotar softwares com todas as suas dependências, garantindo portabilidade e isolamento, enquanto orquestradores automatizam a implantação e escalonamento desses contêineres em clusters de servidores \cite{HOFER2019, INTEL2019}. Essa tendência agora avança em direção ao chão de fábrica: a virtualização de aplicações e sua orquestração em dispositivos de borda é um fenômeno recente no contexto de IIoT/Indústria 4.0 \cite{INTEL2019}. Ferramentas baseadas em Kubernetes, em particular, despontam como candidatas naturais para gerenciar aplicações industriais conteinerizadas distribuídas, dadas suas capacidades robustas de automação e escalabilidade \cite{HOFER2019}. O Kubernetes já se firmou como o padrão em orquestração de contêineres na indústria de software, oferecendo um rico conjunto de funções para implantar, monitorar, escalar e recuperar aplicações conteinerizadas de forma declarativa. Estudos indicam inclusive que casos de uso de borda na manufatura vêm adotando amplamente o Kubernetes – uma pesquisa da CNCF mostrou que grande parte dos projetos de edge computing industrial utiliza variantes do Kubernetes \cite{CNCF2023}.
+
+
+Frente a esse panorama, o presente trabalho propõe avaliar o uso da Cluster API – uma extensão do Kubernetes voltada ao gerenciamento declarativo de clusters – como ferramenta de orquestração de aplicações de controle distribuído modeladas segundo o padrão IEC 61499 e empacotadas em contêineres Docker. Em termos práticos, será desenvolvida uma prova de conceito na qual uma aplicação industrial baseada em blocos funcionais IEC 61499 é distribuída entre diferentes nós computacionais, executando dentro de contêineres e gerenciada de forma unificada por um cluster Kubernetes. A Cluster API será empregada para automatizar a configuração e coordenação desse cluster, permitindo, por exemplo, provisionar e configurar múltiplos nós de forma consistente e coordenada \cite{CNCF_MERCEDES2023}. O foco da pesquisa reside na avaliação de desempenho dessa arquitetura proposta: mediremos métricas como latência de comunicação entre blocos de controle distribuídos, sobrecarga introduzida pela camada de orquestração, tempo de resposta a eventos de escalonamento, entre outras. Espera-se, com isso, verificar a viabilidade e os potenciais gargalos de aplicar tecnologias nativas de nuvem (como Kubernetes e Cluster API) em cenários de automação industrial distribuída sob a ótica do IEC 61499 \cite{CNCF_MERCEDES2023, KUBEEDGE2023}.
+
+
+\section{PROBLEMA}
+\label{sec:problema}
+
+Aplicações industriais distribuídas, especialmente aquelas modeladas segundo o padrão IEC 61499, impõem uma série de desafios para implantação, gerenciamento e escalonamento. Controladores distribuídos exigem coordenação precisa, alta disponibilidade, sincronização entre dispositivos, suporte a reconfiguração dinâmica e operação em borda com restrições de tempo real. No entanto, a orquestração dessas aplicações ainda carece de soluções padronizadas, portáveis e automatizadas, dificultando sua adoção em larga escala.
+
+\section{A PROPOSTA}
+\label{sec:proposta}
+
+Este trabalho propõe utilizar a Cluster API — uma extensão do ecossistema Kubernetes — como mecanismo de orquestração para aplicações industriais distribuídas baseadas no padrão IEC 61499 e empacotadas em contêineres Docker. A proposta será validada por meio do desenvolvimento de uma prova de conceito que distribui uma aplicação IEC 61499 entre diferentes nós, executando em contêineres e gerenciada de forma declarativa via Cluster API.
+
+
+\section{OBJETIVOS}
+\label{sec:objetivos}
+
+\subsection{Objetivo Geral}
+
+Avaliar o uso da Cluster API como ferramenta de orquestração de aplicações industriais de controle distribuído modeladas com IEC 61499.
+
+\subsection{Objetivos Específicos}
+\begin{enumerate}
+    \item Configurar um ambiente experimental com suporte a Cluster API, Kubernetes e contêineres Docker.
+    \item Modelar uma aplicação de controle distribuído com IEC 61499, adaptada para execução conteinerizada.
+    \item Integrar a aplicação ao ambiente orquestrado pela Cluster API.
+    \item Medir métricas de desempenho como latência, tempo de resposta a falhas e sobrecarga da orquestração.
+    \item Analisar a viabilidade e os gargalos da abordagem proposta em cenários industriais reais.
+\end{enumerate}
+
+\section{ORGANIZAÇÃO DO TRABALHO}
+
+Estrutura do trabalho: Este documento está organizado da seguinte forma. No Capítulo 2, são revisados os principais conceitos e fundamentos teóricos que embasam o estudo, incluindo Indústria 4.0, IIoT, controle distribuído com IEC 61499, conteinerização, microsserviços, Kubernetes e Cluster API, além de uma discussão sobre desafios de interoperabilidade, latência e escalabilidade em sistemas de controle distribuído. Em seguida, o Capítulo 3 descreverá a metodologia adotada e o desenvolvimento da prova de conceito, detalhando o ambiente experimental. O Capítulo 4 apresentará os resultados obtidos e uma análise crítica do desempenho observado. Por fim, no Capítulo 5, são expostas as conclusões do trabalho e sugestões de trabalhos futuros relacionados.
+
+% ------------------------------------------------------------------------
+% MODELOS DE FIGURAS E TABELAS A SEREM UTILIZADOS SE NECESSÁRIO
+% ------------------------------------------------------------------------
+
+% Exemplo de figura
+% \begin{figure}[ht!]
+% \centering
+% \caption{Título da Figura \label{fig_exemplo}}
+% \includegraphics[width=105mm]{Imagens/exemplo_figura.png}
+% \fonte{Fonte: <<Citação ou elaboração própria>>}
+% \end{figure}
+
+% Exemplo de tabela
+% \begin{table}[ht!]
+% \centering
+% \caption{Título da Tabela}
+% \begin{tabular}{|c|c|c|}
+% \hline
+% Cabeçalho 1 & Cabeçalho 2 & Cabeçalho 3 \\
+% \hline
+% Dado 1 & Dado 2 & Dado 3 \\
+% \hline
+% \end{tabular}
+% \fonte{Fonte: <<Citação ou elaboração própria>>}
+% \end{table}

@@ -1,0 +1,84 @@
+\chapter{APÊNDICES}
+
+% ----------------------------------------------------------------
+% Apêndice A: Arquitetura experimental
+% ----------------------------------------------------------------
+\chapter{Arquitetura Experimental do Ambiente de Testes}
+\label{apendice:arquitetura}
+
+\begin{figure}[h!]
+\centering
+\caption{Topologia utilizada para testes com Cluster API em ambiente distribuído.}
+\includegraphics[width=120mm]{Imagens/cluster_topologia.png}
+\fonte{Elaboração própria.}
+\end{figure}
+
+\noindent
+<<Descreva brevemente os componentes da arquitetura: local do master node, nós gerenciados, regiões envolvidas, nuvem utilizada (se houver).>>
+
+% ----------------------------------------------------------------
+% Apêndice B: Comandos e scripts utilizados
+% ----------------------------------------------------------------
+\chapter{Comandos e Scripts Utilizados na Implementação}
+\label{apendice:scripts}
+
+\begin{lstlisting}[language=bash, caption={Script de criação de cluster com Cluster API}, label={lst:script-cluster}]
+clusterctl init --infrastructure aws
+...
+kubectl apply -f cluster-definition.yaml
+\end{lstlisting}
+
+\noindent
+<<Inclua aqui os principais comandos usados para provisionar o cluster, unir nós e validar o funcionamento.>>
+
+% ----------------------------------------------------------------
+% Apêndice C: Resultados detalhados de testes
+% ----------------------------------------------------------------
+\chapter{Resultados Detalhados de Testes de Latência e Conectividade}
+\label{apendice:resultados}
+
+\begin{table}[ht!]
+\centering
+\caption{Latência média observada entre o nó de controle e os nós gerenciados.}
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Região do Nó} & \textbf{Latência Média (ms)} & \textbf{Desvio Padrão (ms)} \\
+\hline
+Local (on-premise) & 12 & 1.3 \\
+AWS (us-east-1)    & 47 & 3.8 \\
+AWS (sa-east-1)    & 26 & 2.1 \\
+\hline
+\end{tabular}
+\fonte{Elaboração própria.}
+\end{table}
+
+% ----------------------------------------------------------------
+% Apêndice D: Análise comparativa (se necessário)
+% ----------------------------------------------------------------
+%\chapter{Comparação com Ferramentas Alternativas}
+%\label{apendice:comparativo}
+
+%\begin{table}[ht!]
+%\centering
+%\caption{Comparativo entre Cluster API e outras ferramentas de orquestração.}
+%\begin{tabular}{|c|c|c|c|}
+%\hline
+%\textbf{Ferramenta} & \textbf{Orquestração Multi-Cluster} & \textbf{Nível de Abstração} & \textbf{Suporte Industrial} \\
+%\hline
+%Cluster API & Sim & Alto (Kubernetes-native) & Médio \\
+%Rancher     & Sim & Médio                    & Alto \\
+%KubeFed     & Sim & Baixo                    & Baixo \\
+%\hline
+%\end{tabular}
+%\fonte{Elaboração própria com base na documentação oficial.}
+%\end{table}
+
+% ----------------------------------------------------------------
+% Apêndice E: Glossário (opcional)
+% ----------------------------------------------------------------
+%\chapter{Glossário de Termos Técnicos}
+%\begin{itemize}
+%    \item \textbf{Cluster API} – Ferramenta para orquestração declarativa de clusters Kubernetes.
+%    \item \textbf{Node} – Unidade computacional de um cluster Kubernetes.
+%    \item \textbf{Provisionamento} – Processo de criar e configurar recursos computacionais automaticamente.
+%\end{itemize}

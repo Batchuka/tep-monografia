@@ -1,0 +1,76 @@
+\chapter{RESULTADOS E DISCUSSÕES}
+\label{cha:resultados}
+
+Este capítulo apresenta os resultados obtidos com as duas arquiteturas propostas. A primeira utiliza extração de características e aprendizado de máquina clássico, e a segunda, redes neurais convolucionais com transferência de aprendizado. Todos os experimentos foram realizados em ambiente de nuvem via Kaggle.
+
+\section{Resultados com Aprendizado de Máquina Clássico}
+
+A validação foi feita com \textit{hold-out}, sendo 75\% dos dados para treino e 25\% para teste.
+
+\subsection{SVM}
+
+Três tipos de \textit{kernel} foram testados: linear, polinomial e RBF. A Tabela \ref{TABLE-RESULTADOS1} apresenta os resultados com os descritores HOG e LBP.
+
+\begin{itemize}
+    \item Melhor resultado: SVM RBF com ACC = 30,42\%, FAR = 2,39\% e FRR = 81,58\%.
+    \item HOG e LBP apresentaram resultados praticamente idênticos.
+\end{itemize}
+
+\input{tabelas/tabela_resultados_svm}
+
+\subsection{Floresta Aleatória}
+
+Foram testadas quantidades de árvores de 5 a 120. A melhor acurácia foi com:
+- 115 árvores (HOG): ACC = 29,32\%
+- 105 árvores (LBP): ACC = 29,04\%
+
+\input{tabelas/tabela_resultados_rf}
+
+\begin{itemize}
+    \item O RF apresentou desempenho próximo ao SVM, mas com execução mais rápida.
+    \item O FRR permaneceu alto em ambos os casos.
+\end{itemize}
+
+\section{Resultados com Redes Convolucionais (CNN)}
+
+Foi aplicada a técnica de \textit{transfer learning}, substituindo a última camada das redes por uma camada com 29 neurônios (número de classes). Foram testadas:
+
+\begin{itemize}
+    \item VGG-19: ACC = 36,51\%, FAR = 2,32\%, FRR = 78,85\%
+    \item ResNet-50: ACC = 39,59\%, FAR = 2,29\%, FRR = 77,86\%
+\end{itemize}
+
+\input{tabelas/tabela_resultados_cnn}
+
+\section{Comparação com Trabalhos Correlatos}
+
+\subsection{FAR e FRR}
+
+\input{tabelas/tabela_resultados_far_frr}
+
+\begin{itemize}
+    \item FAR do trabalho proposto (2,29\%) é comparável a diversos trabalhos.
+    \item FRR ainda é alta (77,86\%), indicando limitação em reconhecer usuários legítimos.
+\end{itemize}
+
+\begin{figure}[h!]
+\centering
+\caption{Comparação gráfica das taxas FAR e FRR com a literatura.}
+\includegraphics[width=13cm]{Imagens/FARFRR.png}
+\label{fig:farfrr}
+\fonte{Elaborado pelo autor (2019).}
+\end{figure}
+
+\subsection{Acurácia}
+
+\input{tabelas/tabela_resultados_acc}
+
+\begin{itemize}
+    \item A acurácia ficou abaixo de muitos trabalhos correlatos, mas comparável à EMVIC 2014 (39,63\%).
+    \item As diferenças de estímulo, técnica e quantidade de dados dificultam a comparação direta.
+\end{itemize}
+
+\section{Considerações Finais}
+
+Apesar das limitações da base e da abordagem inicial, os resultados com CNN foram superiores às técnicas clássicas. A proposta mostra-se viável e motivadora para futuras melhorias.
+

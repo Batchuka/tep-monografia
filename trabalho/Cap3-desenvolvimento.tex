@@ -1,0 +1,73 @@
+\chapter{DESENVOLVIMENTO}
+\label{cha:desenvolvimento}
+
+Este capítulo apresenta o desenvolvimento da arquitetura proposta, destacando as decisões técnicas adotadas e os experimentos conduzidos.
+
+\section{Arquitetura Proposta}
+
+São exploradas duas abordagens: (i) uma baseada em extração de características e aprendizado de máquina tradicional, e (ii) outra baseada em aprendizado profundo com redes neurais convolucionais.
+
+\begin{enumerate}
+    \item A primeira utiliza descritores (HOG e LBP) seguidos de classificadores (SVM e RF).
+    \item A segunda aplica CNNs diretamente nas imagens de rastreamento ocular.
+\end{enumerate}
+
+\begin{figure}[h!]
+\centering
+\caption{Fluxo comparativo entre as abordagens de AM tradicional e Aprendizado Profundo.}
+\includegraphics[width=13cm]{Imagens/metodologia_am.png}
+\label{fig:compara}
+\fonte{Adaptado de \citeonline{img_trad_dl}.}
+\end{figure}
+
+\section{Base de Dados}
+
+Foi utilizada a base DOVES, composta por imagens de estímulo e dados de rastreamento ocular de 29 voluntários saudáveis.
+
+\begin{itemize}
+    \item 101 imagens por participante (totalizando 2.929 amostras)
+    \item Cada imagem tem dimensão de 1024x768 pixels, em escala de cinza
+    \item Os movimentos foram coletados com precisão sub-milimétrica a 200Hz
+\end{itemize}
+
+\section{Extração de Características}
+
+\subsection{HOG (Histograma de Gradientes Orientados)}
+
+Utilizado para capturar bordas e texturas nos rastros oculares. Resultado: vetor de 76.320 dimensões.
+
+\subsection{LBP (Padrão Binário Local)}
+
+Captura microtexturas da imagem. Resultado: vetor de 130.626 dimensões.
+
+\section{Modelos de Aprendizado de Máquina}
+
+\subsection{SVM (Máquinas de Vetores de Suporte)}
+
+Classificador binário estendido para multi-classe via abordagem Um-Contra-Um. Foram utilizados diferentes kernels.
+
+\subsection{Random Forest (Floresta Aleatória)}
+
+Classificador do tipo ensemble baseado em múltiplas árvores de decisão. Utilizado pelo seu bom desempenho em conjuntos de alta dimensionalidade.
+
+\subsection{CNN (Redes Neurais Convolucionais)}
+
+Aplicadas via transferência de aprendizado. Duas arquiteturas foram utilizadas:
+
+\begin{itemize}
+    \item VGG-19
+    \item ResNet-50
+\end{itemize}
+
+\section{Métricas de Avaliação}
+
+As métricas utilizadas foram:
+
+\begin{itemize}
+    \item FAR – False Acceptance Rate
+    \item FRR – False Rejection Rate
+    \item ACC – Acurácia média
+\end{itemize}
+
+Os cálculos foram feitos a partir das matrizes de confusão para o cenário multi-classe.
+

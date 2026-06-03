@@ -1,0 +1,196 @@
+{
+  "main": {
+    "id": "95a68da502420c51",
+    "type": "split",
+    "children": [
+      {
+        "id": "24093dea931a479d",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "440e00253a668a04",
+            "type": "leaf",
+            "state": {
+              "type": "canvas",
+              "state": {
+                "file": "docs/mapa_mental.canvas",
+                "viewState": {
+                  "x": 825.7349315462966,
+                  "y": 209.2421371258716,
+                  "zoom": 0.2901444029928743
+                }
+              },
+              "icon": "lucide-layout-dashboard",
+              "title": "mapa_mental"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "26be350e387629c7",
+    "type": "split",
+    "children": [
+      {
+        "id": "4ecd7b9d3c999822",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "a64dc83a706b5cbf",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Explorador de arquivos"
+            }
+          },
+          {
+            "id": "0d6540e5378588d4",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Procurar"
+            }
+          },
+          {
+            "id": "975ce7ff62ccb4b6",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Marcadores"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "7c62a57c540eaffc",
+    "type": "split",
+    "children": [
+      {
+        "id": "c7e74435f0b008ec",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "cc80b4a1dd31e868",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "docs/mapa_mental.canvas",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Links inversos para mapa_mental"
+            }
+          },
+          {
+            "id": "8155230731e96fbd",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "docs/mapa_mental.canvas",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Links de saída para mapa_mental"
+            }
+          },
+          {
+            "id": "0ede1d651bd09440",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Etiquetas"
+            }
+          },
+          {
+            "id": "4011b90a71238134",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "Todas as propriedades"
+            }
+          },
+          {
+            "id": "1520276cadcd523d",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "docs/mapa_mental.canvas",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Sumário de mapa_mental"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Abrir a troca rápida": false,
+      "graph:Abrir visualização em gráfico": false,
+      "canvas:Criar novo canvas": false,
+      "daily-notes:Abrir a nota de hoje": false,
+      "templates:Inserir modelo": false,
+      "command-palette:Abrir paleta de comandos": false,
+      "bases:Criar nova base": false
+    }
+  },
+  "active": "440e00253a668a04",
+  "lastOpenFiles": [
+    "docs/mapa_mental.canvas",
+    "docs/mapa_mental.canvas.tmp.2176.ecdd82e7ea01",
+    "Sem título.canvas",
+    "tese.canvas"
+  ]
+}

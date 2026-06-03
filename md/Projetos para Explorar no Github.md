@@ -1,0 +1,19 @@
+| Repositório                                  | O que é                                                                                                                                                                                                                                               | Por que serve para você                                                                                           |
+| -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| **`epics-containers/example-services`**      | Uma “beamline” simulada de exemplo, feita para treinar EPICS Containers localmente, inclusive com Docker Compose. ([GitHub](https://github.com/epics-containers/example-services?utm_source=chatgpt.com "epics-containers/example-services: An ...")) | Melhor ponto de entrada. Mostra como um sistema de controle científico é organizado em IOCs, serviços e deploy.   |
+| **`epics-base/epics-base`**                  | O núcleo do EPICS. O próprio README mostra como rodar um `softIOC` de exemplo e listar records. ([GitHub](https://github.com/epics-base/epics-base?utm_source=chatgpt.com "The C/C++ core of the EPICS Base control system toolkit"))                 | Para entender a base: IOC, records, PVs e servidor Channel Access. É mais baixo nível.                            |
+| **`ska-telescope/tango-example`**            | Exemplo do Square Kilometre Array mostrando devices simples em **PyTango**. ([GitHub](https://github.com/ska-telescope/tango-example?utm_source=chatgpt.com "ska-telescope/tango-example"))                                                           | Bom para entender a lógica “equipamento como device server”: comandos, atributos, estados.                        |
+| **`bluesky/ophyd`**                          | Biblioteca Python para abstração de hardware, orquestração experimental e aquisição de dados. ([GitHub](https://github.com/bluesky/ophyd?utm_source=chatgpt.com "bluesky/ophyd: hardware abstraction in Python ..."))                                 | Isso já entra no mundo “operação de experimento”: controlar instrumentos sem acoplar tudo ao hardware específico. |
+| **`spacetelescope/jwst`**                    | Pipeline oficial do JWST; processa dados brutos de imageadores e espectrógrafos até produtos científicos calibrados. ([GitHub](https://github.com/spacetelescope/jwst?utm_source=chatgpt.com "James Webb Space Telescope Calibration Pipeline"))      | Melhor para o lado astronomia/software científico, não controle industrial.                                       |
+| **`spacetelescope/jwst-pipeline-notebooks`** | Notebooks Python demonstrando como processar dados pelo pipeline JWST/STScI. ([GitHub](https://github.com/spacetelescope/jwst-pipeline-notebooks?utm_source=chatgpt.com "spacetelescope/jwst-pipeline-notebooks"))                                    | Mais acessível do que entrar direto no código do pipeline. Bom para ver fluxo real de ciência com dados.          |
+
+Coisas que estou tentando entender:
+
+This service designs, develops and maintains Industrial Controls Frameworks, namely:  
+
+- Joint COntrols Project ([JCOP](http://jcop.web.cern.ch/)) framework
+- UNified Industrial Control System ([UNICOS](http://unicos.web.cern.ch/))
+- [UNICOS Continuous Process Controls (CPC)](http://unicos.web.cern.ch/unicos-cpc)
+
+<referências>
+- https://cern.service-now.com/service-portal?id=service_element&name=industrial-control-frameworks

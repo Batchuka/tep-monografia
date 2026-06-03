@@ -1,0 +1,23 @@
+{
+	"nodes":[
+		{"id":"87b9b08c8d4a97c0","x":486,"y":-98,"width":254,"height":218,"type":"text","text":"- Controladores muito rápidos\n- Controladores muito lentos\n- Controladores mal sintonizados podem causar intertravamentos"},
+		{"id":"47a65f132e2d3c1f","x":130,"y":-19,"width":250,"height":60,"type":"text","text":"O sistema Criogênico do LHC tem 5 mil loops PID"},
+		{"id":"270cc170f50b8ceb","x":145,"y":220,"width":220,"height":60,"color":"6","type":"text","text":"Predictability Index (PI)"},
+		{"id":"90a769665b3bcf85","x":486,"y":209,"width":296,"height":82,"type":"text","text":"Usado para quantificar a qualidade da regulagem do loop fechado"},
+		{"id":"abc5d53df15ae3f0","type":"text","text":"$PI_L$ → Índice de Predição;\n","x":-165,"y":420,"width":250,"height":50,"color":"3"},
+		{"id":"f8c6f8ab963554fc","x":-165,"y":470,"width":250,"height":50,"color":"3","type":"text","text":"$t_s$ → Tempo de amostragem;\n"},
+		{"id":"105674e8223a7082","type":"text","text":"$m$ → Ordem de regressão do modelo;","x":-240,"y":570,"width":325,"height":50,"color":"3"},
+		{"id":"32f041f18d9bdb43","type":"text","text":"$n$ → Número de amostras para serem analisadas;","x":-320,"y":620,"width":405,"height":50,"color":"3"},
+		{"id":"1cfd19bc9e09d183","type":"text","text":"$b$ → Horizonte de Predição;","x":-165,"y":520,"width":250,"height":50,"color":"3"}
+	],
+	"edges":[
+		{"id":"93fd23270ef08860","fromNode":"270cc170f50b8ceb","fromSide":"right","toNode":"90a769665b3bcf85","toSide":"left"},
+		{"id":"b515028929769b9d","fromNode":"47a65f132e2d3c1f","fromSide":"right","toNode":"87b9b08c8d4a97c0","toSide":"left"},
+		{"id":"22d99089fe4c3daf","fromNode":"47a65f132e2d3c1f","fromSide":"bottom","toNode":"270cc170f50b8ceb","toSide":"top","label":"por isso usa-se..."},
+		{"id":"0edd053b33e73351","fromNode":"270cc170f50b8ceb","fromSide":"bottom","toNode":"f8c6f8ab963554fc","toSide":"right","color":"3"},
+		{"id":"07c0ba0eebcbc01a","fromNode":"270cc170f50b8ceb","fromSide":"bottom","toNode":"105674e8223a7082","toSide":"right","color":"3"},
+		{"id":"70a917315f634521","fromNode":"270cc170f50b8ceb","fromSide":"bottom","toNode":"1cfd19bc9e09d183","toSide":"right","color":"3"},
+		{"id":"1ca41346b38ee905","fromNode":"270cc170f50b8ceb","fromSide":"bottom","toNode":"32f041f18d9bdb43","toSide":"right","color":"3"},
+		{"id":"d20eb771ca3ca798","fromNode":"270cc170f50b8ceb","fromSide":"bottom","toNode":"abc5d53df15ae3f0","toSide":"right","color":"3"}
+	]
+}

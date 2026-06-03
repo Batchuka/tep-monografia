@@ -4,24 +4,19 @@
     "type": "split",
     "children": [
       {
-        "id": "24093dea931a479d",
+        "id": "95110379e1607c1b",
         "type": "tabs",
         "children": [
           {
-            "id": "440e00253a668a04",
+            "id": "45b856c32eee5616",
             "type": "leaf",
             "state": {
-              "type": "canvas",
+              "type": "pdf",
               "state": {
-                "file": "docs/brain.canvas",
-                "viewState": {
-                  "x": 40.30621724327807,
-                  "y": 344.675328136454,
-                  "zoom": -0.3333333333333333
-                }
+                "file": "main.pdf"
               },
-              "icon": "lucide-layout-dashboard",
-              "title": "brain"
+              "icon": "lucide-file-text",
+              "title": "main"
             }
           }
         ]
@@ -81,7 +76,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 277.5
   },
   "right": {
     "id": "7c62a57c540eaffc",
@@ -97,7 +92,6 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "docs/mapa_mental.canvas",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -107,7 +101,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Links inversos para mapa_mental"
+              "title": "Links inversos"
             }
           },
           {
@@ -172,8 +166,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300,
-    "collapsed": true
+    "width": 300
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -186,12 +179,26 @@
       "bases:Criar nova base": false
     }
   },
-  "active": "440e00253a668a04",
+  "active": "a64dc83a706b5cbf",
   "lastOpenFiles": [
-    "docs/brainstorming_1.canvas",
-    "docs/brain.canvas",
-    "docs/brainstorming_2.canvas",
-    "docs/mapa_mental.canvas.tmp.2176.ecdd82e7ea01",
+    "main.pdf",
+    "md/Teste.md",
+    "Sem título.base",
+    "canvas/WEAPL02.canvas",
+    "articles/WEAPL02 - Automatic PID Performance Monitoring Applied to LHC Cryogenics.pdf",
+    "canvas/cern_industrial_controls_mapa.canvas",
+    "canvas/brainstorming_2.canvas",
+    "canvas/brainstorming_1.canvas",
+    "docs/Projetos para Explorar no Github.md",
+    "main.fls",
+    "main.toc",
+    "main.lot",
+    "main.lof",
+    "main.synctex(busy)",
+    "main.synctex.gz",
+    "trabalho/Cap1-introducao.aux",
+    "trabalho/Cap0-abstract.aux",
+    "md/Projetos para Explorar no Github.md",
     "Sem título.canvas",
     "tese.canvas"
   ]

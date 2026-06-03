@@ -13,15 +13,15 @@
             "state": {
               "type": "canvas",
               "state": {
-                "file": "docs/mapa_mental.canvas",
+                "file": "docs/brain.canvas",
                 "viewState": {
-                  "x": 825.7349315462966,
-                  "y": 209.2421371258716,
-                  "zoom": 0.2901444029928743
+                  "x": 40.30621724327807,
+                  "y": 344.675328136454,
+                  "zoom": -0.3333333333333333
                 }
               },
               "icon": "lucide-layout-dashboard",
-              "title": "mapa_mental"
+              "title": "brain"
             }
           }
         ]
@@ -188,7 +188,9 @@
   },
   "active": "440e00253a668a04",
   "lastOpenFiles": [
-    "docs/mapa_mental.canvas",
+    "docs/brainstorming_1.canvas",
+    "docs/brain.canvas",
+    "docs/brainstorming_2.canvas",
     "docs/mapa_mental.canvas.tmp.2176.ecdd82e7ea01",
     "Sem título.canvas",
     "tese.canvas"

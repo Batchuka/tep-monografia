@@ -1,0 +1,24 @@
+{
+	"nodes":[
+		{"id":"e055e7d6c7c09806","x":-60,"y":-40,"width":200,"height":60,"color":"6","type":"text","text":"# TEP Service"},
+		{"id":"07ad2d99f8129218","x":319,"y":-120,"width":161,"height":64,"color":"3","type":"text","text":"Simulador do Benchmark TEP"},
+		{"id":"a9f43e1017c756e3","type":"text","text":"Implementação **em Rust **do Fortran original de 1997","x":319,"y":-10,"width":241,"height":80,"color":"3"},
+		{"id":"57cb50b40dd65154","x":140,"y":200,"width":250,"height":60,"color":"5","type":"text","text":"É constituído de vários projetos"},
+		{"id":"3fa960ff493734be","x":540,"y":200,"width":250,"height":60,"color":"5","type":"text","text":"tep-plant"},
+		{"id":"77939d558170b46c","type":"text","text":"# TEP Supervisor","x":-40,"y":370,"width":240,"height":60,"color":"6"},
+		{"id":"1958bb442676110e","type":"text","text":"tep-operator","x":540,"y":370,"width":250,"height":60,"color":"5"},
+		{"id":"3c32a10a3e65adb6","type":"text","text":"tep-ihm","x":540,"y":450,"width":250,"height":60,"color":"5"},
+		{"id":"7d77ac113bde5881","type":"text","text":"# TEP IHM","x":-20,"y":620,"width":160,"height":50,"color":"6"}
+	],
+	"edges":[
+		{"id":"ad4a6bd04eecfe75","fromNode":"e055e7d6c7c09806","fromSide":"right","toNode":"07ad2d99f8129218","toSide":"left","color":"3","label":"fato"},
+		{"id":"6338fc059c28f7e8","fromNode":"e055e7d6c7c09806","fromSide":"right","toNode":"a9f43e1017c756e3","toSide":"left","color":"3","label":"fato"},
+		{"id":"aa7f4d4e676e11b7","fromNode":"e055e7d6c7c09806","fromSide":"bottom","toNode":"57cb50b40dd65154","toSide":"left","color":"5","label":"atributo"},
+		{"id":"8eeaf0ba31951e8c","fromNode":"57cb50b40dd65154","fromSide":"right","toNode":"3fa960ff493734be","toSide":"left"},
+		{"id":"ec32763e33f06590","fromNode":"a9f43e1017c756e3","fromSide":"bottom","toNode":"3fa960ff493734be","toSide":"top","color":"5","label":"repo"},
+		{"id":"247a0161c83c6b13","fromNode":"57cb50b40dd65154","fromSide":"right","toNode":"1958bb442676110e","toSide":"left","label":"expandiu para"},
+		{"id":"66ef1c84f424e9bf","fromNode":"57cb50b40dd65154","fromSide":"right","toNode":"3c32a10a3e65adb6","toSide":"left","label":"expandiu para"},
+		{"id":"1cd3a4698a8b65d6","fromNode":"77939d558170b46c","fromSide":"right","toNode":"1958bb442676110e","toSide":"left"},
+		{"id":"d6f57ecdd4d4bbcb","fromNode":"7d77ac113bde5881","fromSide":"right","toNode":"3c32a10a3e65adb6","toSide":"left"}
+	]
+}

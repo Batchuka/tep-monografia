@@ -28,26 +28,23 @@ O modelo inclui 20 distúrbios programados (IDV$_1$ a IDV$_{20}$) que simulam ev
 A relevância do TEP como \textit{benchmark} decorre de sua riqueza dinâmica: o modelo combina não-linearidades, acoplamentos entre malhas de controle, laços de reciclo com elevada constante de tempo e perturbações com mecanismos físicos distintos. Essas características tornam o TEP um ambiente adequado para avaliar arquiteturas de controle supervisório — em especial aquelas que dependem de comunicação distribuída e coordenação entre componentes heterogêneos, como a arquitetura proposta neste trabalho.
 
 % -------------------------------------------------------------------------
-\section{Controle Distribuído e IEC 61499}
-\label{sec:iec61499}
+\section{Controle Proporcional e Avaliação de Qualidade de Malhas}
+\label{sec:controle}
 
-A evolução dos sistemas de automação industrial em direção a arquiteturas mais flexíveis e descentralizadas impulsionou o desenvolvimento do padrão IEC~61499, publicado pela Comissão Eletrotécnica Internacional como resposta às limitações do IEC~61131-3 em ambientes distribuídos \cite{VYATKIN122011}. Enquanto o IEC~61131-3 organiza a execução em dispositivos centralizados e utiliza execução síncrona por varredura (\textit{scan}), o IEC~61499 define um modelo orientado a eventos, distribuível entre múltiplos dispositivos e reonfigurável em tempo de execução \cite{HOLM2005}.
+O controle realimentado é o paradigma central de qualquer sistema de automação industrial. Na sua forma mais simples, um \textbf{controlador proporcional} (P) calcula a variável manipulada $u(t)$ como função linear do erro $e(t) = \text{SP} - \text{PV}(t)$:
 
-O elemento fundamental do IEC~61499 é o \textbf{Bloco Funcional} (\textit{Function Block} — FB). Um FB encapsula dados e algoritmos em um componente com duas interfaces distintas: uma interface de eventos (entradas e saídas de eventos que disparam e notificam execuções) e uma interface de dados (entradas e saídas de dados tipados). A execução de um FB é disparada por eventos — não por varredura temporal — o que permite modelar sistemas reativos e assíncronos de forma natural \cite{VYATKIN122011}.
+\begin{equation}
+  u(t) = K_p \cdot e(t) + u_{\text{bias}}
+  \label{eq:p_controller}
+\end{equation}
 
-O padrão define três tipos de FBs:
+\noindent onde $K_p$ é o ganho proporcional, SP é o setpoint e $u_{\text{bias}}$ é o ponto de operação nominal da variável manipulada. O controlador P apresenta erro estacionário não nulo para perturbações de carga, limitação mitigada pelo controlador PID com adição das ações integral e derivativa. Neste trabalho, três malhas P são implementadas para estabilização da planta TEP: controle de pressão do reator, nível do separador e nível do \textit{stripper}.
 
-\begin{enumerate}
-  \item \textbf{FB Básico} (\textit{Basic FB}): contém uma máquina de estados de execução (\textit{Execution Control Chart} — ECC) e algoritmos em linguagens de IEC~61131-3. É a unidade atômica de computação.
-  \item \textbf{FB Composto} (\textit{Composite FB}): encapsula uma rede de outros FBs, permitindo composição hierárquica.
-  \item \textbf{FB de Interface de Serviço} (\textit{Service Interface FB} — SIFB): abstrai comunicação com hardware ou serviços externos, como protocolos de rede e E/S de campo.
-\end{enumerate}
+A qualidade de uma malha de controle não é binária — um controlador pode estar operando, mas de forma subótima. Malhas com ganho excessivo oscilam; malhas com ganho insuficiente respondem lentamente e permitem que distúrbios se propaguem; malhas com setpoint desatualizado operam em ponto de trabalho inadequado. Em instalações industriais com centenas ou milhares de malhas, identificar automaticamente quais controladores estão mal sintonizados é um problema relevante e de difícil solução manual \cite{CERN_WEAPL02}.
 
-O modelo de aplicação do IEC~61499 descreve redes de FBs interconectados por seus portos de eventos e dados, formando o grafo de controle da aplicação. O modelo de dispositivo define como essa aplicação é particionada em recursos computacionais (\textit{resources}) distribuídos por múltiplos dispositivos físicos. O mapeamento da aplicação aos dispositivos define a distribuição, e a comunicação entre FBs em dispositivos diferentes é tratada pelos SIFBs de comunicação — preservando a transparência de localização do ponto de vista do desenvolvedor \cite{CAMPANELLI201547}.
+Um indicador quantitativo para esse problema é o \textbf{Índice de Preditividade} (\textit{Predictability Index} — PI), proposto para avaliação automática de malhas PID no sistema criogênico do LHC \cite{CERN_WEAPL02}. O PI mede a capacidade do modelo autorregressivo de prever o comportamento futuro da variável de processo: malhas bem reguladas são previsíveis (PI alto), enquanto malhas oscilantes ou instáveis são imprevisíveis (PI baixo). Os parâmetros do índice incluem o horizonte de predição $b$, a ordem de regressão $m$ e o número de amostras $n$ analisadas. Esse índice é calculado em \textit{post-processing} sobre as séries temporais das variáveis medidas — exatamente o tipo de dado que o gêmeo digital deste trabalho é capaz de gerar em escala e com controle total sobre as condições de operação.
 
-A capacidade de reconfiguração dinâmica é um diferencial significativo do IEC~61499: é possível adicionar, remover ou reconfigurar FBs em tempo de execução sem parar a aplicação, o que permite adaptação a mudanças operacionais sem intervenção manual extensa \cite{INDUSTRIALETHERNET61499}. Essa característica alinha-se diretamente com os objetivos de Indústria~4.0 de sistemas de manufatura reconfigurável e autoadaptável.
-
-Do ponto de vista do presente trabalho, o TEP implementado em contêineres Docker pode ser concebido como uma aplicação IEC~61499 distribuída: cada controlador ($P$-\textit{controller}) corresponde a um FB básico; o \texttt{ControllerBank} corresponde a um FB composto que orquestra os FBs individuais; e o CRD \texttt{PLCMachine} no Kubernetes define declarativamente a política de controle — análogo ao modelo de dispositivo do IEC~61499 que descreve como a aplicação deve ser implantada e operada. O Operator Kubernetes assume o papel do runtime de implantação e reconfiguração \cite{VYATKIN122011}.
+A combinação entre gêmeo digital e métricas de qualidade de malha como o PI representa a motivação de longo prazo desta infraestrutura: gerar dados controlados de operação degradada, calcular o índice sobre esses dados, e eventualmente incorporar a lógica de avaliação ao Operator Kubernetes para supervisão autônoma de qualidade.
 
 % -------------------------------------------------------------------------
 \section{Kubernetes e o Padrão de Operators}
@@ -70,7 +67,7 @@ O \textit{loop} de reconciliação de um Operator segue o padrão \textbf{Observ
 
 O framework \textbf{Kubebuilder} é a ferramenta oficial da CNCF para construção de Operators em Go. Ele provê scaffolding de projeto, integração com o \textit{controller-runtime} (biblioteca Go para interação com o API Server), geração de CRDs a partir de structs Go anotadas, e utilitários para testes \cite{KUBEBUILDER2024}. A anotação dos campos do struct com marcadores como \texttt{+kubebuilder:validation} permite validação automática de manifests, e \texttt{+kubebuilder:subresource:status} habilita o subrecurso de \textit{status} separado da \textit{spec}.
 
-Para operações industriais, o padrão de Operator oferece vantagens relevantes: a lógica supervisória é codificada uma vez e executada de forma autônoma; a política de operação é declarativa e auditável em repositórios de versionamento; e o Kubernetes garante alta disponibilidade do próprio operator via restarts automáticos \cite{CNCF_MERCEDES2023}.
+Para operações industriais, o padrão de Operator oferece vantagens relevantes: a lógica supervisória é codificada uma vez e executada de forma autônoma; a política de operação é declarativa e auditável em repositórios de versionamento; e o Kubernetes garante alta disponibilidade do próprio operator via restarts automáticos \cite{CNCF2023}.
 
 % -------------------------------------------------------------------------
 \section{gRPC como Protocolo de Comunicação}
@@ -91,6 +88,73 @@ O gRPC suporta quatro modalidades de comunicação:
 No contexto industrial, o \textit{server streaming} é particularmente adequado para a transmissão contínua de dados de processo: a IHM abre um único fluxo gRPC e recebe atualizações das 41~XMEAS e 12~XMV a cada passo de simulação, sem \textit{polling} periódico. O protocolo HTTP/2 subjacente permite múltiplos fluxos simultâneos em uma única conexão TCP, reduzindo overhead de estabelecimento de conexão \cite{GRPC2024}.
 
 A escolha do gRPC como protocolo de comunicação neste trabalho é motivada por três fatores: (a) suporte nativo a \textit{streaming} de alta frequência com baixa latência; (b) contrato fortemente tipado que detecta incompatibilidades entre componentes em tempo de compilação; e (c) suporte multiplataforma (Rust, Go, Python) sem adaptadores intermediários, permitindo uma arquitetura poliglota coesa.
+
+% -------------------------------------------------------------------------
+\section{OPC UA e a Família de Normas IEC~62541}
+\label{sec:opcua}
+
+\subsection{Contexto e Motivação}
+
+Antes do OPC UA, a comunicação entre sistemas de automação industrial era dominada por protocolos proprietários e incompatíveis: cada fabricante de CLP, SCADA ou sistema de controle de processos expunha seus dados em formatos distintos, forçando integradores a desenvolver adaptadores específicos para cada par de sistemas. O OPC clássico (OPC DA, OPC AE, OPC HDA), lançado em 1996, foi a primeira tentativa de padronização — mas era baseado em COM/DCOM da Microsoft, o que o restringia a Windows e criava barreiras de segurança e escalabilidade.
+
+O \textbf{OPC UA} (\textit{OPC Unified Architecture}), desenvolvido pela OPC Foundation a partir de 2006 e formalizado como família de normas internacionais \textbf{IEC~62541} a partir de 2009, representa uma ruptura com esse modelo: é independente de plataforma e sistema operacional, orientado a serviços, com modelo de segurança nativo baseado em criptografia de chave pública (X.509) e transportável sobre qualquer rede IP \cite{OPCUA2017}. A norma unifica os padrões clássicos — acesso a dados em tempo real (DA), alarmes e eventos (AE) e acesso histórico (HDA) — em uma arquitetura coesa e extensível.
+
+\subsection{Arquitetura}
+
+A arquitetura do OPC UA é centrada no conceito de \textbf{espaço de endereçamento} (\textit{Address Space}): um grafo de nós (\textit{Nodes}) interconectados por referências tipadas (\textit{References}), que representa de forma uniforme todos os dados, metadados, métodos e eventos expostos por um servidor. Cada nó possui uma classe (\textit{NodeClass}) que define seu papel:
+
+\begin{itemize}
+  \item \textbf{Object}: representa entidades do mundo real (e.g., um reator, um sensor).
+  \item \textbf{Variable}: armazena um valor escalar ou estruturado com timestamp, qualidade e tipo de dado.
+  \item \textbf{Method}: define uma operação executável (e.g., ligar uma bomba).
+  \item \textbf{ObjectType / VariableType}: tipos reutilizáveis que definem modelos de informação — análogos a classes em orientação a objetos.
+\end{itemize}
+
+Um cliente OPC UA navega o espaço de endereçamento usando o serviço \texttt{Browse}, lê e escreve valores com \texttt{Read}/\texttt{Write}, e recebe notificações de mudança via \texttt{Subscription}/\texttt{MonitoredItem} — o mecanismo equivalente ao \textit{server streaming} do gRPC, mas padronizado. O servidor publica atualizações periodicamente (\textit{Publishing Interval}) apenas quando o valor monitorado muda além de um limiar configurável (\textit{DeadBand}), reduzindo tráfego de rede desnecessário.
+
+O modelo de segurança opera em três camadas: autenticação do usuário (por certificado, usuário/senha ou anônimo), segurança de canal (\textit{SecureChannel} com criptografia TLS e assinatura de mensagens) e autorização por papel (\textit{Role-Based Access Control} — RBAC). Os modos de segurança são: \texttt{None} (sem segurança), \texttt{Sign} (apenas integridade) e \texttt{Sign\&Encrypt} (integridade e confidencialidade).
+
+\subsection{Família de Normas IEC~62541}
+
+A IEC~62541 é composta por 14 partes publicadas entre 2009 e 2026, cada uma cobrindo um aspecto distinto da especificação. A Tabela~\ref{tab:iec62541} apresenta as partes mais relevantes para este trabalho.
+
+\begin{table}[ht!]
+\centering
+\caption{Partes selecionadas da família IEC~62541 e sua relevância para o projeto TEP}
+\label{tab:iec62541}
+\begin{tabular}{|c|l|p{5.5cm}|p{3cm}|}
+\hline
+\textbf{Parte} & \textbf{Título} & \textbf{Versa sobre} & \textbf{Edições (anos)} \\
+\hline
+3 & Modelo de Espaço de End. & Nós, referências, navegação — base de todo modelo de informação & 2010, 2015, 2020 \\
+\hline
+4 & Serviços & API completa do servidor: Read, Write, Browse, Subscribe, Call & 2010, 2015, 2020 \\
+\hline
+6 & Mapeamentos & Protocolos concretos: UA Binary (TCP), UA XML, UA JSON & 2010, 2015, 2020 \\
+\hline
+8 & Acesso a Dados & Variáveis analógicas e discretas com unidade de engenharia, faixa e qualidade — expor XMEAS/XMV & 2011, 2015, 2020 \\
+\hline
+9 & Alarmes e Condições & Modelo de alarmes: estados, reconhecimento, supressão — mapeável aos ISDs do TEP & 2012, 2015, 2020 \\
+\hline
+11 & Acesso Histórico & Séries temporais: leitura, inserção e agregação de dados históricos — mapeável aos CSVs de experimentos & 2015, 2020 \\
+\hline
+14 & PubSub & Publish-subscribe sobre MQTT/AMQP/UDP — complemento ao cliente-servidor para IIoT & 2020, 2026 \\
+\hline
+\end{tabular}
+\fonte{Elaborado pelo autor com base em \citeonline{OPCUA2017}.}
+\end{table}
+
+A \textbf{Parte 6 (Mapeamentos)} é o ponto de entrada para qualquer implementação: define como serializar as mensagens OPC UA sobre a rede. O mapeamento \textit{UA Binary} usa um formato binário compacto sobre TCP (porta 4840), equivalente ao protobuf do gRPC em termos de eficiência, e é o mais utilizado em campo. O mapeamento \textit{UA JSON} (adicionado na 3ª edição, 2020) permite integração com APIs REST e ambientes de nuvem, tornando o OPC UA compatível com arquiteturas modernas.
+
+A \textbf{Parte 8 (Acesso a Dados)} é a mais relevante para expor variáveis de processo: o tipo \texttt{AnalogItemType} encapsula um valor numérico com sua unidade de engenharia (\texttt{EngineeringUnits}), faixa operacional (\texttt{EURange}) e faixa instrumental (\texttt{InstrumentRange}) — metadados que as XMEAS do TEP possuem intrinsecamente (por exemplo, XMEAS$_7$ é pressão em kPa com faixa operacional definida). A qualidade (\textit{Bad}/\textit{Uncertain}/\textit{Good}) associada a cada leitura permite que clientes OPC UA tomem decisões com base na confiabilidade dos dados — algo inexistente no contrato gRPC atual.
+
+A \textbf{Parte 11 (Acesso Histórico)} define como um servidor OPC UA pode armazenar e disponibilizar séries temporais via serviço \texttt{HistoryRead}. Um cliente pode consultar os valores de uma variável entre dois instantes de tempo sem precisar de uma API separada, usando os mesmos mecanismos de navegação e segurança do servidor. Isso tornaria os CSVs gerados pela IHM diretamente acessíveis como dados históricos padronizados, consultáveis por qualquer ferramenta compatível com OPC UA — incluindo sistemas SCADA, ferramentas de análise de dados e clientes de terceiros.
+
+\subsection{OPC UA no Contexto deste Trabalho}
+
+A comunicação interna entre os componentes do laboratório foi implementada com gRPC por suas vantagens de desempenho e integração nativa com Rust, Go e Python. No entanto, o gRPC é um protocolo interno ao ecossistema do laboratório — não é reconhecido por sistemas de supervisão industriais, CLPs ou ferramentas SCADA de terceiros. O OPC UA, por sua vez, é o protocolo de interoperabilidade industrial adotado por praticamente todos os fabricantes relevantes e normalizado pela IEC~62541.
+
+A integração futura prevista para este laboratório envolve expor a planta TEP como um servidor OPC UA, mapeando as 41~XMEAS como variáveis \texttt{AnalogItemType} (Parte~8) e os distúrbios IDV como métodos invocáveis (Parte~4). Isso permitiria: (a) conectar controladores reais ao gêmeo digital via OPC UA, substituindo o \texttt{ControllerBank} interno por controladores externos de qualquer fabricante; (b) integrar ferramentas de diagnóstico de malhas baseadas em OPC UA para cálculo do Índice de Preditividade; e (c) arquivar os dados de experimentos como séries históricas acessíveis via Parte~11, eliminando a dependência dos CSVs proprietários. Essa arquitetura tornaria o laboratório uma plataforma de integração e teste compatível com o ecossistema industrial real, não apenas um simulador isolado.
 
 % -------------------------------------------------------------------------
 \section{Integração Numérica por Runge-Kutta de 4ª Ordem}

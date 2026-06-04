@@ -1,21 +1,7 @@
 \begin{resumo}[RESUMO]
 \vspace*{-6mm}
 
-<<Apresentar brevemente o conceito principal do trabalho, como o Cluster API, e destaque o interesse recente da indústria em tecnologias de orquestração e controle distribuído.>> 
+Sistemas de controle industrial de grande porte operam com centenas ou milhares de malhas de controle realimentadas, cuja sintonização inadequada pode causar oscilações, desperdício de energia e acionamento de intertravamentos de segurança. O diagnóstico automático da qualidade dessas malhas requer um ambiente de experimentação seguro e reprodutível, no qual distúrbios possam ser introduzidos e estratégias supervisórias testadas sem risco à planta real. Este trabalho propõe e implementa um laboratório de \textbf{gêmeo digital} do Processo Tennessee Eastman (TEP) — \textit{benchmark} clássico da comunidade de controle de processos — integrado a uma camada de supervisão baseada em Kubernetes. A planta química é simulada em Rust com integração numérica Runge-Kutta de 4ª ordem e exposta via servidor gRPC; uma Interface Homem-Máquina (IHM) em FastAPI com WebSocket permite monitoramento em tempo real; e um Operator Kubernetes implementado em Go com Kubebuilder observa continuamente o estado da planta por meio de um Recurso Customizado (\textit{Custom Resource Definition} — CRD) denominado \texttt{PLCMachine}. Dezessete experimentos foram conduzidos, caracterizando o comportamento da planta no estado estacionário e sob os distúrbios IDV(1), IDV(2) e IDV(3). Os resultados demonstram que IDV(1) colapsa a planta por sobrepressão em aproximadamente 2,5 horas simuladas e IDV(2) causa colapso lento por acúmulo de inerte em dezenas de horas — ambos casos relevantes para o desenvolvimento de lógica supervisória. O Operator Kubernetes demonstrou conectividade estável com a planta e operação contínua em modo de observação, validando a arquitetura como infraestrutura para futura incorporação de métricas de qualidade de malha e integração via OPC UA.
 
-<<Explicar os desafios que existem hoje para integrar múltiplos ambientes industriais ou computação de borda, e por que isso exige novas soluções.>> 
-
-Neste contexto, este trabalho propõe uma investigação revisional sobre o uso do Cluster API como mecanismo de controle distribuído em cenários industriais com múltiplos nós de operação, como fábricas remotas ou dispositivos de borda.
-
-<<Descrever a proposta geral do trabalho, indicando que ela envolve tanto um levantamento bibliográfico estruturado quanto uma validação prática em um ambiente experimental.>> 
-
-Para isso, foi construído um ambiente com um nó de controle e múltiplos nós gerenciados em diferentes localizações, permitindo avaliar aspectos como latência, confiabilidade e viabilidade de adoção em ambientes industriais reais. 
-
-<<Resumir as técnicas, ferramentas ou abordagens usadas — ex: tipos de clusters testados, uso de alguma nuvem pública, métricas medidas etc.>> 
-
-Os testes realizados demonstraram <<insira aqui uma síntese dos principais resultados esperados ou obtidos>>. 
-
-Os resultados sugerem que o uso do Cluster API pode representar uma solução promissora para a integração e controle de sistemas industriais distribuídos, especialmente em contextos que exigem escalabilidade, autonomia e baixa latência.
-
-Palavras-chave: Cluster API. Computação de borda. Orquestração de clusters. Indústria 4.0. Integração distribuída.
+\textbf{Palavras-chave}: Gêmeo digital. Processo Tennessee Eastman. Kubernetes. Operator pattern. Supervisão industrial. gRPC. Controle proporcional.
 \end{resumo}

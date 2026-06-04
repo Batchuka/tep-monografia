@@ -123,7 +123,7 @@ Os distúrbios (IDV$_1$ a IDV$_{20}$) são ativados via variável de ambiente \t
 \section{Operator Kubernetes — \texttt{tep-operator}}
 \label{sec:operator}
 
-O repositório \texttt{tep-operator} implementa um Operator Kubernetes em Go, construído com o framework Kubebuilder. Seu objetivo é atuar como supervisor de alto nível da planta TEP, avaliando o estado das variáveis de processo e aplicando ações corretivas de acordo com a política declarada no CRD \texttt{PLCMachine}.
+O repositório \texttt{tep-operator} implementa um Operator Kubernetes em Go, construído com o framework Kubebuilder. Seu objetivo neste trabalho é atuar como \textbf{observador supervisório} da planta TEP: conecta-se à planta via gRPC, lê continuamente o estado das variáveis de processo e registra as observações no \textit{status} do CRD \texttt{PLCMachine}. A arquitetura prevê também a capacidade de intervenção via \texttt{UpdateController} — chamada gRPC que permite ajustar setpoints dos controladores — mas nos experimentos realizados o operator operou em modo de observação pura, sem emissão de comandos à planta. A camada de intervenção ativa é o horizonte natural de evolução deste componente.
 
 \subsection{O CRD \texttt{PLCMachine}}
 
@@ -177,8 +177,7 @@ O controller Go implementa o método \texttt{Reconcile(ctx, req)} chamado pelo \
   \item \textbf{Conexão com a planta}: estabelece ou reutiliza a conexão gRPC com o endereço declarado em \texttt{spec.plantAddress}.
   \item \textbf{Observação}: chama \texttt{GetPlantStatus} para ler as 41~XMEAS e 12~XMV atuais.
   \item \textbf{Avaliação de política}: compara cada variável monitorada com seus limites declarados no CRD.
-  \item \textbf{Ação corretiva}: se alguma variável estiver fora da faixa, calcula a ação de controle e chama \texttt{UpdateController}.
-  \item \textbf{Atualização de status}: grava o estado observado em \texttt{PLCMachine.status}.
+  \item \textbf{Atualização de status}: grava o estado observado — fase, tempo simulado, valores das variáveis monitoradas — em \texttt{PLCMachine.status}.
 \end{enumerate}
 
 O controller é reenfileirado automaticamente após cada ciclo, garantindo observação contínua da planta enquanto a \texttt{PLCMachine} existir no cluster.

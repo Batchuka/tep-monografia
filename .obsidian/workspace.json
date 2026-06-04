@@ -11,10 +11,17 @@
             "id": "601998518bd11fd5",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {},
-              "icon": "lucide-file",
-              "title": "Nova aba"
+              "type": "canvas",
+              "state": {
+                "file": "canvas/brainstorming_1.canvas",
+                "viewState": {
+                  "x": -2301.110150154776,
+                  "y": 1649.6920324300472,
+                  "zoom": 0.5974602761681387
+                }
+              },
+              "icon": "lucide-layout-dashboard",
+              "title": "brainstorming_1"
             }
           }
         ]
@@ -90,6 +97,7 @@
             "state": {
               "type": "backlink",
               "state": {
+                "file": "canvas/brainstorming_1.canvas",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -99,7 +107,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Links inversos"
+              "title": "Links inversos para brainstorming_1"
             }
           },
           {
@@ -108,11 +116,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
+                "file": "canvas/brainstorming_1.canvas",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "Links de saída"
+              "title": "Links de saída para brainstorming_1"
             }
           },
           {
@@ -150,12 +159,13 @@
             "state": {
               "type": "outline",
               "state": {
+                "file": "canvas/brainstorming_1.canvas",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Sumário"
+              "title": "Sumário de brainstorming_1"
             }
           }
         ]
@@ -176,18 +186,23 @@
       "bases:Criar nova base": false
     }
   },
-  "active": "fb9d59d602f72cd7",
+  "active": "601998518bd11fd5",
   "lastOpenFiles": [
-    "main.tex.tmp.2176.3e50dcd95935",
-    "main.tex.tmp.2176.4dd8bbc039a7",
-    "pdfs/art3_Decentralized control of the Tennessee Eastman.pdf",
-    "pdfs/art2_Development of Digital Twins for Continuous Processes.pdf",
-    "pdfs/art1_A plant-wide industrial process control problem.pdf",
-    "pdfs",
-    "main.blg",
-    "main.fls",
-    "main.toc",
-    "main.lot",
-    "main.lof"
+    "main.synctex(busy)",
+    "references.bib.tmp.2176.e29c26afc6a2",
+    "references.bib.tmp.2176.2972c9364758",
+    "standard/IEC 62541.md",
+    "standard/IEC-62541-11-2020.pdf",
+    "standard/IEC-62541-11-2023.pdf",
+    "standard/IEC-62541-6-2020.pdf",
+    "standard/info_iec62541-6{ed3.0.RLV}en.pdf",
+    "standard/Não confirmado 1633.crdownload",
+    "standard/SS IEC 62541-11-2023 Preview.pdf",
+    "standard/IEC-62541-8-2020.pdf",
+    "standard",
+    "canvas/cern_industrial_controls_mapa.canvas",
+    "canvas/WEAPL02.canvas",
+    "canvas/brainstorming_2.canvas",
+    "canvas/brainstorming_1.canvas"
   ]
 }

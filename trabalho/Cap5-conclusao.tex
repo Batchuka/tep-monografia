@@ -37,29 +37,26 @@ Em síntese, o trabalho demonstra que o Kubernetes, com seu modelo declarativo e
 \section{Trabalhos Futuros}
 \label{sec:futuros}
 
-A partir dos resultados e limitações identificadas, destacam-se as seguintes direções para trabalhos futuros:
+A infraestrutura desenvolvida estabelece uma base sobre a qual as seguintes extensões são diretamente aplicáveis:
 
 \begin{enumerate}
 
-  \item \textbf{Lógica supervisória de rejeição de IDV(1) e IDV(2).}
-  O próximo passo natural é implementar no Operator a lógica que detecta a trajetória de pressão crescente e age preventivamente — por exemplo, ajustando o setpoint do feed de A ou reduzindo a vazão de B — antes que o acúmulo se torne irrecuperável. Isso transformaria o Operator de um observador passivo em um supervisor ativo.
+  \item \textbf{Avaliação automática de qualidade de malhas — Índice de Preditividade.}
+  A próxima evolução natural do Operator é incorporar o cálculo do Índice de Preditividade (PI) proposto pelo CERN \cite{CERN_WEAPL02} sobre as séries temporais das XMEAS. O Operator passaria de observador puro para avaliador de desempenho: identificaria automaticamente quais malhas estão oscilando ou com resposta degradada e registraria esse diagnóstico no \textit{status} da \texttt{PLCMachine}. O gêmeo digital, com controle total sobre os distúrbios, é o ambiente ideal para gerar os dados de operação degradada necessários para calibrar e validar o índice.
 
-  \item \textbf{Controladores avançados: PID, MPC e aprendizado por reforço.}
-  A trait \texttt{Controller} está preparada para receber implementações mais sofisticadas. Controladores PID (com ação integral para eliminar o erro estacionário em IDV(2)) e controladores preditivos baseados em modelo (MPC) são candidatos naturais. A gestão dos parâmetros via CRD permite trocar estratégias de controle em tempo de execução sem parar a simulação.
+  \item \textbf{Intervenção ativa via \texttt{UpdateController}.}
+  Com o diagnóstico de qualidade estabelecido, o Operator pode ser estendido para agir: detectar tendência de pressão crescente (IDV(1), IDV(2)) e ajustar setpoints ou ganhos dos controladores antes que o erro acumulado cause intertravamento. A infra\-estrutura gRPC e o método \texttt{UpdateController} já estão implementados — falta a lógica de decisão.
 
-  \item \textbf{Horizontal Pod Autoscaler (HPA) para escalonamento de carga computacional.}
-  A arquitetura atual executa a simulação em um único contêiner. Para cenários com múltiplas instâncias de plantas ou experimentos paralelos, o HPA do Kubernetes poderia escalonar automaticamente o número de réplicas com base em métricas de carga da CPU ou tamanho da fila gRPC.
+  \item \textbf{Integração OPC UA para interoperabilidade.}
+  O OPC UA (\textit{Unified Architecture}), padronizado na IEC~62541, é o protocolo de interoperabilidade industrial amplamente adotado em ambientes heterogêneos. Desenvolver um servidor OPC UA sobre a planta simulada permitiria conectar controladores reais, ferramentas SCADA e sistemas de terceiros ao gêmeo digital sem alteração da camada de simulação — transformando o laboratório em uma plataforma de integração e teste de sistemas industriais reais.
 
-  \item \textbf{Kubernetes na borda (\textit{edge}) com KubeEdge ou k3s.}
-  Para aplicação em cenários industriais reais, o Operator precisaria executar próximo ao hardware de campo. Distribuições leves do Kubernetes como k3s ou frameworks como KubeEdge \cite{KUBEEDGE2023} são adequados para hardware embarcado industrial, permitindo orquestração de contêineres diretamente em PLCs ou gateways de borda.
+  \item \textbf{Exploração dos frameworks do CERN — EPICS e TANGO Controls.}
+  O CERN mantém dois ecossistemas de controle abertos amplamente usados em física experimental: EPICS (\textit{Experimental Physics and Industrial Control System}) e TANGO Controls. Ambos modelam dispositivos com variáveis de processo (PVs), comandos e estados — estrutura diretamente mapeável às XMEAS e XMV do TEP. Integrar o gêmeo digital a um desses frameworks abriria acesso a décadas de ferramentas de diagnóstico, arquivamento e supervisão já consolidadas na comunidade científica.
 
-  \item \textbf{Conformidade formal com IEC~61499.}
-  A correspondência identificada neste trabalho entre o CRD \texttt{PLCMachine} e o modelo de dispositivo do IEC~61499 é conceitual. Um trabalho futuro poderia formalizar essa correspondência, possivelmente gerando manifests Kubernetes a partir de modelos IEC~61499 criados em ferramentas de engenharia como 4DIAC-IDE.
+  \item \textbf{Kubernetes na borda com KubeEdge ou k3s.}
+  Para uso em cenários industriais reais, o Operator deve executar próximo ao hardware de campo. Distribuições leves como k3s ou o framework KubeEdge \cite{KUBEEDGE2023} são adequados para PLCs e gateways industriais, permitindo que a mesma lógica supervisória desenvolvida aqui seja implantada em produção sem reescrita.
 
   \item \textbf{Modelagem completa do trocador de calor do reator.}
-  O Experimento~14 identificou que a dinâmica do sistema de resfriamento do reator não está completamente modelada na implementação atual (IDV(4) ineficaz). Uma modelagem correta do trocador de calor abriria acesso a mais distúrbios do benchmark e permitiria avaliar o supervisor em cenários de degradação térmica.
-
-  \item \textbf{Validação com dados de planta real.}
-  A substituição do simulador Rust por um adaptador que consome dados de um sistema SCADA real validaria a arquitetura em condições industriais autênticas. A interface gRPC garante que essa substituição não requer alterações no Operator ou na IHM.
+  O Experimento~14 identificou que IDV(4) é ineficaz na implementação atual por limitação na modelagem do trocador de calor. Corrigir essa modelagem abriria acesso a distúrbios térmicos do benchmark e enriqueceria os cenários de teste do supervisor.
 
 \end{enumerate}

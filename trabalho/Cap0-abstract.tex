@@ -3,8 +3,8 @@
 \begin{otherlanguage}{english}
 \vspace*{-6mm}
 
-<<aguardando fechar o resumo>>
+Large-scale industrial control systems operate with hundreds or thousands of feedback control loops, whose improper tuning can lead to oscillations, energy waste, and safety interlock trips. Automatically diagnosing loop quality requires a safe and reproducible experimentation environment where disturbances can be deliberately introduced and supervisory strategies tested without risk to the real plant. This work proposes and implements a \textbf{digital twin} laboratory of the Tennessee Eastman Process (TEP) — a classical benchmark in the process control community — integrated with a Kubernetes-based supervisory layer. The chemical plant is simulated in Rust using fourth-order Runge-Kutta numerical integration and exposed via a gRPC server; a FastAPI/WebSocket Human-Machine Interface (HMI) enables real-time monitoring; and a Kubernetes Operator implemented in Go with Kubebuilder continuously observes the plant state through a Custom Resource Definition (CRD) called \texttt{PLCMachine}. Seventeen experiments were conducted, characterizing the plant behavior at steady state and under disturbances IDV(1), IDV(2), and IDV(3). Results show that IDV(1) collapses the plant by overpressure in approximately 2.5 simulated hours, while IDV(2) causes slow collapse by inert accumulation over tens of hours — both relevant scenarios for supervisory logic development. The Kubernetes Operator demonstrated stable connectivity with the plant and continuous operation in observation mode, validating the architecture as a foundation for future incorporation of loop quality metrics and OPC UA integration.
 
-Keywords: <<aguardando fechar o resumo>>
+\textbf{Keywords}: Digital twin. Tennessee Eastman Process. Kubernetes. Operator pattern. Industrial supervision. gRPC. Proportional control.
   \end{otherlanguage}
 \end{resumo}

@@ -1,24 +1,142 @@
 \chapter[REFERENCIAL TEÓRICO]{REFERENCIAL TEÓRICO}
 \label{cha:referencial}
 
-Este capítulo apresenta os principais conceitos e fundamentos teóricos que embasam o desenvolvimento deste trabalho. O objetivo é contextualizar os temas centrais que orientam a proposta do projeto, abordando as tecnologias envolvidas, os paradigmas adotados e os desafios associados à sua implementação.
+Este capítulo apresenta os fundamentos teóricos que embasam o desenvolvimento deste trabalho. São abordados o Processo Tennessee Eastman como benchmark industrial, o padrão IEC~61499 para controle distribuído, o padrão de Operators do Kubernetes como mecanismo de orquestração, o protocolo gRPC como canal de comunicação, a integração numérica por Runge-Kutta de 4ª ordem como método de simulação, e o conceito de gêmeo digital como paradigma que unifica os demais.
 
-\section{Infraestruturas Didáticas na Engenharia de Controle e Automação}
+% -------------------------------------------------------------------------
+\section{Processo Tennessee Eastman (TEP)}
+\label{sec:tep}
 
-Nesta seção são discutidos os principais modelos de infraestrutura utilizados no ensino de sistemas industriais, com ênfase em laboratórios remotos, gêmeos digitais e ambientes simulados. Serão apresentados trabalhos que abordam a construção de ambientes para experimentação, integração entre hardware e software, e o papel dessas infraestruturas no processo de aprendizagem.
+O Processo Tennessee Eastman (\textit{Tennessee Eastman Process} — TEP) é um \textit{benchmark} amplamente utilizado na comunidade de controle de processos para avaliação de estratégias de controle, detecção de falhas e otimização de operações industriais. Proposto originalmente por Downs e Vogel em 1993, o TEP descreve uma planta química realista com dinâmica não-linear complexa, laços de reciclo e múltiplas perturbações programadas, sendo deliberadamente desafiador do ponto de vista de controle \cite{DOWNS1993}.
 
-\section{Provisionamento de Infraestrutura com Terraform}
+A planta consiste em cinco unidades de processo interconectadas: um reator, um condensador, um separador de vapor-líquido (\textit{flash separator}), um compressor e uma coluna de \textit{stripping}. Quatro reagentes (A, B, C, D) são alimentados ao reator, onde ocorrem três reações:
 
-Apresenta-se o conceito de \textit{Infrastructure as Code} (IaC), com foco na ferramenta Terraform, amplamente utilizada para o provisionamento e automação de recursos em nuvem. Discute-se sua sintaxe declarativa, recursos de modularização, controle de estado e integração com provedores como AWS, além de exemplos aplicáveis ao contexto educacional.
+\begin{align}
+  A + C + D &\rightarrow G \quad (\text{produto líquido}) \label{eq:rx1} \\
+  A + C + E &\rightarrow H \quad (\text{produto líquido}) \label{eq:rx2} \\
+  A + E     &\rightarrow F \quad (\text{subproduto gasoso}) \label{eq:rx3}
+\end{align}
 
-\section{Nuvem Pública e Ambientes Segregados na AWS}
+O componente B é inerte e não participa das reações. Os produtos G e H são os produtos desejados; F é um subproduto indesejado. As reações são exotérmicas, e a temperatura do reator é controlada indiretamente pela água de resfriamento (\textit{cooling water} — CW).
 
-Explora-se a arquitetura de ambientes na AWS voltada para aplicações industriais e educacionais. São abordados conceitos como VPC, sub-redes, zonas de disponibilidade, uso de firewalls (SGs e NACLs) e segmentações típicas de ambientes industriais (DMZ, rede de supervisão, rede de controle).
+O modelo matemático é descrito por um sistema de 50 equações diferenciais ordinárias (EDO), representando os holdups de massa e energia de cada vaso de processo. O vetor de estado $\mathbf{y} \in \mathbb{R}^{50}$ inclui os inventários de cada componente nos reatores, separadores e no espaço de vapor, bem como as energias internas de cada subsistema. O modelo completo foi originalmente implementado em FORTRAN e posteriormente portado para diversas linguagens, mantendo a estrutura matemática original.
 
-\section{Digital Twin e Integração com Sistemas Industriais}
+O modelo expõe 41 variáveis medidas (XMEAS$_1$ a XMEAS$_{41}$) e 12 variáveis manipuladas (XMV$_1$ a XMV$_{12}$). As variáveis medidas incluem vazões, composições, temperaturas, pressões e níveis dos principais subsistemas; as variáveis manipuladas correspondem a posições de válvulas e setpoints de controladores de baixo nível. O ponto de operação nominal (Modo 1) é caracterizado por pressão do reator de 2705~kPa, temperatura do reator de 120,4~°C e frações molares de produto (razão G/H) específicas \cite{DOWNS1993}.
 
-Descreve-se o conceito de gêmeo digital, suas aplicações em automação e educação, bem como as tecnologias que permitem sua implementação. São apresentados exemplos de integração com sensores, controladores lógicos programáveis (CLPs), protocolos industriais e ferramentas de visualização SCADA.
+O modelo inclui 20 distúrbios programados (IDV$_1$ a IDV$_{20}$) que simulam eventos operacionais como variações de composição de \textit{feed}, falhas em trocadores de calor e contaminações. Cada distúrbio atua diretamente sobre parâmetros do modelo, permitindo avaliar a robustez de estratégias de controle frente a perturbações realistas. O modelo também define condições de parada por segurança (\textit{Interlock Shutdown Device} — ISD), que encerram a simulação quando variáveis críticas ultrapassam limites operacionais (por exemplo, pressão do reator acima de 3000~kPa ou nível do reator abaixo de 10\%).
 
+A relevância do TEP como \textit{benchmark} decorre de sua riqueza dinâmica: o modelo combina não-linearidades, acoplamentos entre malhas de controle, laços de reciclo com elevada constante de tempo e perturbações com mecanismos físicos distintos. Essas características tornam o TEP um ambiente adequado para avaliar arquiteturas de controle supervisório — em especial aquelas que dependem de comunicação distribuída e coordenação entre componentes heterogêneos, como a arquitetura proposta neste trabalho.
+
+% -------------------------------------------------------------------------
+\section{Controle Distribuído e IEC 61499}
+\label{sec:iec61499}
+
+A evolução dos sistemas de automação industrial em direção a arquiteturas mais flexíveis e descentralizadas impulsionou o desenvolvimento do padrão IEC~61499, publicado pela Comissão Eletrotécnica Internacional como resposta às limitações do IEC~61131-3 em ambientes distribuídos \cite{VYATKIN122011}. Enquanto o IEC~61131-3 organiza a execução em dispositivos centralizados e utiliza execução síncrona por varredura (\textit{scan}), o IEC~61499 define um modelo orientado a eventos, distribuível entre múltiplos dispositivos e reonfigurável em tempo de execução \cite{HOLM2005}.
+
+O elemento fundamental do IEC~61499 é o \textbf{Bloco Funcional} (\textit{Function Block} — FB). Um FB encapsula dados e algoritmos em um componente com duas interfaces distintas: uma interface de eventos (entradas e saídas de eventos que disparam e notificam execuções) e uma interface de dados (entradas e saídas de dados tipados). A execução de um FB é disparada por eventos — não por varredura temporal — o que permite modelar sistemas reativos e assíncronos de forma natural \cite{VYATKIN122011}.
+
+O padrão define três tipos de FBs:
+
+\begin{enumerate}
+  \item \textbf{FB Básico} (\textit{Basic FB}): contém uma máquina de estados de execução (\textit{Execution Control Chart} — ECC) e algoritmos em linguagens de IEC~61131-3. É a unidade atômica de computação.
+  \item \textbf{FB Composto} (\textit{Composite FB}): encapsula uma rede de outros FBs, permitindo composição hierárquica.
+  \item \textbf{FB de Interface de Serviço} (\textit{Service Interface FB} — SIFB): abstrai comunicação com hardware ou serviços externos, como protocolos de rede e E/S de campo.
+\end{enumerate}
+
+O modelo de aplicação do IEC~61499 descreve redes de FBs interconectados por seus portos de eventos e dados, formando o grafo de controle da aplicação. O modelo de dispositivo define como essa aplicação é particionada em recursos computacionais (\textit{resources}) distribuídos por múltiplos dispositivos físicos. O mapeamento da aplicação aos dispositivos define a distribuição, e a comunicação entre FBs em dispositivos diferentes é tratada pelos SIFBs de comunicação — preservando a transparência de localização do ponto de vista do desenvolvedor \cite{CAMPANELLI201547}.
+
+A capacidade de reconfiguração dinâmica é um diferencial significativo do IEC~61499: é possível adicionar, remover ou reconfigurar FBs em tempo de execução sem parar a aplicação, o que permite adaptação a mudanças operacionais sem intervenção manual extensa \cite{INDUSTRIALETHERNET61499}. Essa característica alinha-se diretamente com os objetivos de Indústria~4.0 de sistemas de manufatura reconfigurável e autoadaptável.
+
+Do ponto de vista do presente trabalho, o TEP implementado em contêineres Docker pode ser concebido como uma aplicação IEC~61499 distribuída: cada controlador ($P$-\textit{controller}) corresponde a um FB básico; o \texttt{ControllerBank} corresponde a um FB composto que orquestra os FBs individuais; e o CRD \texttt{PLCMachine} no Kubernetes define declarativamente a política de controle — análogo ao modelo de dispositivo do IEC~61499 que descreve como a aplicação deve ser implantada e operada. O Operator Kubernetes assume o papel do runtime de implantação e reconfiguração \cite{VYATKIN122011}.
+
+% -------------------------------------------------------------------------
+\section{Kubernetes e o Padrão de Operators}
+\label{sec:kubernetes}
+
+O Kubernetes é uma plataforma de orquestração de contêineres de código aberto desenvolvida originalmente pelo Google e atualmente mantida pela \textit{Cloud Native Computing Foundation} (CNCF). Sua arquitetura é centrada no princípio da \textbf{reconciliação declarativa}: o usuário descreve o estado desejado do sistema em manifestos YAML, e o plano de controle do Kubernetes trabalha continuamente para fazer o estado real convergir ao estado desejado \cite{CNCF2023}.
+
+A arquitetura do Kubernetes divide-se em plano de controle (\textit{control plane}) e nós de trabalho (\textit{worker nodes}). O plano de controle inclui o \textit{API Server} (único ponto de entrada para todas as operações), o \textit{etcd} (banco de dados distribuído de chave-valor que armazena o estado do cluster), o \textit{Scheduler} (alocador de cargas de trabalho) e o \textit{Controller Manager} (gerenciador dos controladores nativos). Os nós de trabalho executam os contêineres via \textit{kubelet} e \textit{container runtime}.
+
+O Kubernetes permite estender seu modelo de recursos por meio das \textbf{Definições de Recursos Customizados} (\textit{Custom Resource Definitions} — CRDs). Um CRD declara um novo tipo de recurso no API Server, com seu próprio esquema (\textit{spec} e \textit{status}), tornando-o disponível para criação, listagem e edição com as mesmas ferramentas (kubectl, YAML) usadas para recursos nativos. A separação entre \textit{spec} (intenção declarada pelo usuário) e \textit{status} (estado observado pelo sistema) segue o mesmo princípio dos recursos nativos e é fundamental para o padrão de Operator \cite{KUBEBUILDER2024}.
+
+O \textbf{padrão de Operator} (\textit{Operator Pattern}) é um método de extensão do Kubernetes que codifica o conhecimento operacional de uma aplicação específica em um controlador customizado \cite{CNCF2023}. Um Operator combina um ou mais CRDs com um \textit{controller loop} que observa instâncias desses recursos e age para reconciliar o estado real com o estado desejado — substituindo a intervenção humana pela automação do domínio de conhecimento específico da aplicação.
+
+O \textit{loop} de reconciliação de um Operator segue o padrão \textbf{Observar–Avaliar–Agir}:
+\begin{enumerate}
+  \item \textbf{Observar}: o controller recebe uma notificação de que um recurso customizado foi criado, modificado ou deletado (via \textit{watch} no API Server).
+  \item \textbf{Avaliar}: o controller lê o estado atual da aplicação (possivelmente via chamadas externas, como gRPC) e compara com o estado desejado descrito no \textit{spec} do CRD.
+  \item \textbf{Agir}: se houver divergência, o controller toma ações corretivas — no caso deste trabalho, chamadas gRPC à planta para ajustar parâmetros de controle.
+\end{enumerate}
+
+O framework \textbf{Kubebuilder} é a ferramenta oficial da CNCF para construção de Operators em Go. Ele provê scaffolding de projeto, integração com o \textit{controller-runtime} (biblioteca Go para interação com o API Server), geração de CRDs a partir de structs Go anotadas, e utilitários para testes \cite{KUBEBUILDER2024}. A anotação dos campos do struct com marcadores como \texttt{+kubebuilder:validation} permite validação automática de manifests, e \texttt{+kubebuilder:subresource:status} habilita o subrecurso de \textit{status} separado da \textit{spec}.
+
+Para operações industriais, o padrão de Operator oferece vantagens relevantes: a lógica supervisória é codificada uma vez e executada de forma autônoma; a política de operação é declarativa e auditável em repositórios de versionamento; e o Kubernetes garante alta disponibilidade do próprio operator via restarts automáticos \cite{CNCF_MERCEDES2023}.
+
+% -------------------------------------------------------------------------
+\section{gRPC como Protocolo de Comunicação}
+\label{sec:grpc}
+
+O gRPC é um \textit{framework} de chamada de procedimento remoto (\textit{Remote Procedure Call} — RPC) de alto desempenho desenvolvido pelo Google, baseado no protocolo HTTP/2 e no sistema de serialização \textit{Protocol Buffers} (protobuf) \cite{GRPC2024}. Diferentemente de alternativas baseadas em REST/JSON, o gRPC utiliza serialização binária tipada, o que reduz o tamanho das mensagens e o tempo de serialização — vantagem relevante para aplicações de automação que transmitem dados de sensores em alta frequência.
+
+A definição de um serviço gRPC é feita em um arquivo \texttt{.proto}, que especifica os métodos RPC e os tipos de mensagem de forma agnóstica à linguagem. A partir desse arquivo, o compilador \texttt{protoc} gera \textit{stubs} de cliente e servidor para as linguagens desejadas — no caso deste trabalho, Rust (biblioteca \textit{tonic}) para a planta, Go (biblioteca \textit{google.golang.org/grpc}) para o operator, e Python (biblioteca \textit{grpcio}) para a IHM. A consistência do contrato é garantida pelo arquivo \texttt{.proto} canônico, mantido no repositório \texttt{tep-plant}.
+
+O gRPC suporta quatro modalidades de comunicação:
+\begin{enumerate}
+  \item \textbf{Unário}: uma requisição e uma resposta — usado para comandos pontuais (e.g., \texttt{GetPlantStatus}, \texttt{UpdateController}).
+  \item \textbf{\textit{Server streaming}}: uma requisição e um fluxo contínuo de respostas — usado para streaming de métricas (\texttt{StreamMetrics}).
+  \item \textbf{\textit{Client streaming}}: fluxo de requisições e uma resposta.
+  \item \textbf{Bidirecional}: fluxos simultâneos em ambas as direções.
+\end{enumerate}
+
+No contexto industrial, o \textit{server streaming} é particularmente adequado para a transmissão contínua de dados de processo: a IHM abre um único fluxo gRPC e recebe atualizações das 41~XMEAS e 12~XMV a cada passo de simulação, sem \textit{polling} periódico. O protocolo HTTP/2 subjacente permite múltiplos fluxos simultâneos em uma única conexão TCP, reduzindo overhead de estabelecimento de conexão \cite{GRPC2024}.
+
+A escolha do gRPC como protocolo de comunicação neste trabalho é motivada por três fatores: (a) suporte nativo a \textit{streaming} de alta frequência com baixa latência; (b) contrato fortemente tipado que detecta incompatibilidades entre componentes em tempo de compilação; e (c) suporte multiplataforma (Rust, Go, Python) sem adaptadores intermediários, permitindo uma arquitetura poliglota coesa.
+
+% -------------------------------------------------------------------------
+\section{Integração Numérica por Runge-Kutta de 4ª Ordem}
+\label{sec:rk4}
+
+A simulação dinâmica do TEP requer a integração numérica de um sistema de 50~EDOs da forma:
+
+\begin{equation}
+  \frac{d\mathbf{y}}{dt} = f(\mathbf{y}, \mathbf{u}, t)
+  \label{eq:ode}
+\end{equation}
+
+\noindent onde $\mathbf{y} \in \mathbb{R}^{50}$ é o vetor de estado, $\mathbf{u} \in \mathbb{R}^{12}$ é o vetor de variáveis manipuladas e $f$ é a função de dinâmica da planta — altamente não-linear, com acoplamentos termodinâmicos e de transferência de massa.
+
+O método de \textbf{Runge-Kutta de 4ª ordem} (RK4) é o integrador clássico para EDOs de valores iniciais com dinâmica suave. Para um passo de tempo $h$, a atualização do estado é dada por:
+
+\begin{align}
+  k_1 &= h \cdot f(\mathbf{y}_n, t_n) \nonumber \\
+  k_2 &= h \cdot f\!\left(\mathbf{y}_n + \tfrac{k_1}{2},\; t_n + \tfrac{h}{2}\right) \nonumber \\
+  k_3 &= h \cdot f\!\left(\mathbf{y}_n + \tfrac{k_2}{2},\; t_n + \tfrac{h}{2}\right) \nonumber \\
+  k_4 &= h \cdot f(\mathbf{y}_n + k_3,\; t_n + h) \nonumber \\
+  \mathbf{y}_{n+1} &= \mathbf{y}_n + \tfrac{1}{6}(k_1 + 2k_2 + 2k_3 + k_4)
+  \label{eq:rk4}
+\end{align}
+
+O RK4 possui erro local de truncamento de ordem $\mathcal{O}(h^5)$ e erro global de ordem $\mathcal{O}(h^4)$, o que o torna preciso o suficiente para simulação de processos industriais com passo de tempo adequado. Para o TEP, o modelo original de Downs e Vogel especifica $dt = 0{,}001$~h como passo de integração padrão, valor que garante estabilidade numérica para a dinâmica mais rápida do sistema (tipicamente associada ao espaço de vapor do compressor) \cite{DOWNS1993}.
+
+A norma dos derivativos $\|\mathbf{f}(\mathbf{y}, t)\|_\infty$ — denominada \texttt{deriv\_norm} na implementação deste trabalho — serve como indicador de saúde numérica da simulação: valores excessivamente altos indicam instabilidade iminente ou condições iniciais inconsistentes; valores estabilizados em patamar baixo indicam operação próxima ao estado estacionário. Esse indicador revelou-se útil para detectar o impacto de distúrbios antes que as variáveis medidas apresentassem desvios visíveis.
+
+% -------------------------------------------------------------------------
+\section{Gêmeo Digital Industrial}
+\label{sec:twin}
+
+O conceito de \textbf{gêmeo digital} (\textit{digital twin}) refere-se a uma representação digital de um ativo físico, processo ou sistema que espelha seu comportamento em tempo real e permite simulação, análise e otimização sem intervenção no ativo real \cite{DURAIVELU20221825}. Em contextos industriais, gêmeos digitais são aplicados para monitoramento de saúde de equipamentos, otimização de processos, treinamento de operadores e validação de estratégias de controle antes de sua implantação.
+
+Uma taxonomia comum classifica os gêmeos digitais em três níveis de fidelidade:
+\begin{enumerate}
+  \item \textbf{Modelo digital}: representação estática ou off-line, sem sincronização em tempo real.
+  \item \textbf{\textit{Digital shadow}}: representação que recebe dados do ativo físico mas não envia comandos de volta.
+  \item \textbf{Gêmeo digital completo}: integração bidirecional — recebe dados do físico e pode enviar atuações, formando um \textit{cyber-physical loop}.
+\end{enumerate}
+
+O laboratório desenvolvido neste trabalho implementa um gêmeo digital do tipo \textit{shadow}/completo: a planta simulada em Rust replica a dinâmica do TEP (modelo digital de alta fidelidade), e o Operator Kubernetes atua sobre ela em um laço de controle supervisório — análogo ao que seria feito com um ativo físico real. Embora não haja uma planta física correspondente, a arquitetura é deliberadamente construída para que a substituição da planta simulada por dados reais requeira apenas a troca do endereço gRPC de destino, preservando toda a camada supervisória.
+
+% -------------------------------------------------------------------------
 \section{Considerações Finais}
+\label{sec:ref_conclusao}
 
-A partir da revisão apresentada, é possível compreender os fundamentos que justificam o desenvolvimento de uma infraestrutura didática baseada em nuvem. Os conceitos discutidos servirão de base para a modelagem e implementação da proposta descrita nos capítulos seguintes.
+A revisão apresentada fundamenta as escolhas tecnológicas do trabalho: o TEP provê o modelo de processo com complexidade industrial; o IEC~61499 fornece o referencial conceitual para controle distribuído baseado em eventos; o padrão de Operator do Kubernetes realiza esse controle na prática como um controlador declarativo e autônomo; o gRPC garante comunicação eficiente e fortemente tipada entre os componentes; o RK4 integra as EDOs do modelo com precisão adequada; e o paradigma de gêmeo digital enquadra o sistema como uma arquitetura válida para investigação de orquestração industrial. Os capítulos seguintes descrevem como esses elementos foram combinados na prova de conceito.

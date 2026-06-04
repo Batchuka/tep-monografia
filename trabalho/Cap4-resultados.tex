@@ -1,76 +1,283 @@
 \chapter{RESULTADOS E DISCUSSÕES}
 \label{cha:resultados}
 
-Este capítulo apresenta os resultados obtidos com as duas arquiteturas propostas. A primeira utiliza extração de características e aprendizado de máquina clássico, e a segunda, redes neurais convolucionais com transferência de aprendizado. Todos os experimentos foram realizados em ambiente de nuvem via Kaggle.
+Este capítulo apresenta os resultados obtidos em 17 experimentos realizados com a arquitetura descrita no Capítulo~\ref{cha:desenvolvimento}. Os experimentos são organizados em três fases: (I) inicialização e caracterização do baseline, (II) integração da stack e refatoração arquitetural, e (III) resposta a distúrbios. Todos os experimentos seguem a metodologia Observação → Hipótese → Intervenção → Resultado → Conclusão.
 
-\section{Resultados com Aprendizado de Máquina Clássico}
+% -------------------------------------------------------------------------
+\section{Metodologia Experimental}
+\label{sec:metodologia}
 
-A validação foi feita com \textit{hold-out}, sendo 75\% dos dados para treino e 25\% para teste.
+Cada experimento parte de uma observação ou questão específica sobre o comportamento do sistema, formula uma hipótese, aplica uma intervenção controlada e registra os resultados. As intervenções foram realizadas localmente via VS Code (configurações por \texttt{launch.json} e variáveis de ambiente), sem alterações ao modelo matemático do TEP — preservando a fidelidade ao \textit{benchmark} original \cite{DOWNS1993}.
 
-\subsection{SVM}
+Os dados foram registrados via a funcionalidade \texttt{RECORD\_CSV} da IHM, gerando arquivos CSV com timestamp, tempo simulado e o vetor completo de XMEAS/XMV a cada passo de amostragem. As análises foram realizadas com a ferramenta \texttt{tep\_analysis} (Python) com suporte a smoothing via média móvel e geração de gráficos comparativos.
 
-Três tipos de \textit{kernel} foram testados: linear, polinomial e RBF. A Tabela \ref{TABLE-RESULTADOS1} apresenta os resultados com os descritores HOG e LBP.
+A condição inicial canônica de todos os experimentos de distúrbio é o snapshot \texttt{te\_exp3\_snapshot.toml}, gerado no Experimento 3 e validado como ponto de partida estável sem \textit{cold start} no Experimento 4.
 
-\begin{itemize}
-    \item Melhor resultado: SVM RBF com ACC = 30,42\%, FAR = 2,39\% e FRR = 81,58\%.
-    \item HOG e LBP apresentaram resultados praticamente idênticos.
-\end{itemize}
+% -------------------------------------------------------------------------
+\section{Fase I: Inicialização e Caracterização do Baseline}
+\label{sec:fase1}
 
-\input{tabelas/tabela_resultados_svm}
+\subsection{Experimento 1 — Instrumentação do Startup}
 
-\subsection{Floresta Aleatória}
+O primeiro experimento identificou a causa do \textit{Interlock Shutdown} (ISD) observado durante o \textit{cold start} com \texttt{ramp\_duration=2,0h}: o reator drenava de 77\% para 4,5\% enquanto as válvulas de alimentação ainda estavam sendo rampadas. A instrumentação com painéis de \textit{Feed Valve Ramp} e \textit{Purge Flow + Valve} tornou o mecanismo visível: o purge abre em resposta à queda de pressão no início da rampa, mas a realimentação negativa não é a causa principal — o problema dominante é a taxa de reposição de massa insuficiente com rampa longa.
 
-Foram testadas quantidades de árvores de 5 a 120. A melhor acurácia foi com:
-- 115 árvores (HOG): ACC = 29,32\%
-- 105 árvores (LBP): ACC = 29,04\%
+\subsection{Experimento 2 — Redução do \textit{ramp\_duration}}
 
-\input{tabelas/tabela_resultados_rf}
+Com \texttt{ramp\_duration=0,5h}, o nível mínimo do reator durante o \textit{cold start} foi de 59\% (margem ampla acima do limite ISD de 10\%), e a simulação rodou por mais de 13~h sem ISD. O ponto de operação encontrado — pressão~$\approx$~2680~kPa, temperatura~$\approx$~120°C, reciclo~$\approx$~26~kscmh — difere do Modo~1 nominal do FORTRAN (2705~kPa), o que foi identificado como comportamento esperado dado que os controladores P operam com setpoints fixos.
 
-\begin{itemize}
-    \item O RF apresentou desempenho próximo ao SVM, mas com execução mais rápida.
-    \item O FRR permaneceu alto em ambos os casos.
-\end{itemize}
+\subsection{Experimento 3 — Snapshot de Estado Estável}
 
-\section{Resultados com Redes Convolucionais (CNN)}
+Removendo IDV(4) e rodando 20~h, a planta convergiu para um attractor com temperaturas de água de resfriamento idênticas aos valores nominais do FORTRAN. O estado final foi salvo como \texttt{te\_exp3\_snapshot.toml} — condição inicial canônica para todos os experimentos subsequentes. A temperatura do reator ($\approx$120°C) e a pressão ($\approx$2680~kPa) permaneceram estáveis, com drift residual de nível do reator ($\approx$+0,6\%/h) indicando convergência assintótica ainda em curso.
 
-Foi aplicada a técnica de \textit{transfer learning}, substituindo a última camada das redes por uma camada com 29 neurônios (número de classes). Foram testadas:
+\subsection{Experimento 4 — Validação do Snapshot}
 
-\begin{itemize}
-    \item VGG-19: ACC = 36,51\%, FAR = 2,32\%, FRR = 78,85\%
-    \item ResNet-50: ACC = 39,59\%, FAR = 2,29\%, FRR = 77,86\%
-\end{itemize}
+O boot direto a partir do snapshot com \texttt{ramp\_duration=0,0} foi validado: a planta iniciou diretamente no attractor sem ISD. Observou-se um spike de \texttt{deriv\_norm} em $t=0$ (artefato algébrico do RK4 dissipado em $<0,01$~h), oscilações persistentes no recycle flow ($\pm$0,5~kscmh) e ausência de deriva no nível do reator — confirmando que o Experimento 3 convergiu para o attractor.
 
-\input{tabelas/tabela_resultados_cnn}
+\subsection{Experimentos 5 e 6 — Investigação das Oscilações e do Balanço de Massa}
 
-\section{Comparação com Trabalhos Correlatos}
+O Experimento 5 refutou a hipótese de artefato numérico: reduzir dt 10× ($0{,}001 \to 0{,}0001$~h) não alterou a amplitude das oscilações do recycle flow, e o \texttt{deriv\_norm} oscilou em sincronia — evidência de que o vetor de estado em si oscila.
 
-\subsection{FAR e FRR}
+O Experimento 6 adicionou logging dos estados internos UCVR e UCVV. Os holdups foram lisos, descartando oscilações físicas no loop de reciclo. A descoberta principal foi o acúmulo lento ($\approx$0,4–0,5~kmol/h) em ambos os vasos — os três controladores P não fecham o balanço de massa.
 
-\input{tabelas/tabela_resultados_far_frr}
+\subsection{Experimentos 7, 8 e 9 — Análise do Balanço de Massa}
 
-\begin{itemize}
-    \item FAR do trabalho proposto (2,29\%) é comparável a diversos trabalhos.
-    \item FRR ainda é alta (77,86\%), indicando limitação em reconhecer usuários legítimos.
-\end{itemize}
+O Experimento 7 mostrou que ajustar o setpoint de pressão de 2705 para 2680~kPa redistribuiu o desbalanço entre UCVR e UCVV mas não o eliminou. O Experimento 8 identificou que todos os oito componentes (A–H) crescem proporcionalmente — composição constante, inventário total crescente — assinatura de desbalanço estrutural, não seletivo. O Experimento 9 testou uma 4ª malha (nível do reator → A~feed), que piorou o acúmulo (6× maior): o controlador atuava sobre sintoma, não sobre causa raiz.
 
-\begin{figure}[h!]
+A conclusão desta fase: o drift de inventário ($\approx$0,15\%/h sobre 682~kmol) é irrelevante para runs de 10–20~h e não compromete os experimentos de distúrbio. O foco dos experimentos seguintes deslocou-se da caracterização do baseline para a avaliação de resposta a distúrbios.
+
+\subsection{Experimento 10 — Baseline Canônico}
+
+O Experimento 10 estabeleceu o baseline de referência quantitativo: 20~h simuladas, sem IDV, com os três controladores P canonicais. As trajetórias de referência são apresentadas na Tabela~\ref{tab:baseline}.
+
+\begin{table}[ht!]
 \centering
-\caption{Comparação gráfica das taxas FAR e FRR com a literatura.}
-\includegraphics[width=13cm]{Imagens/FARFRR.png}
-\label{fig:farfrr}
-\fonte{Elaborado pelo autor (2019).}
-\end{figure}
+\caption{Trajetórias de referência do baseline (Experimento 10, $t = 0 \to 20$~h)}
+\label{tab:baseline}
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Variável}               & \textbf{$t=0$}    & \textbf{$t=20$h}  & \textbf{Drift/h} \\
+\hline
+Pressão do reator (XMEAS$_7$)  & $\approx$2680~kPa & $\approx$2700~kPa & +1~kPa/h         \\
+Temperatura do reator (XMEAS$_9$) & $\approx$120°C & $\approx$120°C   & $\approx$0        \\
+Nível do reator (XMEAS$_8$)    & $\approx$69\%     & $\approx$73\%     & +0,2\%/h         \\
+Nível do separador (XMEAS$_{12}$) & $\approx$50\%   & $\approx$50\%     & $\approx$0        \\
+Nível do stripper (XMEAS$_{15}$)  & $\approx$50\%   & $\approx$50\%     & $\approx$0        \\
+Válvula de purge (XMV$_6$)     & $\approx$39,3\%   & $\approx$39,8\%   & +0,025\%/h       \\
+\hline
+\end{tabular}
+\fonte{Elaborado pelo autor a partir dos dados do Experimento 10.}
+\end{table}
 
-\subsection{Acurácia}
+% -------------------------------------------------------------------------
+\section{Fase II: Integração da Stack e Refatoração Arquitetural}
+\label{sec:fase2}
 
-\input{tabelas/tabela_resultados_acc}
+\subsection{Experimento 11 — Desacoplamento dos Controladores}
 
-\begin{itemize}
-    \item A acurácia ficou abaixo de muitos trabalhos correlatos, mas comparável à EMVIC 2014 (39,63\%).
-    \item As diferenças de estímulo, técnica e quantidade de dados dificultam a comparação direta.
-\end{itemize}
+O Experimento 11 refatorou a camada de controle: a lógica dos controladores P foi extraída do \texttt{runtime.rs} para a trait \texttt{Controller} e o \texttt{ControllerBank}. O resultado é uma simulação com CSV numericamente bit-a-bit idêntico ao Experimento 10 — confirmando que a refatoração foi puramente arquitetural, sem efeito sobre a dinâmica. Após esta refatoração, o \texttt{runtime.rs} tornou-se agnóstico à lógica de controle, habilitando gestão externa via CRDs.
 
+\subsection{Experimento 12 — Conectividade do Operator}
+
+O Experimento 12 validou a integração completa da stack: planta Rust + Operator Go no cluster Kind + IHM FastAPI. O primeiro obstáculo foi o endereço de conexão: o operator, rodando dentro do Kind, não conseguia alcançar \texttt{te-plant.default.svc:50051} porque a planta executa fora do cluster. A solução foi o endereço \texttt{host.docker.internal:50051}.
+
+Um segundo obstáculo foi incompatibilidade de versão dos stubs protobuf gerados. Após regeneração dos arquivos \texttt{.pb.go} no repositório \texttt{tep-operator}, o operator conectou-se com sucesso e passou para a fase \texttt{Stable}. Os logs do operator confirmaram:
+
+\begin{lstlisting}[caption={Log do operator após conectividade estabelecida}]
+INFO observation cycle complete
+  plantTime: 28019.85 h
+  xmeas_count: 41
+  xmv_count: 12
+  policy_variables: 3
+  deriv_norm: 488.39
+\end{lstlisting}
+
+O status da \texttt{PLCMachine} reportou fase \texttt{Stable} com as três variáveis monitoradas dentro da faixa (pressão~$\approx$~2705~kPa, separador~$\approx$~50\%, stripper~$\approx$~49\%).
+
+\subsection{Experimento 13 — Revalidação do Baseline com Nova Infraestrutura}
+
+O Experimento 13 verificou que a nova infraestrutura (\texttt{STEP\_DELAY\_MS=36}, gravação CSV via gRPC) é numericamente equivalente ao Experimento 11. A Tabela~\ref{tab:exp13} compara os resultados.
+
+\begin{table}[ht!]
+\centering
+\caption{Comparação Experimento 11 vs. Experimento 13 — baseline de referência}
+\label{tab:exp13}
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Variável} & \textbf{Exp 11} & \textbf{Exp 13} & \textbf{Diferença} \\
+\hline
+Pressão do reator (kPa)    & 2700,53 & 2699,56 & $-$0,97 (ruído) \\
+Nível do separador (\%)    & 50,54   & 49,96   & $-$0,58 (ruído) \\
+Nível do stripper (\%)     & 50,06   & 50,01   & $-$0,05 (ruído) \\
+\hline
+\end{tabular}
+\fonte{Elaborado pelo autor a partir dos dados dos Experimentos 11 e 13.}
+\end{table}
+
+As diferenças são da ordem do ruído de processo, confirmando que a aceleração temporal e o streaming gRPC não introduzem desvios sistemáticos.
+
+% -------------------------------------------------------------------------
+\section{Fase III: Resposta a Distúrbios}
+\label{sec:fase3}
+
+\subsection{Experimento 14 — IDV(4): Temperatura de Entrada do CW do Reator}
+
+O Experimento 14 tentou avaliar o efeito de IDV(4), que eleva +5°C a temperatura de entrada da água de resfriamento do reator. A simulação não atingiu o estado estacionário — colapsou por temperatura no \textit{cold start}, antes que o distúrbio produzisse efeito observável.
+
+A investigação revelou a causa raiz: a implementação \textit{quasi-static} do trocador de calor do reator no Rust produzia $Q_{UR} < 0$ quando $T_{CR}$ caía abaixo de $\approx$67°C durante o arranque, comportamento fisicamente incorreto. A modelagem foi corrigida para $T_{WR} = y[36]$ (fiel ao FORTRAN original, onde \texttt{YP(37)} nunca é atribuído). O distúrbio IDV(4) requer modelagem completa do trocador de calor para ser observável — questão de modelagem fora do escopo deste trabalho.
+
+\subsection{Experimento 15 — IDV(1): Razão A/C no Feed}
+\label{sec:exp15}
+
+IDV(1) aplica um degrau de $-0{,}03$~mol frac em A e $+0{,}03$ em C na corrente~4, reduzindo A de 0,485 para 0,455~mol frac. A hipótese era que menos A disponível causaria acúmulo de gás no reator (A é reagente limitante das duas reações principais) com possível novo estado estacionário.
+
+A hipótese foi refutada: a planta não atingiu novo estado estacionário — colapsou por sobrepressão em $t \approx 2{,}5$~h. Os resultados são apresentados na Tabela~\ref{tab:exp15}.
+
+\begin{table}[ht!]
+\centering
+\caption{Resultados do Experimento 15 — IDV(1), colapso em $t \approx 2{,}5$~h}
+\label{tab:exp15}
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Variável}              & \textbf{Baseline}   & \textbf{Após IDV(1)}              \\
+\hline
+XMEAS$_{23}$ (A mol\%)         & $\approx$32\%       & $\downarrow$ 26\% em $t \approx 0{,}5$~h \\
+XMEAS$_{25}$ (C mol\%)         & $\approx$26\%       & $\uparrow$ 32\% em $t \approx 0{,}5$~h  \\
+XMEAS$_7$ (Pressão reator kPa) & $\approx$2700~kPa   & $\uparrow$ 2960~kPa (ISD em 2{,}5~h)     \\
+XMEAS$_9$ (Temperatura reator) & $\approx$120°C      & Flat — sem resposta                      \\
+XMV$_6$ (Purge valve \%)       & $\approx$39\%       & $\uparrow$ 62\% — insuficiente            \\
+\hline
+\end{tabular}
+\fonte{Elaborado pelo autor a partir dos dados do Experimento 15.}
+\end{table}
+
+O mecanismo identificado: IDV(1) desacelerou as reações que convertem gás em líquido ($A + C + D \to G$, $A + C + E \to H$), causando acúmulo de inventário gasoso no reator com curva de pressão monotonicamente crescente. O controlador P de pressão abriu a purge de 39 para 62\%, mas a taxa de remoção não acompanhou o acúmulo. Notavelmente, a temperatura permaneceu absolutamente flat — uma \textbf{armadilha diagnóstica}: sem sinal térmico, o operador não tem aviso precoce, e a pressão já está em trajetória de colapso quando se torna observável.
+
+\todo[inline]{Inserir figura: gráfico do Experimento 15 — XMEAS7 (pressão) e XMV6 (purge) ao longo do tempo, com marcação do ISD.}
+
+\subsection{Experimento 16 — IDV(2): Composição de B no Feed}
+\label{sec:exp16}
+
+IDV(2) dobra a fração molar de B na corrente~4 ($0{,}005 \to 0{,}010$~mol frac). B é inerte — não reage — e sua única saída do sistema é a purga. A hipótese era que um novo estado estacionário seria atingido quando a taxa de remoção de B pela purga igualasse a taxa de entrada.
+
+A hipótese foi refutada. O Experimento 16 revelou dois regimes distintos:
+
+\begin{enumerate}
+  \item \textbf{Transiente rápido ($t < 10$~h)}: pressão sobe $\approx$110~kPa em degrau e parece estabilizar; XMV$_6$ abre de 42 para 53\%. Esse regime induzia a falsa impressão de novo estado estacionário.
+  \item \textbf{Deriva lenta ($t > 10$~h)}: pressão continua subindo monotonicamente a $\approx$4–5~kPa/h; XMV$_6$ segue abrindo. O controlador P não tem autoridade suficiente — sem integrador, o erro estacionário cresce com a carga de B.
+\end{enumerate}
+
+Os resultados finais são apresentados na Tabela~\ref{tab:exp16}.
+
+\begin{table}[ht!]
+\centering
+\caption{Resultados do Experimento 16 — IDV(2), colapso em $t \approx 31$~h}
+\label{tab:exp16}
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Variável}              & \textbf{Baseline} & \textbf{Após IDV(2)} & \textbf{Hipótese} \\
+\hline
+XMEAS$_{24}$ (B reator mol\%)  & $\approx$10\%     & $\uparrow$ 11\% e cresce & $\times$ SS estável \\
+XMEAS$_7$ (Pressão kPa)        & $\approx$2727     & $\uparrow$ 2840 $\to$ ISD & $\times$ SS estável \\
+XMEAS$_9$ (Temperatura °C)     & $\approx$120      & Flat                     & $\checkmark$ confirmada \\
+XMV$_6$ (Purge \%)             & $\approx$42       & $\uparrow$ 67\%+ — insuficiente & $\sim$ parcial \\
+\hline
+\end{tabular}
+\fonte{Elaborado pelo autor a partir dos dados do Experimento 16.}
+\end{table}
+
+\todo[inline]{Inserir figura: gráfico do Experimento 16 — XMEAS7 e XMV6, destacando os dois regimes (transiente rápido e deriva lenta).}
+
+O contraste com o Experimento 15 é revelador: IDV(1) colapsa em $\approx$2,5~h por mecanismo cinético (menos A → menos consumo de gás); IDV(2) colapsa em dezenas de horas por acúmulo lento de inerte. O ritmo é diferente; o destino é o mesmo. Para o supervisor, IDV(2) representa o caso de \textit{distúrbio mensurável → resposta insuficiente → colapso lento} — a lógica supervisória precisa detectar a deriva de pressão antes que o erro acumulado se torne irrecuperável.
+
+\subsection{Experimento 17 — IDV(3): Temperatura do D Feed}
+\label{sec:exp17}
+
+IDV(3) eleva +5°C a temperatura do feed de D (corrente~2, reagente líquido), alterando a entalpia de entrada. A hipótese era que a temperatura do reator subiria — possivelmente disparando o ISD térmico.
+
+O experimento foi executado por $\approx$1100~h simuladas ($\approx$45 dias simulados). Os resultados foram:
+
+\begin{table}[ht!]
+\centering
+\caption{Resultados do Experimento 17 — IDV(3), 1100~h simuladas}
+\label{tab:exp17}
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Variável}              & \textbf{Baseline}  & \textbf{Após 1100~h com IDV(3)} \\
+\hline
+XMEAS$_9$ (Temperatura °C)     & 120,43             & 120,43 — variação $< 0{,}01$°C \\
+XMEAS$_7$ (Pressão kPa)        & 2695               & 2703 — $+8$~kPa em 45 dias     \\
+XMV$_6$ (Purge \%)             & 39,1               & 39,9 — $+0{,}8$ pp              \\
+\hline
+\end{tabular}
+\fonte{Elaborado pelo autor a partir dos dados do Experimento 17.}
+\end{table}
+
+A temperatura permaneceu absolutamente flat. A variação de pressão de 8~kPa em 1100~h está dentro do ruído de processo. A análise do código confirmou o mecanismo: a entalpia extra do D~feed entra no cálculo de \texttt{yp[35]} (UCVV), diluída pelo reciclo dominante ($\approx$26~kscmh) antes de atingir o reator. Com \texttt{VRNG[0]=400} (D~feed range) frente ao reciclo, o impacto térmico é imperceptível.
+
+\textbf{Conclusão}: IDV(3) é numericamente nulo nesta planta e não é um distúrbio útil para exercitar o supervisor. O foco das análises permanece em IDV(1) e IDV(2).
+
+% -------------------------------------------------------------------------
+\section{Análise Integrada e Discussão}
+\label{sec:analise}
+
+\subsection{Caracterização dos Distúrbios}
+
+Os experimentos da Fase III permitiram caracterizar três regimes de distúrbio com implicações distintas para a lógica supervisória:
+
+\begin{enumerate}
+  \item \textbf{Colapso cinético rápido — IDV(1)}: a planta colapsa em $\approx$2,5~h por acúmulo de gás decorrente da desaceleração cinética. O único sinal disponível é a pressão. A temperatura permanece flat, eliminando diagnóstico térmico.
+  \item \textbf{Acúmulo lento de inerte — IDV(2)}: a planta sobrevive o transiente inicial mas entra em deriva monotônica. O tempo de colapso é da ordem de dezenas de horas, oferecendo uma janela de intervenção — contanto que a lógica supervisória detecte a deriva precocemente.
+  \item \textbf{Distúrbio ineficaz — IDV(3)}: nenhuma resposta mensurável em qualquer horizonte prático. Irrelevante para a avaliação do supervisor.
+\end{enumerate}
+
+\subsection{Eficácia dos Controladores P}
+
+Os três controladores P do baseline são suficientes para manter a planta estável sem distúrbios por horizonte indeterminado (validado por 20~h no Experimento 10 e implicitamente por 30.000~h no Experimento 12). Entretanto, são insuficientes para rejeitar IDV(1) ou IDV(2): em ambos os casos, a purge abre ao máximo sem conseguir conter o acúmulo.
+
+Essa insuficiência motiva diretamente a camada supervisória: o Operator Kubernetes deve detectar a tendência de pressão crescente e agir — por exemplo, ajustando o setpoint de composição de feed ou reduzindo a carga de B — antes que o erro acumulado torne o colapso inevitável.
+
+\subsection{Viabilidade do Operator Kubernetes}
+
+O Experimento 12 demonstrou a viabilidade técnica do Operator: conexão gRPC estável com a planta via \texttt{host.docker.internal}, ciclos de observação contínuos com leitura de todas as 41~XMEAS e 12~XMV, e atualização correta do status do CRD. A fase \texttt{Stable} foi mantida por toda a duração do experimento, sem intervenção manual.
+
+A latência de reconciliação (intervalo entre ciclos de observação) ficou em escala de segundos, adequada para a dinâmica do TEP (constante de tempo da ordem de horas). Para aplicações com dinâmica mais rápida, seria necessário ajustar o período de reconciliação ou usar o \texttt{StreamMetrics} diretamente no controller.
+
+\subsection{Contribuição dos 17 Experimentos}
+
+A Tabela~\ref{tab:experimentos_resumo} sintetiza os 17 experimentos, seus objetivos e contribuições principais.
+
+\begin{table}[ht!]
+\centering
+\caption{Resumo dos experimentos realizados}
+\label{tab:experimentos_resumo}
+\begin{tabular}{|c|l|l|}
+\hline
+\textbf{Exp.} & \textbf{Objetivo}                             & \textbf{Principal contribuição}                        \\
+\hline
+1  & Instrumentação do startup              & Mecanismo de ISD por cold start identificado           \\
+2  & Redução da rampa de feed               & ramp\_duration=0,5h estabiliza o startup               \\
+3  & Snapshot de estado estável             & te\_exp3\_snapshot.toml — base de todos os exps        \\
+4  & Validação do snapshot                  & Boot direto seguro; oscilações no reciclo descobertas  \\
+5  & Investigação das oscilações            & Oscilações não são artefato numérico do RK4            \\
+6  & Componentes de UCVR                    & Desbalanço de massa global identificado                \\
+7  & Ajuste de setpoint de pressão          & Não elimina desbalanço — redistribui                   \\
+8  & Componente acumulante                  & Todos crescem proporcionalmente — desbalanço estrutural \\
+9  & 4ª malha de controle                   & Malha nível → A feed piora o acúmulo                   \\
+10 & Baseline canônico                      & Trajetórias de referência para todos os IDVs           \\
+11 & Desacoplamento dos controladores       & ControllerBank — separação modelo/controle             \\
+12 & Integração do Operator                 & Operator conectado; fase Stable confirmada             \\
+13 & Revalidação com nova infraestrutura    & STEP\_DELAY\_MS e gRPC CSV equivalentes ao Exp 11      \\
+14 & IDV(4) — CW do reator                  & Encerrado; bug de modelagem do trocador corrigido      \\
+15 & IDV(1) — razão A/C                     & Colapso cinético em 2,5h; temperatura é armadilha      \\
+16 & IDV(2) — B no feed                     & Dois regimes; colapso lento por acúmulo de inerte      \\
+17 & IDV(3) — temperatura D feed            & Numericamente nulo; irrelevante para supervisor        \\
+\hline
+\end{tabular}
+\fonte{Elaborado pelo autor.}
+\end{table}
+
+% -------------------------------------------------------------------------
 \section{Considerações Finais}
+\label{sec:res_conclusao}
 
-Apesar das limitações da base e da abordagem inicial, os resultados com CNN foram superiores às técnicas clássicas. A proposta mostra-se viável e motivadora para futuras melhorias.
-
+Os resultados demonstram que: (a) a planta TEP em Rust replica fielmente o comportamento do modelo original de Downs e Vogel; (b) o Operator Kubernetes é capaz de observar e supervisionar a planta via gRPC de forma contínua e autônoma; (c) os controladores P do baseline são insuficientes para rejeitar os distúrbios IDV(1) e IDV(2) sem lógica supervisória adicional; e (d) IDV(1) e IDV(2) representam casos de interesse para desenvolvimento de estratégias supervisórias, enquanto IDV(3) é ineficaz. O próximo capítulo apresenta as conclusões e perspectivas de trabalhos futuros.

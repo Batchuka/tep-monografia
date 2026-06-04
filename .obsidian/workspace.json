@@ -1,22 +1,20 @@
 {
   "main": {
-    "id": "95a68da502420c51",
+    "id": "518daae343471930",
     "type": "split",
     "children": [
       {
-        "id": "95110379e1607c1b",
+        "id": "cee03980fe09e3f1",
         "type": "tabs",
         "children": [
           {
-            "id": "45b856c32eee5616",
+            "id": "601998518bd11fd5",
             "type": "leaf",
             "state": {
-              "type": "pdf",
-              "state": {
-                "file": "main.pdf"
-              },
-              "icon": "lucide-file-text",
-              "title": "main"
+              "type": "empty",
+              "state": {},
+              "icon": "lucide-file",
+              "title": "Nova aba"
             }
           }
         ]
@@ -25,15 +23,15 @@
     "direction": "vertical"
   },
   "left": {
-    "id": "26be350e387629c7",
+    "id": "6023c04d80f8d432",
     "type": "split",
     "children": [
       {
-        "id": "4ecd7b9d3c999822",
+        "id": "ea551e27ae56c1fd",
         "type": "tabs",
         "children": [
           {
-            "id": "a64dc83a706b5cbf",
+            "id": "fb9d59d602f72cd7",
             "type": "leaf",
             "state": {
               "type": "file-explorer",
@@ -46,7 +44,7 @@
             }
           },
           {
-            "id": "0d6540e5378588d4",
+            "id": "a6c8b7e81442b060",
             "type": "leaf",
             "state": {
               "type": "search",
@@ -63,7 +61,7 @@
             }
           },
           {
-            "id": "975ce7ff62ccb4b6",
+            "id": "e46bb954daeca55b",
             "type": "leaf",
             "state": {
               "type": "bookmarks",
@@ -76,18 +74,18 @@
       }
     ],
     "direction": "horizontal",
-    "width": 277.5
+    "width": 300
   },
   "right": {
-    "id": "7c62a57c540eaffc",
+    "id": "2b1e6e84b0c00a82",
     "type": "split",
     "children": [
       {
-        "id": "c7e74435f0b008ec",
+        "id": "cbef43d16f82e3ba",
         "type": "tabs",
         "children": [
           {
-            "id": "cc80b4a1dd31e868",
+            "id": "71383de2d5b76145",
             "type": "leaf",
             "state": {
               "type": "backlink",
@@ -105,21 +103,20 @@
             }
           },
           {
-            "id": "8155230731e96fbd",
+            "id": "144eeb0a9268e712",
             "type": "leaf",
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "docs/mapa_mental.canvas",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "Links de saída para mapa_mental"
+              "title": "Links de saída"
             }
           },
           {
-            "id": "0ede1d651bd09440",
+            "id": "2684b0d9eb1d15a3",
             "type": "leaf",
             "state": {
               "type": "tag",
@@ -134,7 +131,7 @@
             }
           },
           {
-            "id": "4011b90a71238134",
+            "id": "b95bc26cfa58d82c",
             "type": "leaf",
             "state": {
               "type": "all-properties",
@@ -148,25 +145,25 @@
             }
           },
           {
-            "id": "1520276cadcd523d",
+            "id": "004b21d94611d595",
             "type": "leaf",
             "state": {
               "type": "outline",
               "state": {
-                "file": "docs/mapa_mental.canvas",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Sumário de mapa_mental"
+              "title": "Sumário"
             }
           }
         ]
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 300,
+    "collapsed": true
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -179,33 +176,18 @@
       "bases:Criar nova base": false
     }
   },
-  "active": "a64dc83a706b5cbf",
+  "active": "fb9d59d602f72cd7",
   "lastOpenFiles": [
-<<<<<<< HEAD
-    "docs/nota_setup_monografia.md",
-    "docs/mapa_mental.canvas",
-    "docs/mapa_mental.canvas.tmp.2176.ecdd82e7ea01",
-=======
-    "main.pdf",
-    "md/Teste.md",
-    "Sem título.base",
-    "canvas/WEAPL02.canvas",
-    "articles/WEAPL02 - Automatic PID Performance Monitoring Applied to LHC Cryogenics.pdf",
-    "canvas/cern_industrial_controls_mapa.canvas",
-    "canvas/brainstorming_2.canvas",
-    "canvas/brainstorming_1.canvas",
-    "docs/Projetos para Explorar no Github.md",
+    "main.tex.tmp.2176.3e50dcd95935",
+    "main.tex.tmp.2176.4dd8bbc039a7",
+    "pdfs/art3_Decentralized control of the Tennessee Eastman.pdf",
+    "pdfs/art2_Development of Digital Twins for Continuous Processes.pdf",
+    "pdfs/art1_A plant-wide industrial process control problem.pdf",
+    "pdfs",
+    "main.blg",
     "main.fls",
     "main.toc",
     "main.lot",
-    "main.lof",
-    "main.synctex(busy)",
-    "main.synctex.gz",
-    "trabalho/Cap1-introducao.aux",
-    "trabalho/Cap0-abstract.aux",
-    "md/Projetos para Explorar no Github.md",
->>>>>>> ac8dee7aafe53a1646d8edf7dafd84b6d3898488
-    "Sem título.canvas",
-    "tese.canvas"
+    "main.lof"
   ]
 }

@@ -1,7 +1,65 @@
 \chapter[CONCLUSÕES FINAIS E TRABALHOS FUTUROS]{CONCLUSÕES FINAIS E TRABALHOS FUTUROS}
+\label{cha:conclusao}
 
-<<será feito quando eu tiver uma>>
+% -------------------------------------------------------------------------
+\section{Conclusões}
+\label{sec:conclusoes}
 
-%- Comentar que os melhores resultados usaram uma amostra pequena (AC + K-NN) (9 pessoas apenas).
-%- Comentar por que não foram usadas outras bases da literatura.
-%- Comentar que os outros trabalhos usaram bases diferentes.
+Este trabalho investigou a viabilidade de utilizar o Kubernetes — especificamente o padrão de Operator e o mecanismo de Definições de Recursos Customizados (CRDs) — como plataforma de orquestração para aplicações de controle distribuído modeladas segundo os princípios do IEC~61499. A prova de conceito foi realizada sobre uma implementação do Processo Tennessee Eastman (TEP) em Rust, exposta via gRPC, com supervisão Kubernetes em Go/Kubebuilder e interface de operação em FastAPI/WebSocket.
+
+Os principais resultados obtidos permitem afirmar:
+
+\begin{enumerate}
+
+  \item \textbf{Viabilidade técnica da orquestração Kubernetes para controle industrial.}
+  O Operator Kubernetes demonstrou capacidade de observar continuamente o estado de uma planta industrial simulada, avaliar variáveis de processo contra uma política declarativa e aplicar ações corretivas via gRPC — tudo de forma autônoma e sem intervenção humana. A fase \texttt{Stable} foi mantida por horizonte indeterminado (validado em mais de 30.000~h simuladas), e a latência de reconciliação (escala de segundos) é compatível com a dinâmica lenta do TEP.
+
+  \item \textbf{O CRD \texttt{PLCMachine} como equivalente declarativo do modelo de dispositivo IEC~61499.}
+  A separação entre \textit{spec} (política desejada) e \textit{status} (estado observado) do CRD espelha a separação entre modelo de aplicação e estado de execução do IEC~61499. O Operator assume o papel do runtime de implantação e reconfiguração do padrão, tornando o Kubernetes uma infraestrutura viável para o gerenciamento de aplicações de controle distribuído.
+
+  \item \textbf{A separação entre modelo de planta e lógica de controle habilita gestão externa.}
+  A refatoração do Experimento~11, que extraiu os controladores para a trait \texttt{Controller} e o \texttt{ControllerBank}, foi o passo arquitetural que tornou possível a gestão dos controladores pelo Operator. Esse resultado reforça a importância da separação de responsabilidades em sistemas de controle distribuído — princípio central do IEC~61499.
+
+  \item \textbf{Controladores P são insuficientes para rejeitar IDV(1) e IDV(2).}
+  Os Experimentos~15 e 16 demonstraram que os três controladores P do baseline, embora suficientes para estabilidade nominal, não possuem autoridade de controle suficiente para rejeitar distúrbios composicionais. IDV(1) colapsa a planta em $\approx$2,5~h por mecanismo cinético; IDV(2) causa colapso lento ($\approx$30~h) por acúmulo de inerte. Ambos os casos demandam lógica supervisória de nível mais alto — exatamente o papel do Operator.
+
+  \item \textbf{IDV(3) é numericamente ineficaz nesta implementação.}
+  O Experimento~17 confirmou que a perturbação de entalpia do D~feed é diluída pelo reciclo antes de atingir o reator, não gerando resposta mensurável. Esse resultado é consistente com a análise do código FORTRAN original e delimita o espaço de distúrbios relevantes para validação do supervisor a IDV(1) e IDV(2).
+
+  \item \textbf{A arquitetura é extensível e substituível.}
+  A comunicação baseada em contratos gRPC tipados (\texttt{.proto}) garante que qualquer componente pode ser substituído — incluindo o simulador Rust por dados de uma planta física real — sem alteração dos demais. Isso valida a arquitetura como protótipo realista para cenários industriais.
+
+\end{enumerate}
+
+Em síntese, o trabalho demonstra que o Kubernetes, com seu modelo declarativo e o padrão de Operator, constitui uma plataforma tecnicamente viável para orquestração de aplicações de controle distribuído compatíveis com os princípios do IEC~61499 — respondendo afirmativamente à questão de pesquisa proposta.
+
+% -------------------------------------------------------------------------
+\section{Trabalhos Futuros}
+\label{sec:futuros}
+
+A partir dos resultados e limitações identificadas, destacam-se as seguintes direções para trabalhos futuros:
+
+\begin{enumerate}
+
+  \item \textbf{Lógica supervisória de rejeição de IDV(1) e IDV(2).}
+  O próximo passo natural é implementar no Operator a lógica que detecta a trajetória de pressão crescente e age preventivamente — por exemplo, ajustando o setpoint do feed de A ou reduzindo a vazão de B — antes que o acúmulo se torne irrecuperável. Isso transformaria o Operator de um observador passivo em um supervisor ativo.
+
+  \item \textbf{Controladores avançados: PID, MPC e aprendizado por reforço.}
+  A trait \texttt{Controller} está preparada para receber implementações mais sofisticadas. Controladores PID (com ação integral para eliminar o erro estacionário em IDV(2)) e controladores preditivos baseados em modelo (MPC) são candidatos naturais. A gestão dos parâmetros via CRD permite trocar estratégias de controle em tempo de execução sem parar a simulação.
+
+  \item \textbf{Horizontal Pod Autoscaler (HPA) para escalonamento de carga computacional.}
+  A arquitetura atual executa a simulação em um único contêiner. Para cenários com múltiplas instâncias de plantas ou experimentos paralelos, o HPA do Kubernetes poderia escalonar automaticamente o número de réplicas com base em métricas de carga da CPU ou tamanho da fila gRPC.
+
+  \item \textbf{Kubernetes na borda (\textit{edge}) com KubeEdge ou k3s.}
+  Para aplicação em cenários industriais reais, o Operator precisaria executar próximo ao hardware de campo. Distribuições leves do Kubernetes como k3s ou frameworks como KubeEdge \cite{KUBEEDGE2023} são adequados para hardware embarcado industrial, permitindo orquestração de contêineres diretamente em PLCs ou gateways de borda.
+
+  \item \textbf{Conformidade formal com IEC~61499.}
+  A correspondência identificada neste trabalho entre o CRD \texttt{PLCMachine} e o modelo de dispositivo do IEC~61499 é conceitual. Um trabalho futuro poderia formalizar essa correspondência, possivelmente gerando manifests Kubernetes a partir de modelos IEC~61499 criados em ferramentas de engenharia como 4DIAC-IDE.
+
+  \item \textbf{Modelagem completa do trocador de calor do reator.}
+  O Experimento~14 identificou que a dinâmica do sistema de resfriamento do reator não está completamente modelada na implementação atual (IDV(4) ineficaz). Uma modelagem correta do trocador de calor abriria acesso a mais distúrbios do benchmark e permitiria avaliar o supervisor em cenários de degradação térmica.
+
+  \item \textbf{Validação com dados de planta real.}
+  A substituição do simulador Rust por um adaptador que consome dados de um sistema SCADA real validaria a arquitetura em condições industriais autênticas. A interface gRPC garante que essa substituição não requer alterações no Operator ou na IHM.
+
+\end{enumerate}

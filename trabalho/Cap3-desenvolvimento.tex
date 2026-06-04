@@ -1,73 +1,283 @@
 \chapter{DESENVOLVIMENTO}
 \label{cha:desenvolvimento}
 
-Este capítulo apresenta o desenvolvimento da arquitetura proposta, destacando as decisões técnicas adotadas e os experimentos conduzidos.
+Este capítulo descreve a arquitetura proposta e os componentes desenvolvidos para implementar o laboratório de gêmeo digital do Processo Tennessee Eastman com supervisão baseada em Kubernetes. A prova de conceito é composta por quatro repositórios com responsabilidades bem delimitadas: \texttt{tep-plant} (simulador da planta), \texttt{tep-operator} (Operator Kubernetes), \texttt{tep-ihm} (Interface Homem-Máquina) e \texttt{tep-supervisor} (infraestrutura local).
 
-\section{Arquitetura Proposta}
+% -------------------------------------------------------------------------
+\section{Visão Geral da Arquitetura Proposta}
+\label{sec:arch}
 
-São exploradas duas abordagens: (i) uma baseada em extração de características e aprendizado de máquina tradicional, e (ii) outra baseada em aprendizado profundo com redes neurais convolucionais.
+A arquitetura do laboratório segue um modelo em três camadas, inspirado na separação entre campo, supervisão e gerenciamento presente em pirâmides de automação industrial:
 
 \begin{enumerate}
-    \item A primeira utiliza descritores (HOG e LBP) seguidos de classificadores (SVM e RF).
-    \item A segunda aplica CNNs diretamente nas imagens de rastreamento ocular.
+  \item \textbf{Camada de campo}: \texttt{tep-plant} simula a dinâmica da planta química e expõe seus estados via gRPC.
+  \item \textbf{Camada de supervisão}: \texttt{tep-operator} observa o estado da planta e aplica ações corretivas de acordo com uma política declarativa descrita em um CRD Kubernetes.
+  \item \textbf{Camada de monitoramento}: \texttt{tep-ihm} consome o fluxo de dados da planta e os apresenta ao operador humano via dashboard web em tempo real.
 \end{enumerate}
 
-\begin{figure}[h!]
+O fluxo de dados é o seguinte:
+
+\begin{center}
+\texttt{Browser} $\xrightarrow{\text{WebSocket}}$ \texttt{tep-ihm} $\xrightarrow{\text{gRPC StreamMetrics}}$ \texttt{tep-plant} $\xleftarrow{\text{gRPC UpdateController}}$ \texttt{tep-operator}
+\end{center}
+
+A planta avança o tempo simulado via integração RK4 (dt = 0,001~h/passo) e publica continuamente o vetor de medidas. O operator lê essas medidas a cada ciclo de reconciliação, avalia se as variáveis de processo estão dentro das faixas declaradas no CRD \texttt{PLCMachine}, e chama \texttt{UpdateController} quando necessário para ajustar setpoints ou ganhos dos controladores. A IHM consome o mesmo fluxo gRPC e transmite as medidas ao navegador via WebSocket, permitindo visualização em tempo real sem intervenção no laço de controle.
+
+\todo[inline]{Inserir figura: diagrama de arquitetura com os quatro componentes, conexões gRPC/WebSocket e camadas.}
+
+A separação de responsabilidades é deliberada e oferece vantagens arquiteturais: o simulador não conhece o operator nem a IHM; o operator não conhece a IHM; a comunicação é unidirecional exceto pelo canal de controle (UpdateController). Isso permite substituir qualquer componente — por exemplo, trocar o simulador Rust por dados de uma planta física — sem alterar os demais.
+
+% -------------------------------------------------------------------------
+\section{Simulador da Planta — \texttt{tep-plant}}
+\label{sec:plant}
+
+O repositório \texttt{tep-plant} implementa o modelo matemático do TEP em Rust e expõe um servidor gRPC na porta 50051. A escolha de Rust é motivada por sua segurança de memória sem \textit{garbage collector}, desempenho próximo ao de C/C++ e sistema de tipos expressivo — características relevantes para simulação numérica de longa duração.
+
+\subsection{Estrutura Interna}
+
+O repositório é organizado em dois \textit{crates}:
+
+\begin{itemize}
+  \item \textbf{\texttt{te-core}}: biblioteca que implementa o modelo matemático do TEP. Contém o vetor de estado $\mathbf{y} \in \mathbb{R}^{50}$, a função de dinâmica \texttt{tep\_derivatives()} (equivalente à subrotina TEFUNC do FORTRAN original), a lógica de verificação ISD e o integrador RK4.
+  \item \textbf{\texttt{tennessee-eastman-service}}: binário que instancia o modelo, executa o loop de simulação, inicia os controladores via \texttt{ControllerBank} e serve as requisições gRPC utilizando a biblioteca \textit{tonic}.
+\end{itemize}
+
+\subsection{Loop de Simulação}
+
+O loop de simulação é executado em uma \textit{thread} dedicada. A cada iteração:
+
+\begin{enumerate}
+  \item O módulo \texttt{runtime.rs} chama \texttt{plant.step(dt)}, que internamente executa um passo RK4 com $dt = 0{,}001$~h.
+  \item Após a integração, o \texttt{ControllerBank} avalia os controladores ativos via \texttt{bank.step(\&xmeas, \&mut xmv)}, calculando as novas variáveis manipuladas para o próximo passo.
+  \item As medidas atualizadas são publicadas em um canal \textit{broadcast} consumido pelos clientes gRPC conectados.
+  \item O estado completo pode ser serializado em um arquivo TOML (\textit{snapshot}) para reinicialização futura sem \textit{cold start}.
+\end{enumerate}
+
+O tempo simulado avança a 100× a velocidade real (1~h simulada por 36~s de relógio), controlado pela variável de ambiente \texttt{STEP\_DELAY\_MS=36}. Isso permite realizar experimentos de 20~h simuladas em aproximadamente 12~minutos de relógio.
+
+\subsection{Controladores — \texttt{ControllerBank}}
+
+A camada de controle é baseada na trait \texttt{Controller}:
+
+\begin{lstlisting}[language=Rust, caption={Trait Controller e ControllerBank (tep-plant)}]
+pub trait Controller: Send {
+    fn step(&mut self, xmeas: &[f64], xmv: &mut [f64]);
+}
+
+pub struct ControllerBank {
+    controllers: Vec<Box<dyn Controller>>,
+}
+impl ControllerBank {
+    pub fn step(&mut self, xmeas: &[f64], xmv: &mut [f64]) {
+        for ctrl in &mut self.controllers {
+            ctrl.step(xmeas, xmv);
+        }
+    }
+}
+\end{lstlisting}
+
+Essa abstração separa o modelo da planta da lógica de controle, tornando o \texttt{runtime.rs} agnóstico ao tipo e quantidade de controladores. A implementação concreta \texttt{PController} realiza controle proporcional:
+
+\begin{lstlisting}[language=Rust, caption={Controlador Proporcional (tep-plant)}]
+pub struct PController {
+    pub xmeas_idx: usize,
+    pub xmv_idx:   usize,
+    pub kp:        f64,
+    pub setpoint:  f64,
+    pub bias:      f64,
+}
+impl Controller for PController {
+    fn step(&mut self, xmeas: &[f64], xmv: &mut [f64]) {
+        let error = xmeas[self.xmeas_idx] - self.setpoint;
+        xmv[self.xmv_idx] = (self.bias + self.kp * error).clamp(0.0, 100.0);
+    }
+}
+\end{lstlisting}
+
+No ponto de operação nominal, três malhas P são instanciadas em \texttt{main.rs}:
+
+\begin{enumerate}
+  \item \textbf{Pressão do reator} (XMEAS$_7$ → XMV$_6$): $K_p = 0{,}10$, setpoint = 2705~kPa, bias = 40,06\%.
+  \item \textbf{Nível do separador} (XMEAS$_{12}$ → XMV$_7$): $K_p = 1{,}00$, setpoint = 50\%, bias = 38,10\%.
+  \item \textbf{Nível do stripper} (XMEAS$_{15}$ → XMV$_8$): $K_p = 1{,}00$, setpoint = 50\%, bias = 46,50\%.
+\end{enumerate}
+
+\subsection{Servidor gRPC}
+
+O servidor gRPC expõe quatro métodos definidos no arquivo \texttt{tep.proto}:
+
+\begin{itemize}
+  \item \texttt{StreamMetrics}: fluxo contínuo (\textit{server streaming}) de XMEAS$_{1-41}$ e XMV$_{1-12}$.
+  \item \texttt{GetPlantStatus}: snapshot pontual do estado da planta.
+  \item \texttt{ListControllers}: lista os controladores ativos e seus parâmetros.
+  \item \texttt{UpdateController}: atualiza o setpoint ou ganho de um controlador pelo índice.
+\end{itemize}
+
+O método \texttt{UpdateController} é o canal pelo qual o operator Kubernetes age sobre a planta, fechando o laço supervisório.
+
+\subsection{Sistema de Distúrbios}
+
+Os distúrbios (IDV$_1$ a IDV$_{20}$) são ativados via variável de ambiente \texttt{ACTIVE\_IDV} ou dinamicamente via painel da IHM. Cada distúrbio é implementado como um modificador das condições de entrada da planta, fiel ao FORTRAN original de Downs e Vogel \cite{DOWNS1993}. A seleção dos distúrbios relevantes para o supervisor é discutida no Capítulo~\ref{cha:resultados}.
+
+% -------------------------------------------------------------------------
+\section{Operator Kubernetes — \texttt{tep-operator}}
+\label{sec:operator}
+
+O repositório \texttt{tep-operator} implementa um Operator Kubernetes em Go, construído com o framework Kubebuilder. Seu objetivo é atuar como supervisor de alto nível da planta TEP, avaliando o estado das variáveis de processo e aplicando ações corretivas de acordo com a política declarada no CRD \texttt{PLCMachine}.
+
+\subsection{O CRD \texttt{PLCMachine}}
+
+A \texttt{PLCMachine} é o recurso customizado que encapsula a política supervisória. Sua \textit{spec} define:
+
+\begin{itemize}
+  \item \texttt{plantAddress}: endereço gRPC da planta (e.g., \texttt{host.docker.internal:50051}).
+  \item \texttt{variables}: lista de variáveis a monitorar, cada uma com nome, índice XMEAS, e faixas mínima e máxima aceitáveis.
+  \item \texttt{controllers}: lista de controladores a gerenciar, com índice, setpoint nominal e ação corretiva.
+\end{itemize}
+
+Seu \textit{status} armazena:
+
+\begin{itemize}
+  \item \texttt{phase}: estado operacional (\texttt{Pending}, \texttt{Stable}, \texttt{Alarm}).
+  \item \texttt{plantTime}: tempo simulado atual da planta.
+  \item \texttt{lastReconcile}: timestamp do último ciclo de reconciliação.
+  \item Estado observado de cada variável monitorada.
+\end{itemize}
+
+Um exemplo de manifest \texttt{PLCMachine} para o baseline TEP é apresentado no Código~\ref{lst:plcmachine}:
+
+\begin{lstlisting}[language=yaml, caption={Manifest PLCMachine para o baseline TEP}, label={lst:plcmachine}]
+apiVersion: infrastructure.tep.io/v1alpha1
+kind: PLCMachine
+metadata:
+  name: tep-baseline
+spec:
+  plantAddress: "host.docker.internal:50051"
+  variables:
+    - name: reactor_pressure
+      xmeasIndex: 7
+      min: 2600.0
+      max: 2900.0
+    - name: separator_level
+      xmeasIndex: 12
+      min: 30.0
+      max: 70.0
+    - name: stripper_level
+      xmeasIndex: 15
+      min: 30.0
+      max: 70.0
+\end{lstlisting}
+
+\subsection{Loop de Reconciliação}
+
+O controller Go implementa o método \texttt{Reconcile(ctx, req)} chamado pelo \textit{controller-runtime} sempre que uma \texttt{PLCMachine} é criada ou modificada. O loop de reconciliação executa as seguintes etapas:
+
+\begin{enumerate}
+  \item \textbf{Leitura do recurso}: o controller busca a instância \texttt{PLCMachine} no API Server.
+  \item \textbf{Conexão com a planta}: estabelece ou reutiliza a conexão gRPC com o endereço declarado em \texttt{spec.plantAddress}.
+  \item \textbf{Observação}: chama \texttt{GetPlantStatus} para ler as 41~XMEAS e 12~XMV atuais.
+  \item \textbf{Avaliação de política}: compara cada variável monitorada com seus limites declarados no CRD.
+  \item \textbf{Ação corretiva}: se alguma variável estiver fora da faixa, calcula a ação de controle e chama \texttt{UpdateController}.
+  \item \textbf{Atualização de status}: grava o estado observado em \texttt{PLCMachine.status}.
+\end{enumerate}
+
+O controller é reenfileirado automaticamente após cada ciclo, garantindo observação contínua da planta enquanto a \texttt{PLCMachine} existir no cluster.
+
+\subsection{Conectividade com a Planta}
+
+A planta (\texttt{tep-plant}) executa como contêiner Docker no host, enquanto o operator executa dentro do cluster Kind. Devido ao isolamento de rede do Kind, o endereço interno do Docker Compose (\texttt{te-plant:50051}) não é acessível de dentro do cluster. A solução é o endereço especial \texttt{host.docker.internal:50051}, que roteia para a interface do host Docker e alcança a planta, independentemente de onde o Kind está executando. Essa distinção é documentada como regra arquitetural do laboratório e deve ser respeitada em todos os manifests de \texttt{PLCMachine}.
+
+% -------------------------------------------------------------------------
+\section{Interface Homem-Máquina — \texttt{tep-ihm}}
+\label{sec:ihm}
+
+O repositório \texttt{tep-ihm} implementa a IHM do laboratório em Python, usando FastAPI como servidor web e WebSocket para comunicação em tempo real com o navegador.
+
+\subsection{Arquitetura}
+
+A IHM segue uma arquitetura assíncrona baseada em tarefas corrotinas (\textit{asyncio}):
+
+\begin{enumerate}
+  \item Uma tarefa \texttt{grpc\_reader} consome o fluxo \texttt{StreamMetrics} da planta via gRPC e publica cada mensagem em uma fila assíncrona (\texttt{asyncio.Queue}).
+  \item Uma tarefa \texttt{ws\_broadcaster} retira mensagens da fila, serializa para JSON e transmite via WebSocket a todos os clientes conectados.
+  \item O servidor FastAPI serve a interface HTML/JavaScript estática e gerencia as conexões WebSocket.
+\end{enumerate}
+
+Essa separação garante que o consumo gRPC seja independente do número de clientes WebSocket conectados, evitando que atrasos na rede do cliente afetem o laço de coleta de dados.
+
+\subsection{Dashboard}
+
+A interface web do dashboard foi desenvolvida seguindo as diretrizes da norma ISA-101 para interfaces de processo, priorizando clareza informacional sobre estética. O dashboard é composto por:
+
+\begin{itemize}
+  \item \textbf{Painel SVG da planta}: representação esquemática dos cinco subsistemas do TEP com indicação visual dos estados de alarme.
+  \item \textbf{Gráficos de tendência}: séries temporais das principais variáveis (XMEAS$_7$~pressão, XMEAS$_9$~temperatura, XMEAS$_{12}$~nível separador, XMEAS$_{15}$~nível stripper) renderizadas via ECharts.
+  \item \textbf{Painel de controladores}: valores atuais de cada XMV com indicação de setpoint.
+  \item \textbf{Painel de distúrbios}: botões de ativação/desativação dos IDVs, com estado visual.
+  \item \textbf{Painel analítico}: gráficos de composição (XMEAS$_{23-28}$) e inventários de vapor (UCVR, UCVV).
+  \item \textbf{Status do PLCMachine}: exibe o estado atual do CRD via chamada ao API Server do Kubernetes (fase, última reconciliação, variáveis monitoradas).
+\end{itemize}
+
+\todo[inline]{Inserir figura: captura de tela do dashboard da IHM com os painéis principais.}
+
+\subsection{Registro de Dados (CSV)}
+
+A IHM suporta gravação de todos os dados recebidos em arquivo CSV, ativada pela variável de ambiente \texttt{RECORD\_CSV=true}. O arquivo é escrito continuamente durante a sessão e pode ser exportado pelo operador via botão na interface. Os CSVs gerados são a principal fonte de dados para as análises dos experimentos descritos no Capítulo~\ref{cha:resultados}.
+
+Cada linha do CSV contém o timestamp, o tempo simulado da planta, os valores de XMEAS$_{1-41}$ e XMV$_{1-12}$, e indicadores calculados como \texttt{deriv\_norm} e o inventário total de vapor.
+
+% -------------------------------------------------------------------------
+\section{Infraestrutura Local — \texttt{tep-supervisor}}
+\label{sec:supervisor}
+
+O repositório \texttt{tep-supervisor} reúne os arquivos de configuração de infraestrutura necessários para executar o laboratório em ambiente local Windows.
+
+\subsection{Modo de Desenvolvimento — Docker Compose}
+
+Para desenvolvimento e testes rápidos, a planta e a IHM são executadas via Docker Compose. O arquivo \texttt{local/docker-compose.yml} define:
+
+\begin{itemize}
+  \item Serviço \texttt{te-plant}: imagem do simulador, com portas 50051 (gRPC) e variáveis de ambiente de controle (\texttt{STEP\_DELAY\_MS}, \texttt{ACTIVE\_IDV}).
+  \item Serviço \texttt{tep-ihm}: imagem da IHM, com porta 8080 (HTTP/WebSocket), variáveis \texttt{GRPC\_HOST} apontando para \texttt{te-plant:50051}, e volume para persistência dos CSVs.
+\end{itemize}
+
+A rede interna do Docker Compose permite que a IHM alcance a planta pelo nome de serviço \texttt{te-plant}, sem necessidade de configuração adicional.
+
+\subsection{Modo de Produção — Cluster Kind}
+
+Para execução do Operator Kubernetes, um cluster local é provisionado com \textbf{Kind} (\textit{Kubernetes in Docker}). O Kind executa um cluster Kubernetes completo dentro de contêineres Docker, sem necessidade de máquina virtual separada — adequado para desenvolvimento em Windows.
+
+O roteiro de inicialização do laboratório com o Operator ativo é:
+
+\begin{enumerate}
+  \item Iniciar a planta e a IHM via Docker Compose.
+  \item Criar o cluster Kind: \texttt{kind create cluster --name tep}.
+  \item Instalar os CRDs no cluster: \texttt{kubectl apply -f config/crd/}.
+  \item Construir e carregar a imagem do operator no cluster: \texttt{kind load docker-image tep-operator:latest}.
+  \item Implantar o operator: \texttt{kubectl apply -f config/manager/}.
+  \item Aplicar a política supervisória: \texttt{kubectl apply -f config/samples/}.
+\end{enumerate}
+
+A tabela de conectividade entre os componentes em cada modo de execução é resumida na Tabela~\ref{tab:conectividade}.
+
+\begin{table}[ht!]
 \centering
-\caption{Fluxo comparativo entre as abordagens de AM tradicional e Aprendizado Profundo.}
-\includegraphics[width=13cm]{Imagens/metodologia_am.png}
-\label{fig:compara}
-\fonte{Adaptado de \citeonline{img_trad_dl}.}
-\end{figure}
+\caption{Endereços de conexão por modo de execução}
+\label{tab:conectividade}
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Componente}       & \textbf{Docker Compose}      & \textbf{Kind + Operator} \\
+\hline
+IHM → planta              & \texttt{te-plant:50051}      & \texttt{te-plant:50051}  \\
+Operator → planta         & N/A                          & \texttt{host.docker.internal:50051} \\
+Navegador → IHM           & \texttt{localhost:8080}      & \texttt{localhost:8080}  \\
+\hline
+\end{tabular}
+\fonte{Elaborado pelo autor.}
+\end{table}
 
-\section{Base de Dados}
+% -------------------------------------------------------------------------
+\section{Considerações Finais}
+\label{sec:dev_conclusao}
 
-Foi utilizada a base DOVES, composta por imagens de estímulo e dados de rastreamento ocular de 29 voluntários saudáveis.
-
-\begin{itemize}
-    \item 101 imagens por participante (totalizando 2.929 amostras)
-    \item Cada imagem tem dimensão de 1024x768 pixels, em escala de cinza
-    \item Os movimentos foram coletados com precisão sub-milimétrica a 200Hz
-\end{itemize}
-
-\section{Extração de Características}
-
-\subsection{HOG (Histograma de Gradientes Orientados)}
-
-Utilizado para capturar bordas e texturas nos rastros oculares. Resultado: vetor de 76.320 dimensões.
-
-\subsection{LBP (Padrão Binário Local)}
-
-Captura microtexturas da imagem. Resultado: vetor de 130.626 dimensões.
-
-\section{Modelos de Aprendizado de Máquina}
-
-\subsection{SVM (Máquinas de Vetores de Suporte)}
-
-Classificador binário estendido para multi-classe via abordagem Um-Contra-Um. Foram utilizados diferentes kernels.
-
-\subsection{Random Forest (Floresta Aleatória)}
-
-Classificador do tipo ensemble baseado em múltiplas árvores de decisão. Utilizado pelo seu bom desempenho em conjuntos de alta dimensionalidade.
-
-\subsection{CNN (Redes Neurais Convolucionais)}
-
-Aplicadas via transferência de aprendizado. Duas arquiteturas foram utilizadas:
-
-\begin{itemize}
-    \item VGG-19
-    \item ResNet-50
-\end{itemize}
-
-\section{Métricas de Avaliação}
-
-As métricas utilizadas foram:
-
-\begin{itemize}
-    \item FAR – False Acceptance Rate
-    \item FRR – False Rejection Rate
-    \item ACC – Acurácia média
-\end{itemize}
-
-Os cálculos foram feitos a partir das matrizes de confusão para o cenário multi-classe.
-
+A arquitetura proposta realiza a separação clara entre modelo de planta, camada de controle e interface de operação, com comunicação baseada em contratos gRPC versionados. A \texttt{PLCMachine} CRD traduz o conceito de política supervisória do IEC~61499 para o paradigma declarativo do Kubernetes, e o Operator implementa o loop de reconciliação como equivalente ao runtime de implantação do padrão de Operator. O próximo capítulo apresenta os resultados dos experimentos conduzidos com essa arquitetura.

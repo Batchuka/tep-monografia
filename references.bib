@@ -1,4 +1,4 @@
-// PRINCIPAL — TEP
+% PRINCIPAL — TEP
 @article{DOWNS1993,
   author  = {Downs, J. J. and Vogel, E. F.},
   title   = {A plant-wide industrial process control problem},
@@ -7,42 +7,44 @@
   number  = {3},
   pages   = {245--255},
   year    = {1993},
-  doi     = {10.1016/0098-1354(93)80018-I}
+  doi     = {10.1016/0098-1354(93)80018-I},
+  note    = {Disponível em: \url{https://users.abo.fi/khaggblo/RS/Downs.pdf}}
 }
 
-@article{RICKER1996,
-  author  = {Ricker, N. L.},
-  title   = {Decentralized control of the Tennessee Eastman challenge process},
-  journal = {Journal of Process Control},
-  volume  = {6},
-  number  = {4},
-  pages   = {205--221},
-  year    = {1996},
-  doi     = {10.1016/0959-1524(96)00031-5}
-}
-
-// PRINCIPAL — CERN / SUPERVISÃO DE MALHAS
+% PRINCIPAL — CERN / SUPERVISÃO DE MALHAS
 @inproceedings{CERN_WEAPL02,
   author    = {Blanco Viñuela, E. and Fernández Adiego, B. and Gayet, P. and Goddet, M.},
   title     = {Automatic Assessment of PID Controllers Applied to the {LHC} Cryogenic System},
   booktitle = {Proceedings of ICALEPCS 2013},
   year      = {2013},
   pages     = {WEAPL02},
-  note      = {Disponível em: \url{https://accelconf.web.cern.ch/ICALEPCS2013/papers/weapl02.pdf}}
+  note      = {Disponível em: \url{https://cds.cern.ch/record/2305967/files/weapl02.pdf}}
 }
 
-// GÊMEO DIGITAL / INDÚSTRIA 4.0
-@article{DURAIVELU20221825,
-  title   = {Digital transformation in manufacturing industry -- A comprehensive insight},
-  journal = {Materials Today: Proceedings},
-  volume  = {68},
-  pages   = {1825--1829},
-  year    = {2022},
-  doi     = {10.1016/j.matpr.2022.07.409},
-  author  = {K. Duraivelu}
+% PLANTWIDE CONTROL / SUPERVISÃO
+@article{Larsson2000,
+  author  = {Torbjørn Larsson and Sigurd Skogestad},
+  title   = {Plantwide control: {A} review and a new design procedure},
+  journal = {Modeling, Identification and Control},
+  volume  = {21},
+  number  = {4},
+  pages   = {209--240},
+  year    = {2000},
+  doi     = {10.4173/mic.2000.4.2}
 }
 
-// OPC UA / IEC 62541
+@article{Skogestad2004,
+  author  = {Sigurd Skogestad},
+  title   = {Control structure design for complete chemical plants},
+  journal = {Computers \& Chemical Engineering},
+  volume  = {28},
+  number  = {1--2},
+  pages   = {219--234},
+  year    = {2004},
+  doi     = {10.1016/j.compchemeng.2003.08.002}
+}
+
+% OPC UA / IEC 62541
 @book{OPCUA2017,
   author    = {{OPC Foundation}},
   title     = {{OPC} Unified Architecture Specification},
@@ -51,45 +53,30 @@
   note      = {Parts 1--14. Disponível em: \url{https://opcfoundation.org/developer-tools/specifications-unified-architecture}}
 }
 
-// KUBERNETES / CLOUD NATIVE
-@misc{CNCF2023,
-  author       = {{Cloud Native Computing Foundation}},
-  title        = {{CNCF} Annual Report 2023},
-  year         = {2024},
-  howpublished = {\url{https://www.cncf.io/reports/cncf-annual-report-2023/}},
-  note         = {Acesso em: 4 maio 2025}
+% GÊMEO DIGITAL / INDÚSTRIA 4.0
+@incollection{Boschert2016,
+  author    = {Stefan Boschert and Roland Rosen},
+  title     = {Digital Twin---The Simulation Aspect},
+  booktitle = {Mechatronic Futures: Challenges and Solutions for Mechatronic Systems and their Designers},
+  editor    = {Peter Hehenberger and David Bradley},
+  pages     = {59--74},
+  publisher = {Springer International Publishing},
+  address   = {Cham},
+  year      = {2016},
+  doi       = {10.1007/978-3-319-32156-1_5},
+  note      = {Disponível em: \url{https://link.springer.com/book/10.1007/978-3-319-32156-1}}
 }
 
-@misc{KUBEEDGE2023,
-  author       = {{CNCF KubeEdge}},
-  title        = {KubeEdge: Kubernetes Native Edge Computing Framework},
-  year         = {2023},
-  howpublished = {\url{https://kubeedge.io}},
-  note         = {Acesso em: jan. 2025}
-}
-
-@misc{KUBEBUILDER2024,
-  author       = {{The Kubebuilder Authors}},
-  title        = {The Kubebuilder Book},
-  year         = {2024},
-  howpublished = {\url{https://book.kubebuilder.io}},
-  note         = {Acesso em: jan. 2025}
-}
-
-// GRPC / PROTOBUF
-@misc{GRPC2024,
-  author       = {{The gRPC Authors}},
-  title        = {gRPC: A high performance, open source universal {RPC} framework},
-  year         = {2024},
-  howpublished = {\url{https://grpc.io/docs}},
-  note         = {Acesso em: jan. 2025}
-}
-
-// INFRAESTRUTURA
-@misc{KIND2024,
-  author       = {{Kubernetes SIGs}},
-  title        = {kind: Kubernetes {IN} Docker},
-  year         = {2024},
-  howpublished = {\url{https://kind.sigs.k8s.io}},
-  note         = {Acesso em: jan. 2025}
+% KUBERNETES / CLOUD NATIVE
+@article{Burns2016,
+  author  = {Brendan Burns and Brian Grant and David Oppenheimer
+             and Eric Brewer and John Wilkes},
+  title   = {Borg, {Omega}, and {Kubernetes}},
+  journal = {ACM Queue},
+  volume  = {14},
+  number  = {1},
+  pages   = {70--93},
+  year    = {2016},
+  doi     = {10.1145/2898442.2898444},
+  url     = {https://spawn-queue.acm.org/doi/pdf/10.1145/2898442.2898444}
 }

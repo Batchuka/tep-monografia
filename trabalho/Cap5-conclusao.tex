@@ -54,7 +54,7 @@ A infraestrutura desenvolvida estabelece uma base sobre a qual as seguintes exte
   O CERN mantém dois ecossistemas de controle abertos amplamente usados em física experimental: EPICS (\textit{Experimental Physics and Industrial Control System}) e TANGO Controls. Ambos modelam dispositivos com variáveis de processo (PVs), comandos e estados — estrutura diretamente mapeável às XMEAS e XMV do TEP. Integrar o gêmeo digital a um desses frameworks abriria acesso a décadas de ferramentas de diagnóstico, arquivamento e supervisão já consolidadas na comunidade científica.
 
   \item \textbf{Kubernetes na borda com KubeEdge ou k3s.}
-  Para uso em cenários industriais reais, o Operator deve executar próximo ao hardware de campo. Distribuições leves como k3s ou o framework KubeEdge \cite{KUBEEDGE2023} são adequados para PLCs e gateways industriais, permitindo que a mesma lógica supervisória desenvolvida aqui seja implantada em produção sem reescrita.
+  Para uso em cenários industriais reais, o Operator deve executar próximo ao hardware de campo. Distribuições leves como k3s ou o framework KubeEdge são adequados para PLCs e gateways industriais, permitindo que a mesma lógica supervisória desenvolvida aqui seja implantada em produção sem reescrita.
 
   \item \textbf{Modelagem completa do trocador de calor do reator.}
   O Experimento~14 identificou que IDV(4) é ineficaz na implementação atual por limitação na modelagem do trocador de calor. Corrigir essa modelagem abriria acesso a distúrbios térmicos do benchmark e enriqueceria os cenários de teste do supervisor.

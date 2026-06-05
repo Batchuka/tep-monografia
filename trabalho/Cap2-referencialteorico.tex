@@ -50,13 +50,13 @@ A combinação entre gêmeo digital e métricas de qualidade de malha como o PI 
 \section{Kubernetes e o Padrão de Operators}
 \label{sec:kubernetes}
 
-O Kubernetes é uma plataforma de orquestração de contêineres de código aberto desenvolvida originalmente pelo Google e atualmente mantida pela \textit{Cloud Native Computing Foundation} (CNCF). Sua arquitetura é centrada no princípio da \textbf{reconciliação declarativa}: o usuário descreve o estado desejado do sistema em manifestos YAML, e o plano de controle do Kubernetes trabalha continuamente para fazer o estado real convergir ao estado desejado \cite{CNCF2023}.
+O Kubernetes é uma plataforma de orquestração de contêineres de código aberto desenvolvida originalmente pelo Google e atualmente mantida pela \textit{Cloud Native Computing Foundation} (CNCF). Sua arquitetura é centrada no princípio da \textbf{reconciliação declarativa}: o usuário descreve o estado desejado do sistema em manifestos YAML, e o plano de controle do Kubernetes trabalha continuamente para fazer o estado real convergir ao estado desejado \cite{Burns2016}.
 
 A arquitetura do Kubernetes divide-se em plano de controle (\textit{control plane}) e nós de trabalho (\textit{worker nodes}). O plano de controle inclui o \textit{API Server} (único ponto de entrada para todas as operações), o \textit{etcd} (banco de dados distribuído de chave-valor que armazena o estado do cluster), o \textit{Scheduler} (alocador de cargas de trabalho) e o \textit{Controller Manager} (gerenciador dos controladores nativos). Os nós de trabalho executam os contêineres via \textit{kubelet} e \textit{container runtime}.
 
-O Kubernetes permite estender seu modelo de recursos por meio das \textbf{Definições de Recursos Customizados} (\textit{Custom Resource Definitions} — CRDs). Um CRD declara um novo tipo de recurso no API Server, com seu próprio esquema (\textit{spec} e \textit{status}), tornando-o disponível para criação, listagem e edição com as mesmas ferramentas (kubectl, YAML) usadas para recursos nativos. A separação entre \textit{spec} (intenção declarada pelo usuário) e \textit{status} (estado observado pelo sistema) segue o mesmo princípio dos recursos nativos e é fundamental para o padrão de Operator \cite{KUBEBUILDER2024}.
+O Kubernetes permite estender seu modelo de recursos por meio das \textbf{Definições de Recursos Customizados} (\textit{Custom Resource Definitions} — CRDs). Um CRD declara um novo tipo de recurso no API Server, com seu próprio esquema (\textit{spec} e \textit{status}), tornando-o disponível para criação, listagem e edição com as mesmas ferramentas (kubectl, YAML) usadas para recursos nativos. A separação entre \textit{spec} (intenção declarada pelo usuário) e \textit{status} (estado observado pelo sistema) segue o mesmo princípio dos recursos nativos e é fundamental para o padrão de Operator \cite{Burns2016}.
 
-O \textbf{padrão de Operator} (\textit{Operator Pattern}) é um método de extensão do Kubernetes que codifica o conhecimento operacional de uma aplicação específica em um controlador customizado \cite{CNCF2023}. Um Operator combina um ou mais CRDs com um \textit{controller loop} que observa instâncias desses recursos e age para reconciliar o estado real com o estado desejado — substituindo a intervenção humana pela automação do domínio de conhecimento específico da aplicação.
+O \textbf{padrão de Operator} (\textit{Operator Pattern}) é um método de extensão do Kubernetes que codifica o conhecimento operacional de uma aplicação específica em um controlador customizado \cite{Burns2016}. Um Operator combina um ou mais CRDs com um \textit{controller loop} que observa instâncias desses recursos e age para reconciliar o estado real com o estado desejado — substituindo a intervenção humana pela automação do domínio de conhecimento específico da aplicação.
 
 O \textit{loop} de reconciliação de um Operator segue o padrão \textbf{Observar–Avaliar–Agir}:
 \begin{enumerate}
@@ -65,9 +65,9 @@ O \textit{loop} de reconciliação de um Operator segue o padrão \textbf{Observ
   \item \textbf{Agir}: se houver divergência, o controller toma ações corretivas — no caso deste trabalho, chamadas gRPC à planta para ajustar parâmetros de controle.
 \end{enumerate}
 
-O framework \textbf{Kubebuilder} é a ferramenta oficial da CNCF para construção de Operators em Go. Ele provê scaffolding de projeto, integração com o \textit{controller-runtime} (biblioteca Go para interação com o API Server), geração de CRDs a partir de structs Go anotadas, e utilitários para testes \cite{KUBEBUILDER2024}. A anotação dos campos do struct com marcadores como \texttt{+kubebuilder:validation} permite validação automática de manifests, e \texttt{+kubebuilder:subresource:status} habilita o subrecurso de \textit{status} separado da \textit{spec}.
+O framework \textbf{Kubebuilder} é a ferramenta oficial da CNCF para construção de Operators em Go. Ele provê scaffolding de projeto, integração com o \textit{controller-runtime} (biblioteca Go para interação com o API Server), geração de CRDs a partir de structs Go anotadas, e utilitários para testes. A anotação dos campos do struct com marcadores como \texttt{+kubebuilder:validation} permite validação automática de manifests, e \texttt{+kubebuilder:subresource:status} habilita o subrecurso de \textit{status} separado da \textit{spec}.
 
-Para operações industriais, o padrão de Operator oferece vantagens relevantes: a lógica supervisória é codificada uma vez e executada de forma autônoma; a política de operação é declarativa e auditável em repositórios de versionamento; e o Kubernetes garante alta disponibilidade do próprio operator via restarts automáticos \cite{CNCF2023}.
+Para operações industriais, o padrão de Operator oferece vantagens relevantes: a lógica supervisória é codificada uma vez e executada de forma autônoma; a política de operação é declarativa e auditável em repositórios de versionamento; e o Kubernetes garante alta disponibilidade do próprio operator via restarts automáticos \cite{Burns2016}.
 
 % -------------------------------------------------------------------------
 \section{gRPC como Protocolo de Comunicação}
@@ -85,7 +85,7 @@ O gRPC suporta quatro modalidades de comunicação:
   \item \textbf{Bidirecional}: fluxos simultâneos em ambas as direções.
 \end{enumerate}
 
-No contexto industrial, o \textit{server streaming} é particularmente adequado para a transmissão contínua de dados de processo: a IHM abre um único fluxo gRPC e recebe atualizações das 41~XMEAS e 12~XMV a cada passo de simulação, sem \textit{polling} periódico. O protocolo HTTP/2 subjacente permite múltiplos fluxos simultâneos em uma única conexão TCP, reduzindo overhead de estabelecimento de conexão \cite{GRPC2024}.
+No contexto industrial, o \textit{server streaming} é particularmente adequado para a transmissão contínua de dados de processo: a IHM abre um único fluxo gRPC e recebe atualizações das 41~XMEAS e 12~XMV a cada passo de simulação, sem \textit{polling} periódico. O protocolo HTTP/2 subjacente permite múltiplos fluxos simultâneos em uma única conexão TCP, reduzindo overhead de estabelecimento de conexão.
 
 A escolha do gRPC como protocolo de comunicação neste trabalho é motivada por três fatores: (a) suporte nativo a \textit{streaming} de alta frequência com baixa latência; (b) contrato fortemente tipado que detecta incompatibilidades entre componentes em tempo de compilação; e (c) suporte multiplataforma (Rust, Go, Python) sem adaptadores intermediários, permitindo uma arquitetura poliglota coesa.
 
@@ -188,16 +188,40 @@ A norma dos derivativos $\|\mathbf{f}(\mathbf{y}, t)\|_\infty$ — denominada \t
 \section{Gêmeo Digital Industrial}
 \label{sec:twin}
 
-O conceito de \textbf{gêmeo digital} (\textit{digital twin}) refere-se a uma representação digital de um ativo físico, processo ou sistema que espelha seu comportamento em tempo real e permite simulação, análise e otimização sem intervenção no ativo real \cite{DURAIVELU20221825}. Em contextos industriais, gêmeos digitais são aplicados para monitoramento de saúde de equipamentos, otimização de processos, treinamento de operadores e validação de estratégias de controle antes de sua implantação.
+\subsection{Conceito Fundador e Origem}
 
-Uma taxonomia comum classifica os gêmeos digitais em três níveis de fidelidade:
+O conceito de \textbf{gêmeo digital} (\textit{digital twin}) origina-se do programa Apollo da NASA, onde gêmeos idênticos de naves espaciais eram mantidos na Terra para espelhar as condições das naves em órbita, permitindo que engenheiros simulassem alternativas e assistissem os astronautas em situações críticas \cite{Boschert2016}. A ideia foi posteriormente adaptada para sistemas terrestres: na indústria aeroespacial, o conceito do \textit{Iron Bird} — uma integração física de sistemas elétricos, hidráulicos e controles de voo com layouts correspondentes aos aviões reais — representa um análogo físico-digital que permite otimização e validação de falhas em estágios iniciais de desenvolvimento \cite{Boschert2016}.
+
+Com o avanço das tecnologias de simulação e integração de dados, o conceito evoluiu para modelos totalmente digitais que acompanham o ativo físico ao longo de todo seu ciclo de vida. O \textbf{gêmeo digital industrial} moderno refere-se a uma \textit{representação digital compreensiva e funcional de um componente, produto ou sistema que inclui informações úteis em todas as fases do ciclo de vida} — desde o design até operação e manutenção \cite{Boschert2016}.
+
+\subsection{Características Principais}
+
+As características fundamentais de um gêmeo digital são \cite{Boschert2016}:
+
 \begin{enumerate}
-  \item \textbf{Modelo digital}: representação estática ou off-line, sem sincronização em tempo real.
-  \item \textbf{\textit{Digital shadow}}: representação que recebe dados do ativo físico mas não envia comandos de volta.
-  \item \textbf{Gêmeo digital completo}: integração bidirecional — recebe dados do físico e pode enviar atuações, formando um \textit{cyber-physical loop}.
+  \item \textbf{Coleção ligada de artefatos digitais}: o gêmeo integra dados de engenharia, dados operacionais e descrições de comportamento via múltiplos modelos de simulação, cada um com fidelidade apropriada ao problema a ser resolvido.
+  \item \textbf{Evolução com o sistema real}: o gêmeo acompanha as mudanças no ativo físico ao longo de todas as fases do ciclo de vida, mantendo consistência entre projeto, execução e operação.
+  \item \textbf{Suporte a decisões operacionais}: o gêmeo não apenas descreve comportamento, mas fornece funcionalidades para sistemas de assistência que otimizam operação e manutenção, estendendo o paradigma de engenharia baseada em modelos (MBSE) das fases de desenvolvimento para operação e serviço.
 \end{enumerate}
 
-O laboratório desenvolvido neste trabalho implementa um gêmeo digital do tipo \textit{shadow}/completo: a planta simulada em Rust replica a dinâmica do TEP (modelo digital de alta fidelidade), e o Operator Kubernetes atua sobre ela em um laço de controle supervisório — análogo ao que seria feito com um ativo físico real. Embora não haja uma planta física correspondente, a arquitetura é deliberadamente construída para que a substituição da planta simulada por dados reais requeira apenas a troca do endereço gRPC de destino, preservando toda a camada supervisória.
+\subsection{Níveis de Fidelidade e Ciclo de Vida}
+
+Uma taxonomia comum classifica os gêmeos digitais em três níveis de fidelidade \cite{Boschert2016}:
+\begin{enumerate}
+  \item \textbf{Modelo digital}: representação estática ou off-line, sem sincronização em tempo real com o ativo.
+  \item \textbf{\textit{Digital shadow}}: representação que recebe dados do ativo físico mas não envia comandos de volta; tipicamente usada para monitoramento e diagnóstico.
+  \item \textbf{Gêmeo digital completo}: integração bidirecional — recebe dados do ativo e pode enviar atuações e comandos, formando um \textit{cyber-physical loop} que fecha sobre operação e controle.
+\end{enumerate}
+
+O gêmeo digital cresce em complexidade e volume de dados ao longo do ciclo de vida \cite{Boschert2016}: durante o \textbf{design}, modelos de requisitos e funcionais estabelecem a estrutura; no \textbf{engineering}, modelos de múltiplos domínios (mecânico, elétrico, de controle, térmico) são integrados e validados virtualmente, eliminando o desenvolvimento iterativo em hardware; durante a \textbf{operação}, dados em tempo real atualizam continuamente o modelo, permitindo monitoramento de condição via \textit{soft sensors} — extensões virtuais das medições reais que inferem variáveis inacessíveis por medição direta; na \textbf{manutenção e serviço}, dados históricos e modelos de degradação informam planejamento de manutenção preditiva e cálculo de vida útil remanescente.
+
+\subsection{Aplicação a Avaliação de Qualidade de Malhas}
+
+Uma aplicação particular relevante para este trabalho é o uso do gêmeo digital como gerador controlado de dados para métricas de qualidade de malha. O Índice de Preditividade descrito na Seção~\ref{sec:controle} requer históricos de operação em múltiplas condições — com controladores bem sintonizados e degradados, sob perturbações variadas. Um gêmeo digital permite sintetizar esses históricos de forma reprodutível: o simulador gera séries temporais das XMEAS sob condições especificadas, e algoritmos de avaliação de malha processam esses dados como se fossem originários de um ativo real. Essa capacidade de experimentação controlada é impraticável com plantas físicas, onde perturbações e degradações deliberadas arriscam segurança ou causam danos.
+
+\subsection{Implementação no Laboratório TEP}
+
+O laboratório desenvolvido neste trabalho implementa um gêmeo digital do tipo \textit{shadow} em transição para \textit{completo}: a planta simulada em Rust replica a dinâmica do TEP com alta fidelidade via modelo matemático de 50 EDOs (Seção~\ref{sec:tep}), e o Operator Kubernetes atua sobre ela em um laço de controle supervisório — análogo ao que seria feito com um ativo físico real. Embora não haja uma planta física correspondente no presente trabalho, a arquitetura é deliberadamente construída segundo o paradigma de gêmeo digital: a substituição da planta simulada por dados reais requeriria apenas a troca do endereço gRPC de destino, preservando toda a lógica supervisória, seguindo os princípios de separação entre comportamento do ativo e política de controle descritos por Boschert e Rosen.
 
 % -------------------------------------------------------------------------
 \section{Considerações Finais}

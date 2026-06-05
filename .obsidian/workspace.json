@@ -15,9 +15,9 @@
               "state": {
                 "file": "canvas/brainstorming_1.canvas",
                 "viewState": {
-                  "x": -2301.110150154776,
-                  "y": 1649.6920324300472,
-                  "zoom": 0.5974602761681387
+                  "x": -717.3695177051945,
+                  "y": 1497.4168788218105,
+                  "zoom": -0.40253972383186126
                 }
               },
               "icon": "lucide-layout-dashboard",
@@ -188,18 +188,18 @@
   },
   "active": "601998518bd11fd5",
   "lastOpenFiles": [
-    "main.synctex(busy)",
-    "references.bib.tmp.2176.e29c26afc6a2",
-    "references.bib.tmp.2176.2972c9364758",
+    "articles/art2_Automatic PID Performance Monitoring Applied to LHC Cryogenics.pdf",
+    "articles/art4_Decentralized control of the Tennessee Eastman.pdf",
+    "articles/art3_Development of Digital Twins for Continuous Processes.pdf",
+    "articles/art3_Decentralized control of the Tennessee Eastman.pdf",
+    "articles/art2_Development of Digital Twins for Continuous Processes.pdf",
+    "articles/art1_A plant-wide industrial process control problem.pdf",
+    "standard/IEC-62541-10-2015.pdf",
+    "standard/Não confirmado 410968.crdownload",
+    "standard/IEC-62541-9-2015.pdf",
+    "standard/Não confirmado 818449.crdownload",
+    "standard/IEC-62541-7-2012.pdf",
     "standard/IEC 62541.md",
-    "standard/IEC-62541-11-2020.pdf",
-    "standard/IEC-62541-11-2023.pdf",
-    "standard/IEC-62541-6-2020.pdf",
-    "standard/info_iec62541-6{ed3.0.RLV}en.pdf",
-    "standard/Não confirmado 1633.crdownload",
-    "standard/SS IEC 62541-11-2023 Preview.pdf",
-    "standard/IEC-62541-8-2020.pdf",
-    "standard",
     "canvas/cern_industrial_controls_mapa.canvas",
     "canvas/WEAPL02.canvas",
     "canvas/brainstorming_2.canvas",

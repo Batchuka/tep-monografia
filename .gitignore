@@ -1,5 +1,15 @@
 *.bkp
 
+## Obsidian local state (não versionar)
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+
+## PDF compilado (recompile localmente)
+main.pdf
+
+## Saída de ferramentas
+repomix-output.xml
+
 ## Core latex/pdflatex auxiliary files:
 *.aux
 *.lof
@@ -331,3 +341,6 @@ TSWLatexianTemp*
 # option is specified. Footnotes are the stored in a file with suffix Notes.bib.
 # Uncomment the next line to have this generated file ignored.
 #*Notes.bib
+main.pdf
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json

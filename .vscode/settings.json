@@ -1,0 +1,18 @@
+{
+  "files.exclude": {
+    "**/*.aux": true,
+    "**/*.bbl": true,
+    "**/*.blg": true,
+    "**/*.fdb_latexmk": true,
+    "**/*.fls": true,
+    "**/*.lof": true,
+    "**/*.log": true,
+    "**/*.lot": true,
+    "**/*.synctex.gz": true,
+    "**/*.toc": true,
+    "**/*.out": true,
+    "**/*.brf": true,
+    "**/*.tdo": true,
+    "repomix-output.xml": true
+  }
+}

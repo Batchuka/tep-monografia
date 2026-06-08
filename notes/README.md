@@ -63,6 +63,56 @@ O comentário do highlight **é indexado pelo Obsidian** — wikilinks e tags es
 | Verde    | Diretamente usável na monografia              |
 | Azul     | Referência a citar                            |
 
+## Protocolo desse projeto
+
+**Tipo** da Tag
+
+| Tipo      | Quando usar                                                                |
+| --------- | -------------------------------------------------------------------------- |
+| TRADEOFF  | Quando melhorar X implica piorar Y — há tensão entre dois objetivos        |
+| LIMITE    | Quando existe um teto ou piso teórico que nenhuma solução consegue superar |
+| PARADOXO  | Quando o resultado contraria a intuição — o esperado não acontece          |
+| REQUISITO | Quando algo é condição necessária para outra coisa funcionar               |
+| MECANISMO | Quando o insight explica *por que* algo acontece — a causa, não o efeito   |
+| METRICA   | Quando o insight define uma forma de medir, avaliar ou comparar algo       |
+
+---
+
+**Tema** da Tag
+
+| Tema                  | Quando usar                                                              |
+| --------------------- | ------------------------------------------------------------------------ |
+| CONTROLE_AUTOMATICO   | Malhas PID, sintonia, resposta a distúrbios, estabilidade                |
+| SISTEMAS_DINAMICOS    | Modelagem matemática, equações diferenciais, análise de comportamento    |
+| SUPERVISAO            | Camada acima dos loops — decisão, coordenação, metacontrole              |
+| DIAGNOSTICO           | Detecção de falhas, sensores ruins, malhas degradadas                    |
+| INSTRUMENTACAO        | Sensores, atuadores, condicionamento de sinal, leitura de dados          |
+| INTEGRACAO_INDUSTRIAL | Integração de sistemas de controle, interoperabilidade entre componentes |
+| COMUNICACAO           | Protocolos, latência, gRPC, OPC-UA, troca de dados                       |
+| MODELAGEM             | Gêmeo digital, simulação, representação matemática da planta             |
+| CALCULO_NUMERICO      | Métodos numéricos, soluções iterativas, precisão e estabilidade          |
+| SOFTWARE              | Padrões de código, arquitetura, implementação, frameworks, tooling       |
+| BENCHMARKING          | Índices de desempenho, limites teóricos, comparação entre soluções       |
+
+---
+
+**Polaridade** da Tag
+
+| Polaridade | Quando usar                                                           |
+| ---------- | --------------------------------------------------------------------- |
+| POSITIVO   | O insight reforça ou justifica uma decisão do seu projeto             |
+| NEGATIVO   | O insight contradiz, limita ou critica uma decisão do seu projeto     |
+| NEUTRO     | O insight é relevante mas não tem posição clara em relação ao projeto |
+
+---
+
+**Regras**
+
+- Tipo fechado — se não encaixa, o insight não é atômico. Quebre em dois.
+- Tema semi-aberto — novo tema só com justificativa registrada aqui no README.
+- Código final: `TIPO-TEMA-POLARIDADE` → ex: `TRADEOFF-CONTROLE-PROCESSOS-NEGATIVO`
+
+
 ## Os quatro tipos de nota
 
 ### 1. Nota de fonte (`ft`)
@@ -163,9 +213,9 @@ Exemplo: `bs_opcua_supervisor_20260606.md`
 
 `C:\Projetos\tep\Monografia\notes\templates\`
 
-| Template | Prefixo | Tipo de nota |
-| -------- | ------- | ------------ |
-| [[templates/ft\|ft.md]] | `ft_` | Nota de fonte (artigo/livro + PDF) |
-| [[templates/nt\|nt.md]] | `nt_` | Nota atômica de conceito |
-| [[templates/doc\|doc.md]] | `doc_` | Documentação do projeto |
-| [[templates/br\|br.md]] | `bs_` | Brainstorming |
+| Template                  | Prefixo | Tipo de nota                       |
+| ------------------------- | ------- | ---------------------------------- |
+| [[templates/ft\|ft.md]]   | `ft_`   | Nota de fonte (artigo/livro + PDF) |
+| [[templates/nt\|nt.md]]   | `nt_`   | Nota atômica de conceito           |
+| [[templates/doc\|doc.md]] | `doc_`  | Documentação do projeto            |
+| [[templates/br\|br.md]]   | `bs_`   | Brainstorming                      |

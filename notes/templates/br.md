@@ -3,6 +3,7 @@ type: brainstorming
 tema: 
 gatilho: 
 conecta-com: []
+tags: []
 data: <% tp.date.now("YYYY-MM-DD") %>
 status: incubando
 ---

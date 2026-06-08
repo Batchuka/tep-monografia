@@ -4,6 +4,7 @@ componente:
 assunto: 
 status: rascunho
 relates-to: []
+tags: []
 data: <% tp.date.now("YYYY-MM-DD") %>
 ---
 
@@ -31,4 +32,3 @@ data: <% tp.date.now("YYYY-MM-DD") %>
 
 ## Referências internas
 
-- [[]]

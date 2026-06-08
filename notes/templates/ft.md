@@ -1,5 +1,6 @@
 ---
-type: resumo
+type: ft
+annotation-target: 
 titulo: 
 autor: 
 ano: 
@@ -7,10 +8,11 @@ fonte:
 tema: 
 conecta-com: []
 lido-em: <% tp.date.now("YYYY-MM-DD") %>
+tags: []
 status: lido
 ---
 
-# Resumo: <% tp.file.title %>
+# Nota: <% tp.file.title %>
 
 ## O que diz
 > *Descrição objetiva do conteúdo — sem opinião. O que o autor argumenta, prova ou propõe.*
@@ -37,3 +39,4 @@ status: lido
   year   = {},
 }
 ```
+

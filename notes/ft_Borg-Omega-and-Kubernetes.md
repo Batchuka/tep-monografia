@@ -7,13 +7,7 @@ ano: 2015
 fonte: ACM Queue, v.13, n.5
 tema:
 conecta-com: []
-tags:
-  - kubernetes
-  - reconciliation-loop
-  - desired-state
-  - observed-state
-  - consistent-API
-  - applicaiton-oriented-infraestructure
+tags: []
 lido-em:
 status: pendente
 ---

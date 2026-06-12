@@ -8,13 +8,7 @@ fonte: CERN
 tema:
 conecta-com: []
 lido-em:
-tags:
-  - UNICOS
-  - PCO
-  - PLC-SCADA-integration
-  - IEC61512
-  - data-driven
-  - code-generation
+tags: []
 status: em-leitura
 ---
 

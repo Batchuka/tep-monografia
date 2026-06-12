@@ -7,14 +7,7 @@ ano: 1993
 fonte: Computers & Chemical Engineering, v.17, n.3
 tema:
 conecta-com: []
-tags:
-  - benchmark
-  - tennessee-eastman-process
-  - plant-wide-control
-  - process-control
-  - multivariable-control
-  - nonlinear-dynamic-model
-  - chemical-process-simulation
+tags: []
 lido-em:
 status: pendente
 ---

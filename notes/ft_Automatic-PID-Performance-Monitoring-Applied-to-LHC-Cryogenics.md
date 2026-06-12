@@ -8,13 +8,7 @@ fonte: ICALEPCS 2013 — Proceedings
 tema: qualidade de malhas PID; Índice de Preditividade; criogenia
 conecta-com:
 lido-em: 2026-06-06
-tags:
-  - control-loop-performance
-  - predictability-index
-  - PID-performance-monitoring
-  - model-free-monitoring
-  - data-driven-diagnostics
-  - PID-tuning
+tags: []
 status: lido
 ---
 

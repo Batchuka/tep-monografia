@@ -7,13 +7,7 @@ ano:
 fonte:
 tema:
 conecta-com: []
-tags:
-  - plant-wide-control
-  - control-structure-design
-  - self-optimizing-control
-  - degrees-of-freedom
-  - controlled-variable
-  - regulatory-control-layer
+tags: []
 lido-em:
 status: pendente
 ---

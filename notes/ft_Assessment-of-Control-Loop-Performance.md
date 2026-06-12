@@ -7,12 +7,7 @@ ano: 2016
 fonte:
 tema:
 conecta-com: []
-tags:
-  - harris-benchmark
-  - minimum-variance-control
-  - control-loop-performance
-  - closed-loop-assessment
-  - ARIMA
+tags: []
 lido-em:
 status: pendente
 ---

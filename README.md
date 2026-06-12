@@ -20,7 +20,9 @@
 | Control structure design for complete chemical plants                             | Skogestad, S.                                               | —    |
 | Model Learning Algorithms for Anomaly Detection in CERN Control Systems           | Tilaro, F.; Bradu, B.; Berges, A.; Varela, C.; Roshchin, M. | —    |
 | Plantwide control — A review and a new design procedure                           | Larsson; Skogestad                                          | —    |
-| UNICOS — A Framework to Build Industry-Like Control Systems                       | Gayet; Barillere                                            | —    |
+| UNICOS — A Framework to Build Industry-Like Control Systems                       | Gayet; Barilliere                                           | —    |
+| Kubernetes Orchestration of High Availability Distributed Control Systems         | Johansson, B.; Rågebrergi, M.; Nolte, T.; Papadopoulos, A. V. | —    |
+| Design of an IoT-PLC - A containerized programmeble logical controller for the Industry 4.0 | Mellado, J.; Núñez, F.                                      | 2021 |
 
 ### Normas / Standards
 
@@ -37,7 +39,7 @@
 | Mechatronic Futures: Challenges and Solutions for Mechatronic Systems and their Designers | Peter Hehenberger, David Bradley (Editors)            | 2016 | Springer |
 | OPC Unified Architecture                                                                  | Wolfgang Mahnke, Stefan-Helmut Leitner, Matthias Damm | 2009 | Springer |
 
-**Resumo**: 9 artigos + 3 normas + 2 livros = **14 fontes no total**
+**Resumo**: 11 artigos + 3 normas + 2 livros = **16 fontes no total**
 
 ---
 

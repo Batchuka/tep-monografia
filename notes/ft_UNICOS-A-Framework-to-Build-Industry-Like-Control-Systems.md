@@ -1,6 +1,6 @@
 ---
 type: ft
-annotation-target: notes/articles/art6_UNICOS-A-Framework-to-Build-Industry-Like-Control-Systems_Gayet_Barillere.pdf
+annotation-target: articles/art6_UNICOS-A-Framework-to-Build-Industry-Like-Control-Systems_Gayet_Barillere.pdf
 titulo: UNICOS — A Framework to Build Industry-Like Control Systems
 autor:
 ano:

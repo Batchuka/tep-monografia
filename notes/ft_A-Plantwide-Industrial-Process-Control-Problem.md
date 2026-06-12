@@ -1,6 +1,6 @@
 ---
 type: ft
-annotation-target: notes/articles/art1_A-Plantwide-Industrial-Process-Control-Problem_Downs_Vogel.pdf
+annotation-target: articles/art1_A-Plantwide-Industrial-Process-Control-Problem_Downs_Vogel.pdf
 titulo: A plant-wide industrial process control problem
 autor: Downs, J.J.; Vogel, E.F.
 ano: 1993

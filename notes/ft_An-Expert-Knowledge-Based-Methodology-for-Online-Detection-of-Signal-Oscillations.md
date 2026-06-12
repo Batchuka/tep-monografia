@@ -1,14 +1,14 @@
 ---
 type: ft
-annotation-target: notes/articles/art7_An-Expert-Knowledge-Based-Methodology-for-Online-Detection-of-Signal-Oscillations_Tilaro_Bradu_Berges_Roshchin.pdf
+annotation-target: articles/art7_An-Expert-Knowledge-Based-Methodology-for-Online-Detection-of-Signal-Oscillations_Tilaro_Bradu_Berges_Roshchin.pdf
 titulo: An Expert Knowledge Based Methodology for Online Detection of Signal Oscillations
 autor: Tilaro, F.; Bradu, B.; Berges, A.; Roshchin, M.
-ano: 
-fonte: 
-tema: 
+ano:
+fonte:
+tema:
 conecta-com: []
 tags: []
-lido-em: 
+lido-em:
 status: pendente
 ---
 

@@ -1,6 +1,6 @@
 ---
 type: ft
-annotation-target: notes/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf
+annotation-target: articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf
 titulo: Control structure design for complete chemical plants
 autor: Skogestad, S.
 ano:

@@ -1,6 +1,6 @@
 ---
 type: ft
-annotation-target: notes/articles/art9_Assessment-of-Control-Loop-Performance_Harris.pdf
+annotation-target: articles/art9_Assessment-of-Control-Loop-Performance_Harris.pdf
 titulo: Assessment of control loop performance
 autor: Burns, W.L.
 ano: 2016
@@ -8,6 +8,11 @@ fonte:
 tema:
 conecta-com: []
 tags:
+  - harris-benchmark
+  - minimum-variance-control
+  - control-loop-performance
+  - closed-loop-assessment
+  - ARIMA
 lido-em:
 status: pendente
 ---
@@ -49,7 +54,7 @@ status: pendente
 >
 >
 >%%TAGS%%
->
+>#REQUISITO-BENCHMARKING-POSITIVO
 ^qf04ncgd319
 
 
@@ -65,7 +70,7 @@ status: pendente
 >
 >Para o Tennessee Eastman, posso avaliar uma malha não apenas por overshoot ou settling time, mas também pela variabilidade residual da variável controlada durante operação contínua.
 >%%TAGS%%
->
+>#METRICA-BENCHMARKING-POSITIVO
 ^a8foveplqev
 
 
@@ -87,7 +92,7 @@ status: pendente
 >Conclusão para meu TCC:
 >Isso conversa diretamente com o meu TCC: o digital twin pode gerar dados contínuos de operação e permitir que o supervisor avalie malhas sem precisar interromper ou perturbar artificialmente a planta.
 >%%TAGS%%
->
+>#MECANISMO-BENCHMARKING-POSITIVO
 ^m6gi5eb406
 
 
@@ -116,7 +121,7 @@ status: pendente
 >
 >Essa separação também sustenta a futura camada supervisória. O supervisor não deve olhar apenas para a saída e concluir que a malha está ruim. Ele precisa perguntar: a variabilidade observada vem de má atuação do controlador, de uma perturbação previsível não compensada, de atraso inevitável ou de ruído estatístico? O valor do digital twin é justamente permitir repetir esse experimento várias vezes, como um Monte Carlo controlado, mudando sementes, perturbações e janelas de observação para testar se o diagnóstico da malha é robusto.
 >%%TAGS%%
->
+>#MECANISMO-SISTEMAS_DINAMICOS-POSITIVO
 ^324iz2ep1xm
 
 
@@ -134,7 +139,7 @@ status: pendente
 >Conclusão para meu TCC:
 >Minha camada supervisória não pode interpretar toda variabilidade como falha de controle. Em processos com atraso, existe uma parcela inevitável de erro que nenhum controlador feedback consegue remover instantaneamente.
 >%%TAGS%%
->
+>#LIMITE-CONTROLE_AUTOMATICO-POSITIVO
 ^cnd1ljt24uv
 
 
@@ -152,13 +157,13 @@ status: pendente
 >Conclusão para meu TCC:
 >No meu projeto, isso sustenta a ideia de monitoramento online: o sistema pode observar XMEAS e XMV ao longo do tempo e inferir qualidade de controle sem executar experimentos agressivos na planta.
 >%%TAGS%%
->
+>#MECANISMO-DIAGNOSTICO-POSITIVO
 ^w6y5d5gr6nr
 
 
 >%%
 >```annotation-json
->{"created":"2026-06-10T09:08:10.723Z","text":"Depois de escrever a planta como função de transferência discreta, ele define b como o atraso inteiro em número de períodos de amostragem/controle.\n\nOu seja: transforma o atraso físico τ_d em atraso discreto usando o intervalo de controle T.","updated":"2026-06-10T09:08:10.723Z","document":{"title":"Assessment of control loop performance","link":[{"href":"urn:x-pdf:74e243065d2ababf171208423d1f4f1b"},{"href":"vault:/notes/articles/art9_Assessment-of-Control-Loop-Performance_Harris.pdf"}],"documentFingerprint":"74e243065d2ababf171208423d1f4f1b"},"uri":"vault:/notes/articles/art9_Assessment-of-Control-Loop-Performance_Harris.pdf","target":[{"source":"vault:/notes/articles/art9_Assessment-of-Control-Loop-Performance_Harris.pdf","selector":[{"type":"TextPositionSelector","start":3846,"end":3878},{"type":"TextQuoteSelector","exact":"b = 1 + / = 1 + integer (r^ / F)","prefix":" process and is calculated as(2)","suffix":"T is thè control interval and is"}]}]}
+>{"text":"Depois de escrever a planta como função de transferência discreta, ele define b como o atraso inteiro em número de períodos de amostragem/controle.\n\nOu seja: transforma o atraso físico τ_d em atraso discreto usando o intervalo de controle T. Exemplo: se o controlador roda a cada 1 minuto e o processo tem 3,4 minutos de atraso: \n- t_d/T =3.4\n- f = 3\n- b = 1 + 3 = 4\n\nA consequência é: o efeito de U_t só aparece em Y_t depois de algumas amostras. Isso é essencial para o Harris Benchmark.\n","target":[{"source":"vault:/notes/articles/art9_Assessment-of-Control-Loop-Performance_Harris.pdf","selector":[{"type":"TextPositionSelector","start":3846,"end":3878},{"type":"TextQuoteSelector","exact":"b = 1 + / = 1 + integer (r^ / F)","prefix":"process and is calculated as(2)","suffix":"T is thè control interval and is"}]}],"created":"2026-06-10T09:08:10.723Z","updated":"2026-06-10T09:08:10.723Z","document":{"title":"Assessment of control loop performance","link":[{"href":"urn:x-pdf:74e243065d2ababf171208423d1f4f1b"},{"href":"vault:/notes/articles/art9_Assessment-of-Control-Loop-Performance_Harris.pdf"}],"documentFingerprint":"74e243065d2ababf171208423d1f4f1b"},"uri":"vault:/notes/articles/art9_Assessment-of-Control-Loop-Performance_Harris.pdf"}
 >```
 >%%
 >*%%PREFIX%%process and is calculated as(2)%%HIGHLIGHT%% ==b = 1 + / = 1 + integer (r^ / F)== %%POSTFIX%%T is thè control interval and is*
@@ -166,7 +171,70 @@ status: pendente
 >%%COMMENT%%
 >Depois de escrever a planta como função de transferência discreta, ele define b como o atraso inteiro em número de períodos de amostragem/controle.
 >
->Ou seja: transforma o atraso físico τ_d em atraso discreto usando o intervalo de controle T.
->%%TAGS%%
+>Ou seja: transforma o atraso físico τ_d em atraso discreto usando o intervalo de controle T. Exemplo: se o controlador roda a cada 1 minuto e o processo tem 3,4 minutos de atraso: 
+>- t_d/T =3.4
+>- f = 3
+>- b = 1 + 3 = 4
 >
+>A consequência é: o efeito de U_t só aparece em Y_t depois de algumas amostras. Isso é essencial para o Harris Benchmark.
+>
+>%%TAGS%%
+>#MECANISMO-CALCULO_NUMERICO-POSITIVO
 ^48n1xtlaaws
+
+
+>%%
+>```annotation-json
+>{"created":"2026-06-12T07:15:12.784Z","text":"Esse é o modelo ARIMA da perturbação. É uma equação de diferenças estocástica. Ela diz que a perturbação D_t é gerada por ruído branco a_t, filtrado por uma dinâmica ARIMA.\n\nHarris quer separar três coisas:\n- O que vem de ação de controle U_r;\n- O que vem da perturbação D_t;\n- O que é inevitável porque o processo tem atraso; \n\nCom essa separação, é possível perguntar: qual é a menor variância possível de Y_t, dado que o controlador só consegue reagir depois do atraso?\n\n## Ligação possível com TCC:\n\n- Y_t → uma XMEAS controlada, por exemplo pressão do reator\n- U_t → uma XMV, por exemplo vazão de água de resfriamento\n- D_t → efeito das IDVs e perturbações não medidas\n- T → passo de controle / amostragem\n- b → atraso discreto efetivo da malha\n\nIsso é importante porque tua planta dinâmica original pode ser não linear e contínua, mas a avaliação de desempenho da malha pode ser feita em cima dos dados amostrados, como série temporal discreta.","updated":"2026-06-12T07:15:12.784Z","document":{"title":"Assessment of control loop performance","link":[{"href":"urn:x-pdf:74e243065d2ababf171208423d1f4f1b"},{"href":"vault:/notes/articles/art9_Assessment-of-Control-Loop-Performance_Harris.pdf"}],"documentFingerprint":"74e243065d2ababf171208423d1f4f1b"},"uri":"vault:/notes/articles/art9_Assessment-of-Control-Loop-Performance_Harris.pdf","target":[{"source":"vault:/notes/articles/art9_Assessment-of-Control-Loop-Performance_Harris.pdf","selector":[{"type":"TextPositionSelector","start":4263,"end":4306},{"type":"TextQuoteSelector","exact":"D, = d ( z ~ l )a, / [ <t> ( z ~' ) v d ) ]","prefix":"ear filter driven bywhite noise:","suffix":" (3)[ a t ] is a sequence of ind"}]}]}
+>```
+>%%
+>*%%PREFIX%%ear filter driven bywhite noise:%%HIGHLIGHT%% ==D, = d ( z ~ l )a, / [ <t> ( z ~' ) v d ) ]== %%POSTFIX%%(3)[ a t ] is a sequence of ind*
+>%%LINK%%[[#^5liwav3nkou|show annotation]]
+>%%COMMENT%%
+>Esse é o modelo ARIMA da perturbação. É uma equação de diferenças estocástica. Ela diz que a perturbação D_t é gerada por ruído branco a_t, filtrado por uma dinâmica ARIMA.
+>
+>Harris quer separar três coisas:
+>- O que vem de ação de controle U_r;
+>- O que vem da perturbação D_t;
+>- O que é inevitável porque o processo tem atraso; 
+>
+>Com essa separação, é possível perguntar: qual é a menor variância possível de Y_t, dado que o controlador só consegue reagir depois do atraso?
+>
+>## Ligação possível com TCC:
+>
+>- Y_t → uma XMEAS controlada, por exemplo pressão do reator
+>- U_t → uma XMV, por exemplo vazão de água de resfriamento
+>- D_t → efeito das IDVs e perturbações não medidas
+>- T → passo de controle / amostragem
+>- b → atraso discreto efetivo da malha
+>
+>Isso é importante porque tua planta dinâmica original pode ser não linear e contínua, mas a avaliação de desempenho da malha pode ser feita em cima dos dados amostrados, como série temporal discreta.
+>%%TAGS%%
+>#MECANISMO-SISTEMAS_DINAMICOS-POSITIVO
+^5liwav3nkou
+
+
+>%%
+>```annotation-json
+>{"created":"2026-06-12T08:23:05.247Z","text":"# NOTA CENTRAL\n\nPara Harris, controle é escolher a variável manipulada $U_t$ a partir da informação disponível até o instante $t$, para reduzir a variância da variável controlada $Y_t$​ em torno do setpoint.\n\nMais especificamente, é um problema de previsão e compensação da perturbação: usar $U_t$ para cancelar a parte previsível de $D_t$, deixando só o erro inevitável.\n\nEsse erro inevitável não se corrige com feedback; ele vira o piso de desempenho da malha. Então você faz três coisas com ele:\n\n1. aceita como limite se a variância real já está próxima dele;\n2. usa como benchmark para saber se o PID ainda tem espaço de melhoria;\n3. se ele ainda for alto demais, você muda a estrutura do problema: reduz atraso, melhora medição, adiciona feedforward, troca variável manipulada ou ataca a fonte da perturbação.\n\nEm termos do Harris: o erro inevitável é o que sobra mesmo no controle de variância mínima; portanto, ele não é “falha de sintonia”, é limite imposto por atraso + perturbação + informação disponível.","updated":"2026-06-12T08:23:05.247Z","document":{"title":"Assessment of control loop performance","link":[{"href":"urn:x-pdf:74e243065d2ababf171208423d1f4f1b"},{"href":"vault:/notes/articles/art9_Assessment-of-Control-Loop-Performance_Harris.pdf"}],"documentFingerprint":"74e243065d2ababf171208423d1f4f1b"},"uri":"vault:/notes/articles/art9_Assessment-of-Control-Loop-Performance_Harris.pdf","target":[{"source":"vault:/notes/articles/art9_Assessment-of-Control-Loop-Performance_Harris.pdf","selector":[{"type":"TextPositionSelector","start":0,"end":38},{"type":"TextQuoteSelector","exact":"Assessment of Control Loop Performance","prefix":"0%50%75%100%125%150%200%300%400%","suffix":"THOMAS /. HARRISDepartment of Ch"}]}]}
+>```
+>%%
+>*%%PREFIX%%0%50%75%100%125%150%200%300%400%%%HIGHLIGHT%% ==Assessment of Control Loop Performance== %%POSTFIX%%THOMAS /. HARRISDepartment of Ch*
+>%%LINK%%[[#^f4fp2z5k0th|show annotation]]
+>%%COMMENT%%
+># NOTA CENTRAL
+>
+>Para Harris, controle é escolher a variável manipulada $U_t$ a partir da informação disponível até o instante $t$, para reduzir a variância da variável controlada $Y_t$​ em torno do setpoint.
+>
+>Mais especificamente, é um problema de previsão e compensação da perturbação: usar $U_t$ para cancelar a parte previsível de $D_t$, deixando só o erro inevitável.
+>
+>Esse erro inevitável não se corrige com feedback; ele vira o piso de desempenho da malha. Então você faz três coisas com ele:
+>
+>1. aceita como limite se a variância real já está próxima dele;
+>2. usa como benchmark para saber se o PID ainda tem espaço de melhoria;
+>3. se ele ainda for alto demais, você muda a estrutura do problema: reduz atraso, melhora medição, adiciona feedforward, troca variável manipulada ou ataca a fonte da perturbação.
+>
+>Em termos do Harris: o erro inevitável é o que sobra mesmo no controle de variância mínima; portanto, ele não é “falha de sintonia”, é limite imposto por atraso + perturbação + informação disponível.
+>%%TAGS%%
+>#LIMITE-BENCHMARKING-POSITIVO
+^f4fp2z5k0th

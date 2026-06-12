@@ -1,6 +1,6 @@
 ---
 type: resumo
-annotation-target: notes/articles/art2_Automatic-PID-Performance-Monitoring-Applied-to-LHC-Cryogenics_Bradu_Vinuela_Tilaro.pdf
+annotation-target: articles/art2_Automatic-PID-Performance-Monitoring-Applied-to-LHC-Cryogenics_Bradu_Vinuela_Tilaro.pdf
 titulo: Automatic Assessment of PID Controllers Applied to the LHC Cryogenic System
 autor: Blanco Viñuela; Fernández Adiego; Gayet; Goddet
 ano: "2013"

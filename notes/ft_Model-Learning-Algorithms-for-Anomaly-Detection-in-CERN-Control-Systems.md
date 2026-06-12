@@ -1,11 +1,11 @@
 ---
 type: ft
-annotation-target: notes/articles/art8_Model-Learning-Algorithms-for-Anomaly-Detection-in-CERN-Control-Systems_Tilaro_Bradu_Berges_Varela_Roshchin.pdf
+annotation-target: articles/art8_Model-Learning-Algorithms-for-Anomaly-Detection-in-CERN-Control-Systems_Tilaro_Bradu_Berges_Varela_Roshchin.pdf
 titulo: Model Learning Algorithms for Anomaly Detection in CERN Control Systems
 autor: Tilaro, F.; Bradu, B.; Berges, A.; Varela, C.; Roshchin, M.
-ano: 
-fonte: 
-tema: 
+ano:
+fonte:
+tema:
 conecta-com: []
 tags:
   - REQUISITO-SUPERVISAO-POSITIVO
@@ -15,7 +15,7 @@ tags:
   - LIMITE-MODELAGEM-POSITIVO
   - MECANISMO-SOFTWARE-POSITIVO
   - REQUISITO-SUPERVISAO-NEUTRO
-lido-em: 
+lido-em:
 status: pendente
 ---
 

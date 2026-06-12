@@ -8,7 +8,7 @@ fonte: ICALEPCS 2013 — Proceedings
 tema: qualidade de malhas PID; Índice de Preditividade; criogenia
 conecta-com:
 lido-em: 2026-06-06
-tags: []
+tags: [POLITICA_IMPLEMENTACAO]
 status: lido
 ---
 

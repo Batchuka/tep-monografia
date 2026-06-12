@@ -7,7 +7,7 @@ ano:
 fonte:
 tema:
 conecta-com: []
-tags:
+tags: [POLITICA_PROPOSTA]
 lido-em:
 status: pendente
 ---

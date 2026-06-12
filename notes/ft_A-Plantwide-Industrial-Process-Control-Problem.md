@@ -7,7 +7,7 @@ ano: 1993
 fonte: Computers & Chemical Engineering, v.17, n.3
 tema:
 conecta-com: []
-tags: []
+tags: [PROBLEMA_LACUNA]
 lido-em:
 status: pendente
 ---

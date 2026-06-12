@@ -8,7 +8,7 @@ fonte: Springer
 tema: Mecatrônica, Sistemas Mecatrônicos, Desafio de Design
 conecta-com: []
 lido-em: 2026-06-12
-tags: []
+tags: [PROBLEMA_PROPOSTA]
 status: lido
 ---
 

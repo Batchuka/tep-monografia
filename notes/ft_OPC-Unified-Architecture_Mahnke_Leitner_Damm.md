@@ -8,7 +8,7 @@ fonte: Springer
 tema: OPC UA, Arquitetura, Comunicação Industrial
 conecta-com: []
 lido-em: 2026-06-12
-tags: []
+tags: [INTEGRACAO_PROPOSTA]
 status: lido
 ---
 

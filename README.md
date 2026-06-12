@@ -10,19 +10,19 @@
 
 ### Artigos
 
-| Título                                                                            | Autores                                                     | Ano  |
-| --------------------------------------------------------------------------------- | ----------------------------------------------------------- | ---- |
-| A plant-wide industrial process control problem                                   | Downs, J.J.; Vogel, E.F.                                    | 1993 |
-| An Expert Knowledge Based Methodology for Online Detection of Signal Oscillations | Tilaro, F.; Bradu, B.; Berges, A.; Roshchin, M.             | —    |
-| Assessment of control loop performance                                            | Burns, W.L.                                                 | 2016 |
-| Automatic Assessment of PID Controllers Applied to the LHC Cryogenic System       | Blanco Viñuela; Fernández Adiego; Gayet; Goddet             | 2013 |
-| Borg, Omega, and Kubernetes                                                       | Verma, A. et al. (Google)                                   | 2015 |
-| Control structure design for complete chemical plants                             | Skogestad, S.                                               | —    |
-| Model Learning Algorithms for Anomaly Detection in CERN Control Systems           | Tilaro, F.; Bradu, B.; Berges, A.; Varela, C.; Roshchin, M. | —    |
-| Plantwide control — A review and a new design procedure                           | Larsson; Skogestad                                          | —    |
-| UNICOS — A Framework to Build Industry-Like Control Systems                       | Gayet; Barilliere                                           | —    |
-| Kubernetes Orchestration of High Availability Distributed Control Systems         | Johansson, B.; Rågebrergi, M.; Nolte, T.; Papadopoulos, A. V. | —    |
-| Design of an IoT-PLC - A containerized programmeble logical controller for the Industry 4.0 | Mellado, J.; Núñez, F.                                      | 2021 |
+| Título                                                                                      | Autores                                                       | Ano  |
+| ------------------------------------------------------------------------------------------- | ------------------------------------------------------------- | ---- |
+| A plant-wide industrial process control problem                                             | Downs, J.J.; Vogel, E.F.                                      | 1993 |
+| An Expert Knowledge Based Methodology for Online Detection of Signal Oscillations           | Tilaro, F.; Bradu, B.; Berges, A.; Roshchin, M.               | —    |
+| Assessment of control loop performance                                                      | Burns, W.L.                                                   | 2016 |
+| Automatic Assessment of PID Controllers Applied to the LHC Cryogenic System                 | Blanco Viñuela; Fernández Adiego; Gayet; Goddet               | 2013 |
+| Borg, Omega, and Kubernetes                                                                 | Verma, A. et al. (Google)                                     | 2015 |
+| Control structure design for complete chemical plants                                       | Skogestad, S.                                                 | —    |
+| Model Learning Algorithms for Anomaly Detection in CERN Control Systems                     | Tilaro, F.; Bradu, B.; Berges, A.; Varela, C.; Roshchin, M.   | —    |
+| Plantwide control — A review and a new design procedure                                     | Larsson; Skogestad                                            | —    |
+| UNICOS — A Framework to Build Industry-Like Control Systems                                 | Gayet; Barilliere                                             | —    |
+| Kubernetes Orchestration of High Availability Distributed Control Systems                   | Johansson, B.; Rågebrergi, M.; Nolte, T.; Papadopoulos, A. V. | —    |
+| Design of an IoT-PLC - A containerized programmeble logical controller for the Industry 4.0 | Mellado, J.; Núñez, F.                                        | 2021 |
 
 ### Normas / Standards
 
@@ -40,6 +40,41 @@
 | OPC Unified Architecture                                                                  | Wolfgang Mahnke, Stefan-Helmut Leitner, Matthias Damm | 2009 | Springer |
 
 **Resumo**: 11 artigos + 3 normas + 2 livros = **16 fontes no total**
+
+---
+
+## Classificação no Referencial — Tags de Enquadramento
+
+Toda nota de fonte (`ft_`) é classificada segundo dois eixos — **pilar** (contexto/papel na supervisão) e **papel** (tipo de contribuição). Essa classificação é registrada como **tags combinadas** no campo `tags: []` do frontmatter.
+
+### Estrutura das Tags
+
+As tags de enquadramento seguem o formato: `<PILAR>_<PAPEL>`
+
+**Exemplo:** `PROBLEMA_LACUNA`, `RUNTIME_IMPLEMENTACAO`, `POLITICA_PROPOSTA`
+
+### Pilar
+
+Cada pilar representa um contexto de supervisão:
+
+| Pilar      | Significado                                                                      |
+| ---------- | -------------------------------------------------------------------------------- |
+| PROBLEMA   | Estabelece o problema origem ou fundação geral — por que supervisão é necessária |
+| POLITICA   | Política de supervisão — decisões de alto nível, arquitetura de decisão          |
+| RUNTIME    | Infraestrutura, orquestração e mecanismos de execução                            |
+| INTEGRACAO | Comunicação, protocolos e integração entre sistemas                              |
+
+> **Nota:** "Supervisão" é um contexto implícito em todos os pilares. Está omitido no nome da tag para evitar redundância, mas é compreendido que todos os pilares se referem ao universo de **supervisão de processos industriais**.
+
+### Papel
+
+Cada papel descreve o tipo de contribuição que a fonte oferece:
+
+| Papel         | Significado                                                       |
+| ------------- | ----------------------------------------------------------------- |
+| LACUNA        | Identifica uma falta, problema não resolvido ou questão em aberto |
+| PROPOSTA      | Apresenta uma solução, método, framework ou abordagem             |
+| IMPLEMENTACAO | Detalhes técnicos, case study ou implementação prática            |
 
 ---
 

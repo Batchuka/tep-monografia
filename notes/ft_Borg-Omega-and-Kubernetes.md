@@ -7,7 +7,7 @@ ano: 2015
 fonte: ACM Queue, v.13, n.5
 tema:
 conecta-com: []
-tags: []
+tags: [RUNTIME_PROPOSTA]
 lido-em:
 status: pendente
 ---

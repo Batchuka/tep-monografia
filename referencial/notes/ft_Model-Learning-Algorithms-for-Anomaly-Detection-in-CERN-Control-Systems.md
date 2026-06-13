@@ -1,23 +1,10 @@
 ---
-type: ft
 annotation-target: articles/art8_Model-Learning-Algorithms-for-Anomaly-Detection-in-CERN-Control-Systems_Tilaro_Bradu_Berges_Varela_Roshchin.pdf
 titulo: Model Learning Algorithms for Anomaly Detection in CERN Control Systems
 autor: Tilaro, F.; Bradu, B.; Berges, A.; Varela, C.; Roshchin, M.
 ano:
 fonte:
-tema:
-conecta-com: []
-tags:
-  - POLITICA_IMPLEMENTACAO
-  - REQUISITO-SUPERVISAO-POSITIVO
-  - MECANISMO-MODELAGEM-POSITIVO
-  - MECANISMO-SUPERVISAO-POSITIVO
-  - MECANISMO-INTEGRACAO_INDUSTRIAL-POSITIVO
-  - LIMITE-MODELAGEM-POSITIVO
-  - MECANISMO-SOFTWARE-POSITIVO
-  - REQUISITO-SUPERVISAO-NEUTRO
-lido-em:
-status: pendente
+tema: politica_supervisao/tecnica
 ---
 
 ## O que diz
@@ -52,7 +39,7 @@ status: pendente
 >%%COMMENT%%
 >Aqui o artigo justifica tecnicamente por que monitoramento manual é inviável. A anomalia não é tratada como um problema isolado de algoritmo, mas como consequência de escala operacional: muitos sistemas, muitos sinais e muita heterogeneidade.
 >%%TAGS%%
->#REQUISITO-SUPERVISAO-POSITIVO
+>#semantica/REQUISITO-SUPERVISAO-POSITIVO
 ^zjvod2cr8e9
 
 
@@ -66,7 +53,7 @@ status: pendente
 >%%COMMENT%%
 >Este é o núcleo da ideia de “falta de padrão”: uma anomalia não precisa ser uma falha explícita, basta uma divergência consistente em relação ao comportamento histórico esperado. No meu projeto, isso pode virar uma condição observada pelo supervisor.
 >%%TAGS%%
->#MECANISMO-MODELAGEM-POSITIVO
+>#semantica/MECANISMO-MODELAGEM-POSITIVO
 ^nhoofw5a48
 
 
@@ -80,7 +67,7 @@ status: pendente
 >%%COMMENT%%
 >O artigo transforma incoerência de sinal em alarme. No meu caso, esse alarme pode ser modelado como evento/estado observado em uma arquitetura tipo Kubernetes, por exemplo uma condição Anomalous=True associada a uma malha ou grupo de sinais.
 >%%TAGS%%
->#MECANISMO-SUPERVISAO-POSITIVO
+>#semantica/MECANISMO-SUPERVISAO-POSITIVO
 ^087w9wtm8vif
 
 
@@ -94,7 +81,7 @@ status: pendente
 >%%COMMENT%%
 >Esse trecho justifica usar telemetria industrial como base para supervisão. O dado de controle não serve apenas para plotar gráfico; ele carrega informação sobre estado, estabilidade e desempenho do processo.
 >%%TAGS%%
->#REQUISITO-SUPERVISAO-POSITIVO
+>#semantica/REQUISITO-SUPERVISAO-POSITIVO
 ^221f4p6tc1o
 
 
@@ -108,7 +95,7 @@ status: pendente
 >%%COMMENT%%
 >Esse trecho é perfeito para defender detecção de mudança de regime. A pergunta supervisória passa a ser: o comportamento atual ainda pertence ao padrão histórico esperado ou entrou em outro regime dinâmico?
 >%%TAGS%%
->#MECANISMO-MODELAGEM-POSITIVO
+>#semantica/MECANISMO-MODELAGEM-POSITIVO
 ^r3osxqt60ib
 
 
@@ -122,7 +109,7 @@ status: pendente
 >%%COMMENT%%
 >Aqui aparece a ponte com Kubernetes: não é análise offline eventual; é uma tarefa contínua de monitoramento. Isso se aproxima conceitualmente de um controller loop observando continuamente o estado real do sistema.
 >%%TAGS%%
->#MECANISMO-SUPERVISAO-POSITIVO
+>#semantica/MECANISMO-SUPERVISAO-POSITIVO
 ^3qbf5x491m8
 
 
@@ -136,7 +123,7 @@ status: pendente
 >%%COMMENT%%
 >Esse é um trecho fundamental. A anomalia é detectada por quebra de relações esperadas: relações físicas entre sensores próximos e relações lógicas entre entradas e saídas de malhas de controle. Isso é mais forte que limite fixo de alarme.
 >%%TAGS%%
->#MECANISMO-INTEGRACAO_INDUSTRIAL-POSITIVO
+>#semantica/MECANISMO-INTEGRACAO_INDUSTRIAL-POSITIVO
 ^c0di8cqp1l
 
 
@@ -150,7 +137,7 @@ status: pendente
 >%%COMMENT%%
 >Aqui está o argumento de modelo aprendido: primeiro se constrói uma referência do comportamento normal; depois se detecta ponto de mudança. Para meu projeto, isso sustenta um supervisor que compara estado observado contra um padrão esperado.
 >%%TAGS%%
->#MECANISMO-MODELAGEM-POSITIVO
+>#semantica/MECANISMO-MODELAGEM-POSITIVO
 ^gf39nxg83vw
 
 
@@ -164,7 +151,7 @@ status: pendente
 >%%COMMENT%%
 >Esse trecho é importante porque evita uma premissa fraca: o padrão normal não é fixo. Em sistemas dinâmicos industriais, o modelo de normalidade precisa acompanhar o modo operacional.
 >%%TAGS%%
->#LIMITE-MODELAGEM-POSITIVO
+>#semantica/LIMITE-MODELAGEM-POSITIVO
 ^yiezzqgy9xc
 
 
@@ -178,7 +165,7 @@ status: pendente
 >%%COMMENT%%
 >Esse trecho sustenta a arquitetura: histórico → extração de padrão → comparação com stream online → detecção. Em termos de Kubernetes, isso pode virar um reconciler que observa continuamente medições e atualiza o estado da malha.
 >%%TAGS%%
->#MECANISMO-SOFTWARE-POSITIVO
+>#semantica/MECANISMO-SOFTWARE-POSITIVO
 ^1j7rfkmrlxv
 
 
@@ -192,7 +179,7 @@ status: pendente
 >%%COMMENT%%
 >Esse é o melhor trecho visual para “falta de padrão”. O problema não é o valor absoluto do sinal, mas sua perda de coordenação com sinais que historicamente se moviam juntos.
 >%%TAGS%%
->#MECANISMO-MODELAGEM-POSITIVO
+>#semantica/MECANISMO-MODELAGEM-POSITIVO
 ^9a3ew06y8bm
 
 
@@ -206,7 +193,7 @@ status: pendente
 >%%COMMENT%%
 >Esse trecho é muito útil para seu TCC: mudança manual, override ou alteração operacional pode aparecer como anomalia no processo de controle. Isso abre espaço para tratar mudança de estratégia como evento supervisório observável.
 >%%TAGS%%
->#MECANISMO-SUPERVISAO-POSITIVO
+>#semantica/MECANISMO-SUPERVISAO-POSITIVO
 ^2g553s99yn2
 
 
@@ -220,7 +207,7 @@ status: pendente
 >%%COMMENT%%
 >Aqui o artigo conecta anomalia com instabilidade/oscilações de controle. Para seu projeto, isso pode justificar uma condição supervisória do tipo: se uma malha entra em oscilação persistente, o supervisor pode recomendar ou aplicar outra configuração de controle.
 >%%TAGS%%
->#MECANISMO-SUPERVISAO-POSITIVO
+>#semantica/MECANISMO-SUPERVISAO-POSITIVO
 ^z8wgqi5t2sh
 
 
@@ -234,7 +221,7 @@ status: pendente
 >%%COMMENT%%
 >Esse trecho impõe um limite importante. O artigo não resolve diagnóstico causal nem decisão automática. Ele detecta anomalia; a decisão sobre trocar estratégia ou parâmetro precisa ser uma camada adicional do seu projeto.
 >%%TAGS%%
->#LIMITE-MODELAGEM-POSITIVO
+>#semantica/LIMITE-MODELAGEM-POSITIVO
 ^9kxq5hz85uh
 
 
@@ -248,7 +235,7 @@ status: pendente
 >%%COMMENT%%
 >Esse trecho sustenta integração com camada supervisória. No CERN, o resultado analítico volta para o SCADA; no seu projeto, pode voltar como estado observado em uma API/CRD inspirada em Kubernetes.
 >%%TAGS%%
->#MECANISMO-INTEGRACAO_INDUSTRIAL-POSITIVO
+>#semantica/MECANISMO-INTEGRACAO_INDUSTRIAL-POSITIVO
 ^7oxfmbq6vgj
 
 
@@ -262,7 +249,7 @@ status: pendente
 >%%COMMENT%%
 >Esse é o trecho mais próximo da sua ideia de mudar parâmetros. Mas cuidado: no artigo, quem melhora a sintonia são os engenheiros, não um algoritmo automático. Você pode usar isso como justificativa para evoluir de detecção para recomendação ou reconciliação de parâmetros
 >%%TAGS%%
->#MECANISMO-SUPERVISAO-POSITIVO
+>#semantica/MECANISMO-SUPERVISAO-POSITIVO
 ^5e6chgipwpn
 
 
@@ -276,7 +263,7 @@ status: pendente
 >%%COMMENT%%
 >O artigo transforma correlação entre sensores em uma geometria: sensores historicamente correlacionados ficam “próximos” em um grafo. A distância usada é d_ij=−ln * a_ij, onde a_ij é a correlação de Pearson. Se dois sinais eram fortemente correlacionados e passam a divergir, a distância efetiva entre eles aumenta. Assim, a anomalia é identificada como uma quebra da vizinhança esperada entre sinais. Isso é útil para uma arquitetura supervisória porque a “falta de padrão” pode ser formalizada como perda de coerência entre sinais relacionados, não apenas como violação de setpoint.
 >%%TAGS%%
->#MECANISMO-MODELAGEM-POSITIVO
+>#semantica/MECANISMO-MODELAGEM-POSITIVO
 ^ma4hff8wq6q
 
 
@@ -290,7 +277,7 @@ status: pendente
 >%%COMMENT%%
 >O artigo transforma correlação entre sensores em uma geometria: sensores historicamente correlacionados ficam “próximos” em um grafo. A distância usada é d_ij=−ln * a_ij, onde a_ij é a correlação de Pearson. Se dois sinais eram fortemente correlacionados e passam a divergir, a distância efetiva entre eles aumenta. Assim, a anomalia é identificada como uma quebra da vizinhança esperada entre sinais. Isso é útil para uma arquitetura supervisória porque a “falta de padrão” pode ser formalizada como perda de coerência entre sinais relacionados, não apenas como violação de setpoint.
 >%%TAGS%%
->#MECANISMO-MODELAGEM-POSITIVO
+>#semantica/MECANISMO-MODELAGEM-POSITIVO
 ^7fvhg1ifx1k
 
 
@@ -318,7 +305,7 @@ status: pendente
 >%%COMMENT%%
 >A identificação da anomalia ocorre por uma métrica de dissimilaridade esperada. O artigo calcula algo como E(d_i) = Soma p(j|i)d_ij, isto é, uma distância média ponderada entre um sinal e seus vizinhos esperados. Se essa dissimilaridade passa de um limiar, o sinal é considerado anômalo. O ponto importante é que o sistema não pergunta apenas “qual é o valor do sensor?”, mas “esse sensor ainda se comporta como seus vizinhos históricos?”. Para meu projeto, isso pode alimentar um estado observado da malha, como
 >%%TAGS%%
->#MECANISMO-MODELAGEM-POSITIVO
+>#semantica/MECANISMO-MODELAGEM-POSITIVO
 ^omzs8yb521b
 
 
@@ -346,5 +333,5 @@ status: pendente
 >%%COMMENT%%
 >O segundo método identifica padrões por agrupamento estatístico. Primeiro, os sinais são padronizados em cada janela temporal, removendo diferença de escala e calibração. Depois, o K-Means agrupa sinais com comportamento semelhante. A recorrência desses clusters ao longo das janelas vira um modelo probabilístico. Se a frequência esperada de um cluster muda além de um limiar, o artigo gera alarme. Em termos de controle supervisório, isso permite detectar mudança de regime: a planta não apenas mudou de valor, ela mudou a estrutura estatística do comportamento observado.
 >%%TAGS%%
->#MECANISMO-MODELAGEM-POSITIVO
+>#semantica/MECANISMO-MODELAGEM-POSITIVO
 ^vq807zavj

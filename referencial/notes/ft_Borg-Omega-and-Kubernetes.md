@@ -1,15 +1,10 @@
 ---
-type: ft
 annotation-target: articles/art5_Borg-Omega-and-Kubernetes_Burns_Grant_Oppenheimer_Brewer_Wilkes.pdf
 titulo: Borg, Omega, and Kubernetes
 autor: Verma, A. et al. (Google)
 ano: 2015
 fonte: ACM Queue, v.13, n.5
-tema:
-conecta-com: []
-tags: [RUNTIME_PROPOSTA]
-lido-em:
-status: pendente
+tema: runtime_supervisao/espirito
 ---
 
 ## O que diz
@@ -46,7 +41,7 @@ status: pendente
 >%%COMMENT%%
 >Este trecho fornece o lastro arquitetural para tratar a simulação como um sistema observável, no qual diferentes componentes podem reagir a alterações de estado. No TCC, isso justifica separar a planta simulada dos controladores e da camada supervisória, usando um estado compartilhado ou barramento de sinais como ponto de integração entre medições, atuadores e decisões de controle.
 >%%TAGS%%
->#MECANISMO-INTEGRACAO_INDUSTRIAL-POSITIVO
+>#semantica/MECANISMO-INTEGRACAO_INDUSTRIAL-POSITIVO
 ^2micfpbttzy
 
 
@@ -60,7 +55,7 @@ status: pendente
 >%%COMMENT%%
 >Este trecho é útil porque desloca a discussão de infraestrutura bruta para unidade operacional. No TCC, a digital twin deve ser tratada como uma aplicação de processo industrial, não apenas como uma rotina numérica. Isso sustenta a decisão de modelar explicitamente a planta, seus sinais, seus controladores e sua supervisão como entidades de domínio.
 >%%TAGS%%
->#MECANISMO-MODELAGEM-POSITIVO
+>#semantica/MECANISMO-MODELAGEM-POSITIVO
 ^6tyayrsutdb
 
 
@@ -76,7 +71,7 @@ status: pendente
 >
 >A contribuição deste trecho é o conceito de saúde operacional explícita. Em uma digital twin, health checks podem representar tanto saúde de software quanto saúde da simulação: estabilidade numérica, coerência temporal, validade dos sinais e respeito aos limites físicos do processo. Isso permite supervisão automática sem misturar essa lógica com as equações da planta.
 >%%TAGS%%
->#REQUISITO-SUPERVISAO-POSITIVO
+>#semantica/REQUISITO-SUPERVISAO-POSITIVO
 ^alzrq80v74
 
 
@@ -90,7 +85,7 @@ status: pendente
 >%%COMMENT%%
 >Aqui o ponto central é que Kubernetes não resolve complexidade adicionando mais ferramentas soltas, mas impondo uma gramática comum para representar objetos operacionais. Para o TCC, isso sustenta a ideia de que a digital twin não deve expor sensores, atuadores, experimentos e controladores como estruturas desconexas; todos devem seguir um modelo comum de representação para permitir automação, inspeção e extensão.
 >%%TAGS%%
->#MECANISMO-SOFTWARE-POSITIVO
+>#semantica/MECANISMO-SOFTWARE-POSITIVO
 ^myjb8yiplhh
 
 
@@ -105,7 +100,7 @@ status: pendente
 >%%COMMENT%%
 >Esse é um dos trechos mais fortes para aplicar no TCC. A divisão entre metadados, especificação e status permite separar três coisas que frequentemente ficam misturadas em simuladores: a identidade do objeto, aquilo que se deseja que aconteça e aquilo que está acontecendo de fato. Na Tennessee Eastman, isso pode virar uma estrutura para representar experimento, planta, controlador, perturbação ou malha de controle.
 >%%TAGS%%
->#MECANISMO-MODELAGEM-POSITIVO
+>#semantica/MECANISMO-MODELAGEM-POSITIVO
 ^279orsxwwui
 
 
@@ -119,7 +114,7 @@ status: pendente
 >%%COMMENT%%
 >Este trecho conecta diretamente Kubernetes com controle supervisório. Em controle de processos, existe sempre uma diferença entre referência e variável medida; aqui, a mesma ideia aparece em nível arquitetural. Para o TCC, Spec pode representar setpoints, modos de operação, distúrbios ativos e limites desejados, enquanto Status pode representar XMEAS, XMV efetivamente aplicado, alarmes, saturações e condição numérica da simulação.
 >%%TAGS%%
->#MECANISMO-SUPERVISAO-POSITIVO
+>#semantica/MECANISMO-SUPERVISAO-POSITIVO
 ^8pouim8tgy
 
 
@@ -133,7 +128,7 @@ status: pendente
 >%%COMMENT%%
 >O valor aqui não é apenas organização estética. Uma API uniforme permite que ferramentas diferentes operem sobre os mesmos objetos sem conhecer todos os detalhes internos. No TCC, isso justifica a criação de uma camada de sinais e objetos operacionais que possa ser usada tanto pelo simulador quanto por controladores PID, scripts de experimento, dashboards, logs e futura supervisão.
 >%%TAGS%%
->#MECANISMO-INTEGRACAO_INDUSTRIAL-POSITIVO
+>#semantica/MECANISMO-INTEGRACAO_INDUSTRIAL-POSITIVO
 ^qt6q97hbd0p
 
 
@@ -147,7 +142,7 @@ status: pendente
 >%%COMMENT%%
 >Esse trecho é crucial para não misturar camadas. O autoscaler não cria pods diretamente; ele ajusta o estado desejado e deixa outro componente executar a convergência. Para a digital twin, a analogia correta é: a supervisão não deve manipular diretamente as equações diferenciais nem o vetor interno de estados; ela deve alterar referências, modos ou objetivos, enquanto planta, integrador e controladores executam a dinâmica e a atuação.
 >%%TAGS%%
->#MECANISMO-SUPERVISAO-POSITIVO
+>#semantica/MECANISMO-SUPERVISAO-POSITIVO
 ^63hkje87gh7
 
 
@@ -161,7 +156,7 @@ status: pendente
 >%%COMMENT%%
 >Este é provavelmente o trecho mais importante da seção. O padrão de reconciliação compara estado desejado e estado observado, depois toma ações para reduzir a diferença. Para o TCC, isso fornece o fundamento da camada supervisória: observar a planta simulada, comparar com uma condição operacional desejada e agir por meio de comandos discretos, ajustes de setpoint, ativação de controladores ou tratamento de falhas. A ideia de “choreography” reforça que o comportamento global pode surgir da cooperação entre pequenos loops especializados, sem exigir um controlador monolítico central.
 >%%TAGS%%
->#MECANISMO-SUPERVISAO-POSITIVO
+>#semantica/MECANISMO-SUPERVISAO-POSITIVO
 ^tfcyzhuf4l
 
 
@@ -175,7 +170,7 @@ status: pendente
 >%%COMMENT%%
 >Este trecho sustenta a decomposição do sistema em componentes especializados. No TCC, isso permite separar responsabilidades sem perder coerência: a planta calcula a dinâmica, o integrador avança o tempo, os controladores atuam sobre sinais e o supervisor reconcilia objetivos. A decomposição, porém, deve respeitar determinismo e ordem temporal da simulação.
 >%%TAGS%%
->#MECANISMO-SOFTWARE-POSITIVO
+>#semantica/MECANISMO-SOFTWARE-POSITIVO
 ^i17mwiv7gxg
 
 
@@ -189,7 +184,7 @@ status: pendente
 >%%COMMENT%%
 >A ideia aplicável ao TCC é que comandos sobre a planta devem passar por validação semântica. Um supervisor não deveria escrever qualquer valor em qualquer variável. Uma camada de API ou barramento validado permite impor limites, valores padrão, versionamento de configuração e consistência entre estado desejado e operação simulada.
 >%%TAGS%%
->#REQUISITO-INTEGRACAO_INDUSTRIAL-POSITIVO
+>#semantica/REQUISITO-INTEGRACAO_INDUSTRIAL-POSITIVO
 ^ct83gfik2z7
 
 
@@ -203,5 +198,5 @@ status: pendente
 >%%COMMENT%%
 >Este trecho é importante porque alerta contra transformar configuração em uma linguagem informal e difícil de testar. Para o TCC, isso sustenta a decisão de representar cenários, setpoints, modos de operação e perturbações da digital twin como dados simples e versionáveis, enquanto a lógica de validação, cálculo, controle e supervisão deve permanecer em código real, testável e depurável. A configuração deve descrever o experimento; não deve esconder a lógica do sistema.
 >%%TAGS%%
->#MECANISMO-SOFTWARE-POSITIVO
+>#semantica/MECANISMO-SOFTWARE-POSITIVO
 ^usla9zax1yc

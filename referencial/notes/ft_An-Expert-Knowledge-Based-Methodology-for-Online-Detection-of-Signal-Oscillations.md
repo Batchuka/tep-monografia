@@ -1,15 +1,10 @@
 ---
-type: ft
 annotation-target: articles/art7_An-Expert-Knowledge-Based-Methodology-for-Online-Detection-of-Signal-Oscillations_Tilaro_Bradu_Berges_Roshchin.pdf
 titulo: An Expert Knowledge Based Methodology for Online Detection of Signal Oscillations
 autor: Tilaro, F.; Bradu, B.; Berges, A.; Roshchin, M.
 ano:
 fonte:
-tema:
-conecta-com: []
-tags: [POLITICA_IMPLEMENTACAO]
-lido-em:
-status: pendente
+tema: politica_supervisao/espirito
 ---
 
 ## O que diz
@@ -44,7 +39,7 @@ status: pendente
 >%%COMMENT%%
 >O artigo começa mostrando que o problema não é apenas de controle, mas de escala operacional: muitos sistemas, milhões de sinais e volume massivo de dados. Isso justifica uma camada automática de análise, porque o operador humano não consegue inspecionar manualmente esse espaço de estados.
 >%%TAGS%%
->#REQUISITO-SUPERVISAO-POSITIVO
+>#semantica/REQUISITO-SUPERVISAO-POSITIVO
 ^rbskg7min4
 
 
@@ -58,7 +53,7 @@ status: pendente
 >%%COMMENT%%
 >Esse é um ponto forte: a análise deixa de ser um script externo e passa a fazer parte da operação contínua da máquina. Para o seu TCC, isso sustenta a ideia de um digital twin ou sistema supervisório que não apenas registra dados, mas executa diagnósticos em tempo de operação
 >%%TAGS%%
->#MECANISMO-SUPERVISAO-POSITIVO
+>#semantica/MECANISMO-SUPERVISAO-POSITIVO
 ^5a62b7qrgn4
 
 
@@ -72,7 +67,7 @@ status: pendente
 >%%COMMENT%%
 >Esse trecho é central. Ele afirma que uma análise computacional, quando operacionalizada, vira componente do próprio sistema de controle. Isso ajuda a defender uma arquitetura onde analytics, supervisão e controle não são camadas decorativas, mas partes ativas do sistema industrial.
 >%%TAGS%%
->#MECANISMO-SUPERVISAO-POSITIVO
+>#semantica/MECANISMO-SUPERVISAO-POSITIVO
 ^yutoba6qky
 
 
@@ -86,7 +81,7 @@ status: pendente
 >%%COMMENT%%
 >Aqui o artigo liga diretamente oscilação com desempenho de malhas de controle. A oscilação não é tratada como ruído visual no gráfico, mas como sintoma operacional relevante para avaliar estabilidade, sintonia e comportamento da planta.
 >%%TAGS%%
->#MECANISMO-CONTROLE_AUTOMATICO-POSITIVO
+>#semantica/MECANISMO-CONTROLE_AUTOMATICO-POSITIVO
 ^a09yk0h9ifc
 
 
@@ -100,7 +95,7 @@ status: pendente
 >%%COMMENT%%
 >O artigo mostra que oscilações têm consequência física real: podem afetar estabilidade, segurança, qualidade da operação e manutenção de equipamentos. Isso é importante porque tira o tema do campo abstrato de “melhorar gráfico” e coloca no campo industrial: preservar ativo, processo e produção.
 >%%TAGS%%
->#MECANISMO-DIAGNOSTICO-POSITIVO
+>#semantica/MECANISMO-DIAGNOSTICO-POSITIVO
 ^oklqu0wdhll
 
 
@@ -114,7 +109,7 @@ status: pendente
 >%%COMMENT%%
 >Esse trecho é excelente para defender uma escolha pragmática: em sistemas industriais grandes e mutáveis, manter um modelo rigoroso atualizado pode ser caro demais. O artigo justifica uma abordagem baseada em sinais, conhecimento especialista e análise espectral, sem depender de um modelo completo da planta.
 >%%TAGS%%
->#LIMITE-MODELAGEM-POSITIVO
+>#semantica/LIMITE-MODELAGEM-POSITIVO
 ^6bg46rf7zc
 
 
@@ -128,7 +123,7 @@ status: pendente
 >%%COMMENT%%
 >Esse é um limite conceitual importante: o algoritmo detecta anomalias, mas não fecha automaticamente a causa raiz. Para seu trabalho, isso ajuda a separar monitoramento, diagnóstico e ação de controle — três camadas que muita gente mistura indevidamente.
 >%%TAGS%%
->#LIMITE-DIAGNOSTICO-POSITIVO
+>#semantica/LIMITE-DIAGNOSTICO-POSITIVO
 ^awjg5ej3nw6
 
 
@@ -142,7 +137,7 @@ status: pendente
 >%%COMMENT%%
 >O artigo afirma que uma oscilação pode ocorrer mesmo com a planta em estado nominal, sem disparar alarmes. Esse é um argumento forte para defender análise de séries temporais: nem todo problema operacional aparece como alarme discreto no SCADA.
 >%%TAGS%%
->#MECANISMO-DIAGNOSTICO-POSITIVO
+>#semantica/MECANISMO-DIAGNOSTICO-POSITIVO
 ^7lnv3nsoel7
 
 
@@ -158,7 +153,7 @@ status: pendente
 >
 >A base matemática principal é a Transformada Discreta de Fourier. A ideia é que uma oscilação regular no tempo aparece como um pico no domínio da frequência. Para uma janela de amostras x[n], a DFT decompõe o sinal em componentes senoidais discretas. Se uma frequência específica concentra muita amplitude/energia, ela vira uma candidata a oscilação. Isso transforma um problema visual — “esse sinal parece oscilar?” — em um critério quantitativo: “existe pico espectral acima de um limiar?”.
 >%%TAGS%%
->#MECANISMO-CALCULO_NUMERICO-POSITIVO
+>#semantica/MECANISMO-CALCULO_NUMERICO-POSITIVO
 ^vvlgaviqx9i
 
 
@@ -172,7 +167,7 @@ status: pendente
 >%%COMMENT%%
 >O artigo fecha a ideia principal: conhecimento especialista é convertido em regras simples, escalado em Spark/Hadoop e usado para monitorar mais de 5000 sinais. O mais útil é que o resultado retorna ao controle: a informação ajudou a diagnosticar e corrigir comportamento, muitas vezes por ajuste de parâmetros da malha.
 >%%TAGS%%
->#MECANISMO-DIAGNOSTICO-POSITIVO
+>#semantica/MECANISMO-DIAGNOSTICO-POSITIVO
 ^3jgniy45oo4
 
 
@@ -186,7 +181,7 @@ status: pendente
 >%%COMMENT%%
 >O zero-crossing é uma técnica simples para verificar se o sinal cruza regularmente sua média. Antes da análise, o sinal filtrado é centralizado, ou seja, subtrai-se a média. Se o sinal realmente oscila, ele deve cruzar o zero repetidamente. O número de cruzamentos esperado depende da frequência detectada: frequências mais altas geram mais cruzamentos por unidade de tempo; frequências mais baixas geram menos. Essa etapa ajuda a diferenciar oscilação persistente de transitório isolado.
 >%%TAGS%%
->#MECANISMO-CALCULO_NUMERICO-POSITIVO
+>#semantica/MECANISMO-CALCULO_NUMERICO-POSITIVO
 ^ubfe8ucppe
 
 
@@ -200,5 +195,5 @@ status: pendente
 >%%COMMENT%%
 >A última etapa verifica se a oscilação é regular. O artigo compara a média do período/amplitude com seus respectivos desvios-padrão. A ideia é simples: uma oscilação industrial relevante não deve apenas cruzar zero; ela deve ter alguma consistência temporal e de amplitude. O artigo define dois índices: r_p, para regularidade do período, e r_a, para regularidade da amplitude. Se ambos forem maiores que 1, a oscilação é considerada regular.
 >%%TAGS%%
->#MECANISMO-CALCULO_NUMERICO-POSITIVO
+>#semantica/MECANISMO-CALCULO_NUMERICO-POSITIVO
 ^n85tyojgkpk

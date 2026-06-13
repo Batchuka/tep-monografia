@@ -1,15 +1,10 @@
 ---
-type: ft
 annotation-target: articles/art4_Plantwide-Control-A-Review-and-a-new-Design-Procedure_Larsson_Skogestad.pdf
 titulo: Plantwide control — A review and a new design procedure
 autor:
 ano:
 fonte:
-tema:
-conecta-com: []
-tags: [POLITICA_PROPOSTA]
-lido-em:
-status: pendente
+tema: politica_supervisao/espirito
 ---
 
 ## O que diz

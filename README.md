@@ -2,7 +2,7 @@
 
 ## Big Picture
 
-![Big picture da monografia TEP](notes/big_picture_tcc_tep.svg)
+![Big picture da monografia TEP](referencial/big_picture_tcc_tep.svg)
 
 ---
 
@@ -43,44 +43,76 @@
 
 ---
 
-## Classificação no Referencial — Tags de Enquadramento
+## Estrutura do referencial (`referencial/`)
 
-Toda nota de fonte (`ft_`) é classificada segundo dois eixos — **pilar** (contexto/papel na supervisão) e **papel** (tipo de contribuição). Essa classificação é registrada como **tags combinadas** no campo `tags: []` do frontmatter.
+Todos os arquivos do vault Obsidian — notas, artigos, livros, normas e o big picture — estão centralizados em `referencial/`. Não há subpastas espalhadas pelo repositório.
 
-### Estrutura das Tags
+```
+referencial/
+├── .obsidian/          # configuração interna do Obsidian (plugins, graph, temas)
+├── articles/           # PDFs de artigos vinculados via Annotator
+├── books/              # PDFs de livros e normas
+├── notes/              # todas as notas (ft_, nt_, doc_, bs_)
+├── standard/           # PDFs de normas separados por clareza
+└── big_picture_tcc_tep.svg
+```
 
-As tags de enquadramento seguem o formato: `<PILAR>_<PAPEL>`
+---
 
-**Exemplo:** `PROBLEMA_LACUNA`, `RUNTIME_IMPLEMENTACAO`, `POLITICA_PROPOSTA`
+## O campo `tema` — classificação das fontes
 
-### Pilar
+Cada nota de fonte (`ft_`) carrega no frontmatter um campo `tema` que indica **onde aquela fonte se encaixa no argumento da monografia**. É a única classificação da fonte como um todo — não há mais tags de viés.
 
-Cada pilar representa um contexto de supervisão:
+O campo segue o formato `<categoria>_<subcategoria>` quando há subcategoria, ou apenas `<categoria>` quando não há:
 
-| Pilar      | Significado                                                                      |
-| ---------- | -------------------------------------------------------------------------------- |
-| PROBLEMA   | Estabelece o problema origem ou fundação geral — por que supervisão é necessária |
-| POLITICA   | Política de supervisão — decisões de alto nível, arquitetura de decisão          |
-| RUNTIME    | Infraestrutura, orquestração e mecanismos de execução                            |
-| INTEGRACAO | Comunicação, protocolos e integração entre sistemas                              |
+| Valor do `tema`        | Significado                                                                      |
+| ---------------------- | -------------------------------------------------------------------------------- |
+| `problema`             | Estabelece o problema de origem — por que supervisão industrial é necessária     |
+| `politica_espirito`    | Fundamento teórico e conceitual da política de supervisão                        |
+| `politica_tecnica`     | Derivado do espírito: abordagem aplicada, método, framework de decisão           |
+| `runtime_espirito`     | Infraestrutura e plataforma — o que sustenta a execução do controle supervisório |
+| `runtime_tecnica`      | Implementação concreta do runtime: orquestrador, operador, serviço               |
+| `integracao_espirito`  | Comunicação, padrões e normas — o que conecta os componentes                     |
+| `implementacao`        | O que foi construído neste projeto — o próprio digital twin TEP                  |
 
-> **Nota:** "Supervisão" é um contexto implícito em todos os pilares. Está omitido no nome da tag para evitar redundância, mas é compreendido que todos os pilares se referem ao universo de **supervisão de processos industriais**.
+**Exemplo de frontmatter:**
 
-### Papel
+```yaml
+---
+annotation-target: articles/art1_...pdf
+titulo: A plant-wide industrial process control problem
+autor: Downs, J.J.; Vogel, E.F.
+ano: 1993
+fonte: Computers & Chemical Engineering, v.17, n.3
+tema: problema
+---
+```
 
-Cada papel descreve o tipo de contribuição que a fonte oferece:
+---
 
-| Papel         | Significado                                                       |
-| ------------- | ----------------------------------------------------------------- |
-| LACUNA        | Identifica uma falta, problema não resolvido ou questão em aberto |
-| PROPOSTA      | Apresenta uma solução, método, framework ou abordagem             |
-| IMPLEMENTACAO | Detalhes técnicos, case study ou implementação prática            |
+## Graph View — Grupos por Tema
+
+O grafo do Obsidian (`Ctrl+G`) exibe os nós agrupados e coloridos por valor do campo `tema`. As cores foram escolhidas para comunicar a posição de cada fonte no argumento:
+
+| Grupo                 | Cor         | Motivação                                                          |
+| --------------------- | ----------- | ------------------------------------------------------------------ |
+| `problema`            | Vermelho    | Ponto de tensão — o que motiva tudo                                |
+| `politica_espirito`   | Azul escuro | Fundamento teórico e conceitual                                    |
+| `politica_tecnica`    | Azul claro  | Derivado do espírito, mais aplicado                                |
+| `runtime_espirito`    | Verde escuro| Infraestrutura e plataforma                                        |
+| `runtime_tecnica`     | Verde claro | Implementação concreta do runtime                                  |
+| `integracao_espirito` | Roxo        | Comunicação, padrão, norma                                         |
+| `implementacao`       | Laranja     | O que você construiu                                               |
+
+Os grupos são configurados em **Settings → Graph view → Groups**, com filtros por propriedade `tema`.
 
 ---
 
 ## Protocolo de Tags — Classificação de Insights
 
-Toda nota de fonte (`ft_`) que contém highlights deve conter tags no formato **TIPO-TEMA-POLARIDADE** para classificar insights importantes.
+Dentro das notas de fonte, highlights individuais podem receber tags no formato **TIPO-TEMA-POLARIDADE**. Essas tags vinculam fragmentos de conhecimento entre artigos diferentes — dois highlights de fontes distintas com a mesma tag formam uma aresta no grafo.
+
+> Não descrevem a fonte como um todo (isso é papel do campo `tema`). Descrevem aquele fragmento específico.
 
 ### Tipo da Tag
 
@@ -128,58 +160,63 @@ Toda nota de fonte (`ft_`) que contém highlights deve conter tags no formato **
 ## Os Quatro Tipos de Nota
 
 ### 1. Nota de Fonte (`ft_`)
-**Quando usar:** Sempre que estiver lendo ou for ler um artigo, livro, seção de norma ou qualquer conteúdo externo. Vincula o PDF via Annotator.
 
-**Como invocar o template:**
-`Ctrl+P → Templater: Create new note from template → ft.md`
+**Quando usar:** Sempre que estiver lendo um artigo, livro, seção de norma ou qualquer conteúdo externo. Vincula o PDF via Annotator.
 
-**Convenção de nome do arquivo:** `ft_<autor>_<ano>.md`
-Exemplo: `ft_downs_1993.md`
+**Convenção de nome:** `ft_<titulo-resumido>.md`
+Exemplo: `ft_A-Plantwide-Industrial-Process-Control-Problem.md`
+
+**Frontmatter obrigatório:**
+
+```yaml
+---
+annotation-target: articles/<arquivo>.pdf
+titulo: <título completo>
+autor: <autores>
+ano: <ano>
+fonte: <periódico / editora / norma>
+tema: <valor do tema>
+---
+```
 
 ---
 
 ### 2. Nota Atômica de Conceito (`nt_`)
-**Quando usar:** Quando você aprende um conceito novo — uma ideia, um método, uma definição. Uma nota por conceito. É isso que alimenta o Graph View (`Ctrl+G`).
 
-**Como invocar o template:**
-`Ctrl+P → Templater: Create new note from template → nt.md`
+**Quando usar:** Quando você aprende um conceito novo — uma ideia, um método, uma definição. Uma nota por conceito. É o que alimenta o Graph View (`Ctrl+G`).
 
-**Convenção de nome do arquivo:** `nt_<conceito>.md`
+**Convenção de nome:** `nt_<conceito>.md`
 Exemplo: `nt_harris-index.md`, `nt_predictability-index.md`, `nt_controle-discreto.md`
 
 **Protocolo de escrita:**
-1. Preencha `conceito` com o nome do conceito em uma ou duas palavras
-2. Preencha `origem` com a nota `ft_` de onde veio (ex: `[[ft_harris_1989]]`)
-3. Preencha `conecta-com` com outros conceitos relacionados — mesmo sem saber ainda como
-4. Escreva em `## O que é` apenas uma frase direta
-5. Escreva em `## Como se conecta ao projeto` onde isso aparece no TCC
+1. `conceito` — nome do conceito em uma ou duas palavras
+2. `origem` — nota `ft_` de onde veio (ex: `[[ft_harris_1989]]`)
+3. `conecta-com` — outros conceitos relacionados, mesmo sem saber como ainda
+4. `## O que é` — apenas uma frase direta
+5. `## Como se conecta ao projeto` — onde isso aparece no TCC
 
 ---
 
-### 3. Documentação do Projeto (`doc-projeto`)
+### 3. Documentação do Projeto (`doc_`)
+
 **Quando usar:** Para registrar decisões de arquitetura, descrições de componentes, resultados de experimentos, problemas resolvidos.
 
-**Como invocar o template:**
-`Ctrl+P → Templater: Create new note from template → doc.md`
-
-**Convenção de nome do arquivo:** `doc_<componente>_<assunto>.md`
+**Convenção de nome:** `doc_<componente>_<assunto>.md`
 Exemplo: `doc_tep-plant_controllerbank.md`
 
 **Protocolo de escrita:**
-1. Preencha o frontmatter (componente, status, relates-to)
+1. Preencha o frontmatter (componente, relates-to)
 2. Seja objetivo — este é um registro técnico, não um diário
 3. Sempre termine com `## Próximos passos` ou `## Problemas em aberto`
 4. Se virar brainstorming, crie uma nota separada e linke
 
 ---
 
-### 4. Brainstorming (`brainstorming`)
+### 4. Brainstorming (`bs_`)
+
 **Quando usar:** Quando uma ideia surge e você não sabe ainda onde ela se encaixa. Para conexões entre conceitos. Para perguntas em aberto.
 
-**Como invocar o template:**
-`Ctrl+P → Templater: Create new note from template → br.md`
-
-**Convenção de nome do arquivo:** `bs_<tema>_<data>.md`
+**Convenção de nome:** `bs_<tema>_<data>.md`
 Exemplo: `bs_opcua_supervisor_20260606.md`
 
 **Protocolo de escrita:**

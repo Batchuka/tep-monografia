@@ -1,20 +1,20 @@
 {
   "main": {
-    "id": "39128cf8f2139d93",
+    "id": "518daae343471930",
     "type": "split",
     "children": [
       {
-        "id": "76c63cbd3fe53faa",
+        "id": "c12f13103c3c3765",
         "type": "tabs",
         "children": [
           {
-            "id": "0f0025974fbe8fba",
+            "id": "c7b72de7a0675770",
             "type": "leaf",
             "state": {
               "type": "graph",
               "state": {},
               "icon": "lucide-git-fork",
-              "title": "Visualização em gráfico"
+              "title": "Graph view"
             }
           }
         ]
@@ -23,15 +23,15 @@
     "direction": "vertical"
   },
   "left": {
-    "id": "0af1130e1aead2a0",
+    "id": "6023c04d80f8d432",
     "type": "split",
     "children": [
       {
-        "id": "3132ceed03f0c8ef",
+        "id": "ea551e27ae56c1fd",
         "type": "tabs",
         "children": [
           {
-            "id": "7cff337cf7a165d3",
+            "id": "fb9d59d602f72cd7",
             "type": "leaf",
             "state": {
               "type": "file-explorer",
@@ -40,16 +40,16 @@
                 "autoReveal": false
               },
               "icon": "lucide-folder-closed",
-              "title": "Explorador de arquivos"
+              "title": "Files"
             }
           },
           {
-            "id": "4a612dd8cb15ae06",
+            "id": "a6c8b7e81442b060",
             "type": "leaf",
             "state": {
               "type": "search",
               "state": {
-                "query": "",
+                "query": "tag:vies/PROBLEMA_LACUNA",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -57,11 +57,11 @@
                 "sortOrder": "alphabetical"
               },
               "icon": "lucide-search",
-              "title": "Procurar"
+              "title": "Search"
             }
           },
           {
-            "id": "8502b6794276e68f",
+            "id": "e46bb954daeca55b",
             "type": "leaf",
             "state": {
               "type": "bookmarks",
@@ -74,18 +74,18 @@
       }
     ],
     "direction": "horizontal",
-    "width": 206.5
+    "width": 391.5
   },
   "right": {
-    "id": "5f794957cba6860d",
+    "id": "2b1e6e84b0c00a82",
     "type": "split",
     "children": [
       {
-        "id": "3e655377d3f793f6",
+        "id": "cbef43d16f82e3ba",
         "type": "tabs",
         "children": [
           {
-            "id": "ad474c671dffe73e",
+            "id": "71383de2d5b76145",
             "type": "leaf",
             "state": {
               "type": "backlink",
@@ -103,7 +103,7 @@
             }
           },
           {
-            "id": "a7be5a4010d253b6",
+            "id": "144eeb0a9268e712",
             "type": "leaf",
             "state": {
               "type": "outgoing-link",
@@ -116,7 +116,7 @@
             }
           },
           {
-            "id": "990679fc64f52f2d",
+            "id": "2684b0d9eb1d15a3",
             "type": "leaf",
             "state": {
               "type": "tag",
@@ -131,7 +131,7 @@
             }
           },
           {
-            "id": "2022d30d5916b4bd",
+            "id": "b95bc26cfa58d82c",
             "type": "leaf",
             "state": {
               "type": "all-properties",
@@ -145,7 +145,7 @@
             }
           },
           {
-            "id": "f6452ce0859abebb",
+            "id": "004b21d94611d595",
             "type": "leaf",
             "state": {
               "type": "outline",
@@ -159,16 +159,17 @@
             }
           },
           {
-            "id": "924da2caf06cb72e",
+            "id": "cae8c55597335bd4",
             "type": "leaf",
             "state": {
-              "type": "calendar",
+              "type": "file-properties",
               "state": {},
-              "icon": "lucide-ghost",
-              "title": "calendar"
+              "icon": "lucide-info",
+              "title": "Propriedades dos arquivos"
             }
           }
-        ]
+        ],
+        "currentTab": 4
       }
     ],
     "direction": "horizontal",
@@ -177,49 +178,58 @@
   },
   "left-ribbon": {
     "hiddenItems": {
-      "switcher:Abrir a troca rápida": false,
-      "graph:Abrir visualização em gráfico": false,
-      "canvas:Criar novo canvas": false,
-      "daily-notes:Abrir a nota de hoje": false,
-      "templates:Inserir modelo": false,
-      "command-palette:Abrir paleta de comandos": false,
-      "bases:Criar nova base": false
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
     }
   },
-  "active": "0f0025974fbe8fba",
+  "active": "c7b72de7a0675770",
   "lastOpenFiles": [
-    "ft_Kubernetes-Orchestration-of-High-Availability_Johansson_et_al.md",
-    "articles/art10_Kubernetes-Orchestration-of-High-Availability_Johansson_et_al.pdf",
-    "ft_UNICOS-A-Framework-to-Build-Industry-Like-Control-Systems.md",
-    "ft_A-Plantwide-Industrial-Process-Control-Problem.md",
-    "sedByCcam",
-    "sedMfN5P2",
-    "sedMq32cR",
-    "sedW9RKQ7",
-    "sed1hWzZX",
-    "sed69EkkJ",
-    "sedrrhyJm",
-    "sedIAwWrw",
-    "sedpERgKJ",
-    "ft_Automatic-PID-Performance-Monitoring-Applied-to-LHC-Cryogenics.md",
-    "ft_Plantwide-Control-A-Review-and-a-new-Design-Procedure.md",
-    "ft_Design-of-an-IoT-PLC_Mellado_Nunez.md",
-    "big_picture_tcc_tep.svg",
-    "ft_Mechatronic-Futures_Hehenberger_Bradley.md",
-    "ft_OPC-Unified-Architecture_Mahnke_Leitner_Damm.md",
-    "ft_IEC_61512-1.md",
-    "ft_IEC_62541.md",
-    "ft_IEC_61512.md",
-    "standard/ft_IEC_62541.md",
-    "standard/ft_IEC_61512.md",
-    "bs_exploracao-tecnologias_20260606.md",
-    "standard/IEC 61512.md",
-    "standard/ft_IEC_61512-1.md",
-    "standard/IEC 62541.md",
-    "ft_An-Expert-Knowledge-Based-Methodology-for-Online-Detection-of-Signal-Oscillations.md",
-    "ft_Assessment-of-Control-Loop-Performance.md",
-    "ft_Borg-Omega-and-Kubernetes.md",
-    "ft_Control-Structure-Desing-for-Complete-Chemical-Plants.md",
-    "ft_Model-Learning-Algorithms-for-Anomaly-Detection-in-CERN-Control-Systems.md"
+    "notes/ft_UNICOS-A-Framework-to-Build-Industry-Like-Control-Systems.md",
+    "notes/ft_OPC-Unified-Architecture_Mahnke_Leitner_Damm.md",
+    "notes/ft_Plantwide-Control-A-Review-and-a-new-Design-Procedure.md",
+    "notes/ft_Kubernetes-Orchestration-of-High-Availability_Johansson_et_al.md",
+    "notes/ft_Mechatronic-Futures_Hehenberger_Bradley.md",
+    "notes/ft_Model-Learning-Algorithms-for-Anomaly-Detection-in-CERN-Control-Systems.md",
+    "notes/ft_Control-Structure-Desing-for-Complete-Chemical-Plants.md",
+    "notes/ft_Design-of-an-IoT-PLC_Mellado_Nunez.md",
+    "notes/ft_IEC_61512.md",
+    "notes/ft_IEC_61512-1.md",
+    "notes/ft_Borg-Omega-and-Kubernetes.md",
+    "notes/ft_Automatic-PID-Performance-Monitoring-Applied-to-LHC-Cryogenics.md",
+    "notes/ft_Assessment-of-Control-Loop-Performance.md",
+    "notes/ft_An-Expert-Knowledge-Based-Methodology-for-Online-Detection-of-Signal-Oscillations.md",
+    "notes/ft_A-Plantwide-Industrial-Process-Control-Problem.md",
+    "notes/ft_IEC_62541.md",
+    "Untitled 1.base",
+    "Untitled.base",
+    "notes",
+    "notes/standard/ft_IEC_62541.md.tmp.22716.6e2d80bd42ae",
+    "notes/standard/ft_IEC_61512.md.tmp.22716.dbf6d4ee8430",
+    "notes/books/book2_OPC Unified Architecture -- Wolfgang Mahnke, Stefan-Helmut Leitner, Matthias Damm -- Springer Nature, Berlin, 2009.pdf",
+    "notes/standard/book2_OPC Unified Architecture -- Wolfgang Mahnke, Stefan-Helmut Leitner, Matthias Damm -- Springer Nature, Berlin, 2009.pdf",
+    "notes/standard/Não confirmado 476842.crdownload",
+    "notes/bs_exploracao-tecnologias_20260606.md",
+    "README.md",
+    "docs",
+    "notes/ft_Assessment-of-Control-Loop-Performance.md.tmp.22716.5a71988b6918",
+    "Plantwide Control.md",
+    "notes/standard/IEC 61512.md",
+    "Mudei de ideia.md",
+    "notes/ft_assessment-control-loop-performance.md",
+    "notes/ft_model-learning-anomaly-detection-cern.md",
+    "notes/ft_expert-knowledge-online-detection.md",
+    "notes/ft_unicos-framework.md",
+    "notes/topicos_dispersos.canvas",
+    "notes/monografia.canvas",
+    "canvas/monografia.canvas",
+    "notes/artigo2.canvas",
+    "canvas/topicos_dispersos.canvas",
+    "canvas/cern_industrial_controls_mapa.canvas",
+    "canvas/artigo2.canvas"
   ]
 }

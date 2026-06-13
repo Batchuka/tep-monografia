@@ -1,15 +1,10 @@
 ---
-type: ft
-annotation-target: C:\projetos\pessoal\tep-monografia\notes\books\book1_Mechatronic-Futures_Hehenberger_Bradley.pdf
+annotation-target: books\book1_Mechatronic-Futures_Hehenberger_Bradley.pdf
 titulo: Mechatronic Futures - Challenges and Solutions for Mechatronic Systems and their Designers
 autor: Peter Hehenberger, David Bradley (Editors)
 ano: 2016
 fonte: Springer
-tema: Mecatrônica, Sistemas Mecatrônicos, Desafio de Design
-conecta-com: []
-lido-em: 2026-06-12
-tags: [PROBLEMA_PROPOSTA]
-status: lido
+tema: integracao_supervisao/espirito
 ---
 
 # Nota: Mechatronic Futures - Hehenberger & Bradley

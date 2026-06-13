@@ -1,15 +1,10 @@
 ---
-type: ft
 annotation-target: articles/art10_Kubernetes-Orchestration-of-High-Availability_Johansson_et_al.pdf
 titulo: Kubernetes Orchestration of High Availability Distributed Control Systems
 autor: Bjarne Johansson, Mats Rågebrergi, Thomas Nolte, Alessandro V. Papadopoulos
 ano:
 fonte: ABB, Västerås, Sweden; Mälardalen University
-tema: Kubernetes, Orquestração, Sistemas de Controle Distribuído, Alta Disponibilidade
-conecta-com: []
-lido-em: 2026-06-12
-tags: [RUNTIME_PROPOSTA]
-status: lido
+tema: runtime_supervisao/espirito
 ---
 
 # Nota: Kubernetes Orchestration of High Availability Distributed Control Systems

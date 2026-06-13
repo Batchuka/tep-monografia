@@ -33,12 +33,12 @@ Monografia/
 ├── latex/
 │   ├── trabalho/         ← capítulos .tex (Cap0 a Cap5)
 │   └── pdf/              ← PDFs incluídos (folha, aprovacao)
-├── notes/                ← notas Obsidian + referências bibliográficas
-│   ├── articles/
-│   ├── books/
-│   ├── standard/
-│   └── templates/
-└── .obsidian/            ← config do Obsidian
+└── referencial/          ← vault Obsidian (notas + PDFs + config)
+    ├── .obsidian/
+    ├── articles/
+    ├── books/
+    ├── notes/
+    └── standard/
 ```
 
 ## Capítulos

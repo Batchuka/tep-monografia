@@ -1,15 +1,10 @@
 ---
-type: ft
 annotation-target: articles/art1_A-Plantwide-Industrial-Process-Control-Problem_Downs_Vogel.pdf
 titulo: A plant-wide industrial process control problem
 autor: Downs, J.J.; Vogel, E.F.
 ano: 1993
 fonte: Computers & Chemical Engineering, v.17, n.3
-tema:
-conecta-com: []
-tags: [PROBLEMA_LACUNA]
-lido-em:
-status: pendente
+tema: problema_supervisao
 ---
 
 ## O que diz
@@ -48,7 +43,7 @@ status: pendente
 >Aqui o artigo define o TEP como benchmark industrial, não como uma planta real aberta nem como um simples exemplo acadêmico.
 >
 >%%TAGS%%
->#MECANISMO-BENCHMARKING-NEUTRO
+>#semantica/MECANISMO-BENCHMARKING-NEUTRO
 ^8jla28mbzqn
 
 
@@ -63,7 +58,7 @@ status: pendente
 >A motivação do artigo é criar um problema comum de comparação para estratégias de controle.
 >
 >%%TAGS%%
->#REQUISITO-BENCHMARKING-NEUTRO
+>#semantica/REQUISITO-BENCHMARKING-NEUTRO
 ^r38nak5twkq
 
 
@@ -78,7 +73,7 @@ status: pendente
 >O coração do TEP é um modelo dinâmico não linear, não uma função de transferência linearizada.
 >
 >%%TAGS%%
->#MECANISMO-SISTEMAS_DINAMICOS-NEUTRO
+>#semantica/MECANISMO-SISTEMAS_DINAMICOS-NEUTRO
 ^c5sthcjfhbk
 
 
@@ -93,7 +88,7 @@ status: pendente
 >A dinâmica térmica é central: temperatura altera taxa de reação, e taxa de reação altera geração de calor.
 >
 >%%TAGS%%
->#MECANISMO-SISTEMAS_DINAMICOS-NEUTRO
+>#semantica/MECANISMO-SISTEMAS_DINAMICOS-NEUTRO
 ^5sxg4848cv3
 
 
@@ -108,7 +103,7 @@ status: pendente
 >A planta é pequena em número de equipamentos, mas já contém reciclo, separação, reação e remoção de calor.
 >
 >%%TAGS%%
->#MECANISMO-INTEGRACAO_INDUSTRIAL-NEUTRO
+>#semantica/MECANISMO-INTEGRACAO_INDUSTRIAL-NEUTRO
 ^cl0vjqxnjok
 
 
@@ -124,7 +119,7 @@ status: pendente
 >O TEP não tem apenas um ponto operacional; ele exige operar em diferentes misturas e regimes de produção.
 >
 >%%TAGS%%
->#MECANISMO-SUPERVISAO-NEUTRO
+>#semantica/MECANISMO-SUPERVISAO-NEUTRO
 ^b6qnpvh8z36
 
 
@@ -139,7 +134,7 @@ status: pendente
 >XMV é a interface de atuação da planta: o controlador não mexe nos estados diretamente, mexe nessas entradas.
 >
 >%%TAGS%%
->#MECANISMO-INSTRUMENTACAO-NEUTRO
+>#semantica/MECANISMO-INSTRUMENTACAO-NEUTRO
 ^vs6wl3vx05
 
 
@@ -154,7 +149,7 @@ status: pendente
 >XMEAS é a planta observada: aquilo que o controlador e o monitoramento conseguem enxergar.
 >
 >%%TAGS%%
->#MECANISMO-INSTRUMENTACAO-NEUTRO
+>#semantica/MECANISMO-INSTRUMENTACAO-NEUTRO
 ^xkytd9epjo
 
 
@@ -169,7 +164,7 @@ status: pendente
 >IDV transforma o TEP em banco de ensaio: cada perturbação testa uma fragilidade diferente da estratégia de controle.
 >
 >%%TAGS%%
->#MECANISMO-BENCHMARKING-NEUTRO
+>#semantica/MECANISMO-BENCHMARKING-NEUTRO
 ^5k2z63jphsq
 
 
@@ -184,7 +179,7 @@ status: pendente
 >Aqui o artigo separa planta simulada, integrador numérico, controladores e loop de execução.
 >
 >%%TAGS%%
->#MECANISMO-CALCULO_NUMERICO-NEUTRO
+>#semantica/MECANISMO-CALCULO_NUMERICO-NEUTRO
 ^0jeocmszd379
 
 
@@ -199,7 +194,7 @@ status: pendente
 >O controle não deve apenas rastrear setpoints; ele deve manter a planta dentro de limites físicos e de segurança.
 >
 >%%TAGS%%
->#REQUISITO-CONTROLE_AUTOMATICO-NEUTRO
+>#semantica/REQUISITO-CONTROLE_AUTOMATICO-NEUTRO
 ^mei7s056d98
 
 
@@ -214,7 +209,7 @@ status: pendente
 >A qualidade do controle é julgada pela variabilidade de vazão e composição do produto, não apenas pelo erro instantâneo de uma malha.
 >
 >%%TAGS%%
->#METRICA-CONTROLE_AUTOMATICO-NEUTRO
+>#semantica/METRICA-CONTROLE_AUTOMATICO-NEUTRO
 ^17axcx2rosh
 
 
@@ -229,7 +224,7 @@ status: pendente
 >O TEP considera impacto da planta sobre unidades a montante; mexer demais nas vazões de alimentação também é um problema operacional.
 >
 >%%TAGS%%
->#MECANISMO-INTEGRACAO_INDUSTRIAL-NEUTRO
+>#semantica/MECANISMO-INTEGRACAO_INDUSTRIAL-NEUTRO
 ^heeflotux2u
 
 
@@ -244,7 +239,7 @@ status: pendente
 >Os autores recusam reduzir desempenho a uma única fórmula; desempenho envolve trade-offs, falhas de medição, operador, manutenção e implementação.
 >
 >%%TAGS%%
->#TRADEOFF-BENCHMARKING-NEUTRO
+>#semantica/TRADEOFF-BENCHMARKING-NEUTRO
 ^ihw0jz6rqh
 
 
@@ -259,7 +254,7 @@ status: pendente
 >O artigo propõe cenários comuns para comparar estratégias de controle em bases semelhantes.
 >
 >%%TAGS%%
->#MECANISMO-BENCHMARKING-NEUTRO
+>#semantica/MECANISMO-BENCHMARKING-NEUTRO
 ^86fjqhgoboe
 
 
@@ -274,7 +269,7 @@ status: pendente
 >Além de controlar, a planta pode ser otimizada: perdas em purga, subprodutos, compressor e vapor entram no custo.
 >
 >%%TAGS%%
->#MECANISMO-SUPERVISAO-NEUTRO
+>#semantica/MECANISMO-SUPERVISAO-NEUTRO
 ^zcr5jsj3glj
 
 
@@ -289,7 +284,7 @@ status: pendente
 >O TEP não foi criado para uma única técnica; ele serve para controle plant-wide, MIMO, MPC, controle adaptativo, não linear, diagnóstico e educação.
 >
 >%%TAGS%%
->#MECANISMO-BENCHMARKING-NEUTRO
+>#semantica/MECANISMO-BENCHMARKING-NEUTRO
 ^zkopi8iyg6
 
 
@@ -304,7 +299,7 @@ status: pendente
 >O modelo assume vasos bem misturados, gases ideais, equilíbrio vapor-líquido por Raoult e pressão de vapor por Antoine.
 >
 >%%TAGS%%
->#MECANISMO-MODELAGEM-NEUTRO
+>#semantica/MECANISMO-MODELAGEM-NEUTRO
 ^j93sck7nyx
 
 
@@ -320,7 +315,7 @@ status: pendente
 >Os autores assumem explicitamente uma decisão de modelagem: manter dinâmica realista sem tornar o sistema rígido demais numericamente.
 >
 >%%TAGS%%
->#TRADEOFF-CALCULO_NUMERICO-NEUTRO
+>#semantica/TRADEOFF-CALCULO_NUMERICO-NEUTRO
 ^h6kerzc6x4
 
 
@@ -335,7 +330,7 @@ status: pendente
 >O FORTRAN fornece a função da planta; o usuário precisa fornecer integrador, controladores e rotina de saída.
 >
 >%%TAGS%%
->#MECANISMO-SOFTWARE-NEUTRO
+>#semantica/MECANISMO-SOFTWARE-NEUTRO
 ^jvds8r7sis
 
 
@@ -350,5 +345,5 @@ status: pendente
 >Esta figura mostra a resposta em malha aberta da planta a uma mudança em degrau na vazão de água de resfriamento do reator. O ponto importante é que uma única atuação térmica no reator se propaga por várias variáveis da planta: alimentação do reator, pressão, nível, temperatura, separador, purga e stripper. Isso evidencia o caráter acoplado e multivariável do Tennessee Eastman Process: mexer em uma variável manipulada não afeta apenas uma saída, mas reorganiza a dinâmica de várias unidades conectadas por reação, separação e reciclo.
 >
 >%%TAGS%%
->#MECANISMO-INTEGRACAO_INDUSTRIAL-NEUTRO
+>#semantica/MECANISMO-INTEGRACAO_INDUSTRIAL-NEUTRO
 ^b7gr6awnh4t

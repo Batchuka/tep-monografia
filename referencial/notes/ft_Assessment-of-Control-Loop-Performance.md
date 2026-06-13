@@ -1,15 +1,10 @@
 ---
-type: ft
 annotation-target: articles/art9_Assessment-of-Control-Loop-Performance_Harris.pdf
 titulo: Assessment of control loop performance
 autor: Burns, W.L.
 ano: 2016
 fonte:
-tema:
-conecta-com: []
-tags: [POLITICA_PROPOSTA]
-lido-em:
-status: pendente
+tema: politica_supervisao/tecnica
 ---
 
 ## O que diz
@@ -49,7 +44,7 @@ status: pendente
 >
 >
 >%%TAGS%%
->#REQUISITO-BENCHMARKING-POSITIVO
+>#semantica/REQUISITO-BENCHMARKING-POSITIVO
 ^qf04ncgd319
 
 
@@ -65,7 +60,7 @@ status: pendente
 >
 >Para o Tennessee Eastman, posso avaliar uma malha não apenas por overshoot ou settling time, mas também pela variabilidade residual da variável controlada durante operação contínua.
 >%%TAGS%%
->#METRICA-BENCHMARKING-POSITIVO
+>#semantica/METRICA-BENCHMARKING-POSITIVO
 ^a8foveplqev
 
 
@@ -87,7 +82,7 @@ status: pendente
 >Conclusão para meu TCC:
 >Isso conversa diretamente com o meu TCC: o digital twin pode gerar dados contínuos de operação e permitir que o supervisor avalie malhas sem precisar interromper ou perturbar artificialmente a planta.
 >%%TAGS%%
->#MECANISMO-BENCHMARKING-POSITIVO
+>#semantica/MECANISMO-BENCHMARKING-POSITIVO
 ^m6gi5eb406
 
 
@@ -116,7 +111,7 @@ status: pendente
 >
 >Essa separação também sustenta a futura camada supervisória. O supervisor não deve olhar apenas para a saída e concluir que a malha está ruim. Ele precisa perguntar: a variabilidade observada vem de má atuação do controlador, de uma perturbação previsível não compensada, de atraso inevitável ou de ruído estatístico? O valor do digital twin é justamente permitir repetir esse experimento várias vezes, como um Monte Carlo controlado, mudando sementes, perturbações e janelas de observação para testar se o diagnóstico da malha é robusto.
 >%%TAGS%%
->#MECANISMO-SISTEMAS_DINAMICOS-POSITIVO
+>#semantica/MECANISMO-SISTEMAS_DINAMICOS-POSITIVO
 ^324iz2ep1xm
 
 
@@ -134,7 +129,7 @@ status: pendente
 >Conclusão para meu TCC:
 >Minha camada supervisória não pode interpretar toda variabilidade como falha de controle. Em processos com atraso, existe uma parcela inevitável de erro que nenhum controlador feedback consegue remover instantaneamente.
 >%%TAGS%%
->#LIMITE-CONTROLE_AUTOMATICO-POSITIVO
+>#semantica/LIMITE-CONTROLE_AUTOMATICO-POSITIVO
 ^cnd1ljt24uv
 
 
@@ -152,7 +147,7 @@ status: pendente
 >Conclusão para meu TCC:
 >No meu projeto, isso sustenta a ideia de monitoramento online: o sistema pode observar XMEAS e XMV ao longo do tempo e inferir qualidade de controle sem executar experimentos agressivos na planta.
 >%%TAGS%%
->#MECANISMO-DIAGNOSTICO-POSITIVO
+>#semantica/MECANISMO-DIAGNOSTICO-POSITIVO
 ^w6y5d5gr6nr
 
 
@@ -174,7 +169,7 @@ status: pendente
 >A consequência é: o efeito de U_t só aparece em Y_t depois de algumas amostras. Isso é essencial para o Harris Benchmark.
 >
 >%%TAGS%%
->#MECANISMO-CALCULO_NUMERICO-POSITIVO
+>#semantica/MECANISMO-CALCULO_NUMERICO-POSITIVO
 ^48n1xtlaaws
 
 
@@ -205,7 +200,7 @@ status: pendente
 >
 >Isso é importante porque tua planta dinâmica original pode ser não linear e contínua, mas a avaliação de desempenho da malha pode ser feita em cima dos dados amostrados, como série temporal discreta.
 >%%TAGS%%
->#MECANISMO-SISTEMAS_DINAMICOS-POSITIVO
+>#semantica/MECANISMO-SISTEMAS_DINAMICOS-POSITIVO
 ^5liwav3nkou
 
 
@@ -231,5 +226,5 @@ status: pendente
 >
 >Em termos do Harris: o erro inevitável é o que sobra mesmo no controle de variância mínima; portanto, ele não é “falha de sintonia”, é limite imposto por atraso + perturbação + informação disponível.
 >%%TAGS%%
->#LIMITE-BENCHMARKING-POSITIVO
+>#semantica/LIMITE-BENCHMARKING-POSITIVO
 ^f4fp2z5k0th

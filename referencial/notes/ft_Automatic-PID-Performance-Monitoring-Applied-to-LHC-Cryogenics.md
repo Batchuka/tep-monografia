@@ -1,15 +1,10 @@
 ---
-type: resumo
 annotation-target: articles/art2_Automatic-PID-Performance-Monitoring-Applied-to-LHC-Cryogenics_Bradu_Vinuela_Tilaro.pdf
 titulo: Automatic Assessment of PID Controllers Applied to the LHC Cryogenic System
 autor: Blanco Viñuela; Fernández Adiego; Gayet; Goddet
 ano: "2013"
 fonte: ICALEPCS 2013 — Proceedings
-tema: qualidade de malhas PID; Índice de Preditividade; criogenia
-conecta-com:
-lido-em: 2026-06-06
-tags: [POLITICA_IMPLEMENTACAO]
-status: lido
+tema: politica_supervisao/tecnica
 ---
 
 
@@ -55,7 +50,7 @@ status: lido
 >
 >Se você quiser enfatizar a camada acima das malhas, também caberia 'SUPERVISAO'
 >%%TAGS%%
->#REQUISITO-BENCHMARKING-POSITIVO, #REQUISITO-SUPERVISAO-POSITIVO
+>#semantica/REQUISITO-BENCHMARKING-POSITIVO, #semantica/REQUISITO-SUPERVISAO-POSITIVO
 ^u9izq95yr7e
 
 
@@ -71,7 +66,7 @@ status: lido
 >
 >Porque a nota mostra que o CERN não opera esses PIDs como lógicas isoladas: eles estão dentro de um framework industrial padronizado, o UNICOS, que organiza controle, operação e infraestrutura.
 >%%TAGS%%
->#MECANISMO-INTEGRACAO_INDUSTRIAL-POSITIVO
+>#semantica/MECANISMO-INTEGRACAO_INDUSTRIAL-POSITIVO
 ^v3l8hdyvkdh
 
 
@@ -89,7 +84,7 @@ status: lido
 >
 >Ela reforça seu argumento: em operação industrial real, não basta controlar; é preciso detectar quais malhas estão degradadas.
 >%%TAGS%%
->#REQUISITO-DIAGNOSTICO-POSITIVO
+>#semantica/REQUISITO-DIAGNOSTICO-POSITIVO
 ^0lvl58wpi36
 
 
@@ -107,7 +102,7 @@ status: lido
 >
 >Isso reforça positivamente seu argumento de que é preciso monitorar desempenho, não apenas violação de limites.
 >%%TAGS%%
->#LIMITE-DIAGNOSTICO-POSITIVO
+>#semantica/LIMITE-DIAGNOSTICO-POSITIVO
 ^6hdihaz6de7
 
 
@@ -125,7 +120,7 @@ status: lido
 >
 >Mas eu prefiro BENCHMARKING, porque o foco da nota é o cálculo do indicador, não ainda a decisão operacional de diagnosticar uma malha ruim.
 >%%TAGS%%
->#MECANISMO-BENCHMARKING-POSITIVO, #MECANISMO-DIAGNOSTICO-POSITIVO
+>#semantica/MECANISMO-BENCHMARKING-POSITIVO, #semantica/MECANISMO-DIAGNOSTICO-POSITIVO
 ^kpangmwo9vp
 
 
@@ -143,7 +138,7 @@ status: lido
 >
 >Mas eu prefiro DIAGNOSTICO, porque a função prática da técnica é identificar malhas PID degradadas.
 >%%TAGS%%
->#MECANISMO-DIAGNOSTICO-POSITIVO, #MECANISMO-BENCHMARKING-POSITIVO
+>#semantica/MECANISMO-DIAGNOSTICO-POSITIVO, #semantica/MECANISMO-BENCHMARKING-POSITIVO
 ^0pq9v8gwuykk
 
 
@@ -159,7 +154,7 @@ status: lido
 >
 >Porque o trecho mostra como o algoritmo evita falsos positivos: ele não usa só o PI bruto, mas adiciona condições auxiliares antes de declarar uma malha como ruim.
 >%%TAGS%%
->#MECANISMO-DIAGNOSTICO-POSITIVO
+>#semantica/MECANISMO-DIAGNOSTICO-POSITIVO
 ^qqt0ygvmcd
 
 
@@ -175,7 +170,7 @@ status: lido
 >
 >Porque a nota define o que a métrica mede: a fração do erro da malha que permanece imprevisível após a predição.
 >%%TAGS%%
->#METRICA-BENCHMARKING-POSITIVO
+>#semantica/METRICA-BENCHMARKING-POSITIVO
 ^17x7pbz9h
 
 
@@ -193,7 +188,7 @@ status: lido
 >
 >Se quiser uma segunda tag, menos central: diagnóstico
 >%%TAGS%%
->#TRADEOFF-DIAGNOSTICO-POSITIVO, #MECANISMO-DIAGNOSTICO-POSITIVO
+>#semantica/TRADEOFF-DIAGNOSTICO-POSITIVO, #semantica/MECANISMO-DIAGNOSTICO-POSITIVO
 ^ma9cwtxr7os
 
 
@@ -209,5 +204,5 @@ status: lido
 >
 >Porque o insight central é um trade-off de controle: melhorar o rastreamento do nível pode piorar o esforço/oscilação do atuador; suavizar o atuador pode piorar o erro da variável controlada.
 >%%TAGS%%
->#TRADEOFF-CONTROLE_AUTOMATICO-POSITIVO, #TRADEOFF-INSTRUMENTACAO-POSITIVO
+>#semantica/TRADEOFF-CONTROLE_AUTOMATICO-POSITIVO, #semantica/TRADEOFF-INSTRUMENTACAO-POSITIVO
 ^35fk1zrjvo2

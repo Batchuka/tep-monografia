@@ -1,15 +1,10 @@
 ---
-type: ft
-annotation-target: C:\projetos\pessoal\tep-monografia\notes\books\book2_OPC-Unified-Architecture_Mahnke,_Leitner_Damm.pdf
+annotation-target: books\book2_OPC-Unified-Architecture_Mahnke,_Leitner_Damm.pdf
 titulo: OPC Unified Architecture
 autor: Wolfgang Mahnke, Stefan-Helmut Leitner, Matthias Damm
 ano: 2009
 fonte: Springer
-tema: OPC UA, Arquitetura, Comunicação Industrial
-conecta-com: []
-lido-em: 2026-06-12
-tags: [INTEGRACAO_PROPOSTA]
-status: lido
+tema: integracao_supervisao/espirito
 ---
 
 # Nota: OPC Unified Architecture - Mahnke, Leitner & Damm

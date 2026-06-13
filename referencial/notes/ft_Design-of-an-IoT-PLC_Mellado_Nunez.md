@@ -1,15 +1,10 @@
 ---
-type: ft
 annotation-target: articles/art11_Design-of-an-IoT-PLC-A-Containerized-Programmeble-Logical-Controller-for-the-Industry-4_Mellado_Nunez.pdf
 titulo: Design of an IoT-PLC - A containerized programmeble logical controller for the Industry 4.0
 autor: Jacob Mellado, Felipe Núñez
 ano: 2021
 fonte: Journal of Industrial Information Integration
-tema: IoT-PLC, Controlador Lógico Programável, Industry 4.0, Containerização
-conecta-com: []
-lido-em: 2026-06-12
-tags: []
-status: lido
+tema: runtime_supervisao/espirito
 ---
 
 # Nota: Design of an IoT-PLC - A containerized programmeble logical controller for the Industry 4.0

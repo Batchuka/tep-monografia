@@ -1,0 +1,72 @@
+{
+  "collapse-filter": false,
+  "search": "",
+  "showTags": true,
+  "showAttachments": true,
+  "hideUnresolved": false,
+  "showOrphans": true,
+  "collapse-color-groups": false,
+  "colorGroups": [
+    {
+      "query": "[tema:problema_supervisao]",
+      "color": {
+        "a": 1,
+        "rgb": 14034523
+      }
+    },
+    {
+      "query": "[tema:politica_supervisao/espirito]",
+      "color": {
+        "a": 1,
+        "rgb": 1711615
+      }
+    },
+    {
+      "query": "[tema:politica_supervisao/tecnica]",
+      "color": {
+        "a": 1,
+        "rgb": 5614591
+      }
+    },
+    {
+      "query": "[tema:runtime_supervisao/espirito]",
+      "color": {
+        "a": 1,
+        "rgb": 678425
+      }
+    },
+    {
+      "query": "[tema:runtime_supervisao/tecnica]",
+      "color": {
+        "a": 1,
+        "rgb": 5025868
+      }
+    },
+    {
+      "query": "[tema:integracao_supervisao/espirito]",
+      "color": {
+        "a": 1,
+        "rgb": 8716543
+      }
+    },
+    {
+      "query": "[tema:implementacao]",
+      "color": {
+        "a": 1,
+        "rgb": 16744272
+      }
+    }
+  ],
+  "collapse-display": false,
+  "showArrow": false,
+  "textFadeMultiplier": 0,
+  "nodeSizeMultiplier": 1.27837370242215,
+  "lineSizeMultiplier": 2.80432525951557,
+  "collapse-forces": false,
+  "centerStrength": 0.558823529411765,
+  "repelStrength": 20,
+  "linkStrength": 1,
+  "linkDistance": 250,
+  "scale": 0.16348370567220297,
+  "close": false
+}

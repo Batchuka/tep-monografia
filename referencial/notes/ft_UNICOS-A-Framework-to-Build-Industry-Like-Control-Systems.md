@@ -1,15 +1,10 @@
 ---
-type: ft
 annotation-target: articles/art6_UNICOS-A-Framework-to-Build-Industry-Like-Control-Systems_Gayet_Barillere.pdf
 titulo: UNICOS — A Framework to Build Industry-Like Control Systems
 autor:
 ano:
 fonte: CERN
-tema:
-conecta-com: []
-lido-em:
-tags: [RUNTIME_LACUNA]
-status: em-leitura
+tema: politica_supervisao/tecnica
 ---
 
 ## O que diz
@@ -47,7 +42,7 @@ status: em-leitura
 >
 >Porque a nota não fala de PID nem de dinâmica da planta; ela mostra um mecanismo arquitetural usado pelo CERN para estruturar aplicações de controle industrial em camadas. Positivo porque reforça sua ideia de organizar o digital twin/control system com entidades modulares e hierarquia operacional.
 >%%TAGS%%
->#MECANISMO-INTEGRACAO_INDUSTRIAL-POSITIVO
+>#semantica/MECANISMO-INTEGRACAO_INDUSTRIAL-POSITIVO
 ^1u6ohu3fy3g
 
 
@@ -65,7 +60,7 @@ status: em-leitura
 >
 >É positivo para seu argumento porque justifica a necessidade de uma camada/modelo comum de integração, como UNICOS ou uma arquitetura modular inspirada em entidades operacionais.
 >%%TAGS%%
->#LIMITE-INTEGRACAO_INDUSTRIAL-POSITIVO
+>#semantica/LIMITE-INTEGRACAO_INDUSTRIAL-POSITIVO
 ^fgbsk42c8q5
 
 
@@ -84,7 +79,7 @@ status: em-leitura
 >
 >É positivo porque reforça sua tese de que uma arquitetura industrial robusta não depende de um fornecedor único, mas de uma camada lógica padronizada que integra hardware e software diversos.
 >%%TAGS%%
->#MECANISMO-INTEGRACAO_INDUSTRIAL-POSITIVO
+>#semantica/MECANISMO-INTEGRACAO_INDUSTRIAL-POSITIVO
 ^ljvivz5wsq
 
 
@@ -102,7 +97,7 @@ status: em-leitura
 >
 >Eu não colocaria como INTEGRACAO_INDUSTRIAL aqui, porque a ênfase não é interoperabilidade entre sistemas, mas modelo lógico de representação da planta.
 >%%TAGS%%
->#MECANISMO-MODELAGEM-POSITIVO
+>#semantica/MECANISMO-MODELAGEM-POSITIVO
 ^7l2ljodsinn
 
 
@@ -124,7 +119,7 @@ status: em-leitura
 >
 >Eu manteria em MODELAGEM, não em INTEGRACAO_INDUSTRIAL, porque o ponto forte aqui não é conectar fornecedores diferentes, mas criar uma representação operacional da planta em camadas.
 >%%TAGS%%
->#MECANISMO-MODELAGEM-POSITIVO
+>#semantica/MECANISMO-MODELAGEM-POSITIVO
 ^kjc6jpp3ckp
 
 
@@ -142,7 +137,7 @@ status: em-leitura
 >
 >Mas cuidado: a frase citada fala em modificação por especialista na fase de programação. Então eu não afirmaria ainda que isso está disponível em operação. Essa parte é uma hipótese sua, não uma conclusão direta do trecho.
 >%%TAGS%%
->#REQUISITO-SUPERVISAO-NEUTRO
+>#semantica/REQUISITO-SUPERVISAO-NEUTRO
 ^15ryb7qz3gc
 
 
@@ -160,7 +155,7 @@ status: em-leitura
 >
 >Eu não colocaria como MODELAGEM aqui: a modelagem aparece, mas o ponto principal é a interface operacional entre PLC e supervisão.
 >%%TAGS%%
->#MECANISMO-SUPERVISAO-POSITIVO
+>#semantica/MECANISMO-SUPERVISAO-POSITIVO
 ^wk1kisb92z8
 
 
@@ -178,7 +173,7 @@ status: em-leitura
 >
 >Eu colocaria em INTEGRACAO_INDUSTRIAL, não MODELAGEM, porque a modelagem é o meio; o insight útil é a ponte operacional coerente entre camadas heterogêneas.
 >%%TAGS%%
->#MECANISMO-INTEGRACAO_INDUSTRIAL-POSITIVO
+>#semantica/MECANISMO-INTEGRACAO_INDUSTRIAL-POSITIVO
 ^n7pn2gqb4ln
 
 
@@ -196,7 +191,7 @@ status: em-leitura
 >
 >Eu manteria em MODELAGEM, não SOFTWARE, porque o ponto não é a implementação em código PLC, mas a estrutura conceitual usada antes da implementação.
 >%%TAGS%%
->#MECANISMO-MODELAGEM-POSITIVO
+>#semantica/MECANISMO-MODELAGEM-POSITIVO
 ^960ys8rjqc7
 
 
@@ -214,7 +209,7 @@ status: em-leitura
 >
 >É positivo para seu projeto porque reforça que a modelagem modular precisa ser uma decisão de engenharia baseada em autonomia operacional, não uma simples tradução mecânica de equipamentos para objetos.
 >%%TAGS%%
->#LIMITE-MODELAGEM-POSITIVO
+>#semantica/LIMITE-MODELAGEM-POSITIVO
 ^ycqhaqsfp68
 
 
@@ -232,7 +227,7 @@ status: em-leitura
 >
 >Há um subtexto de LIMITE, mas eu não usaria como tag principal: o ponto mais forte é o mecanismo de geração de infraestrutura, não a limitação em si.
 >%%TAGS%%
->#MECANISMO-SOFTWARE-POSITIVO
+>#semantica/MECANISMO-SOFTWARE-POSITIVO
 ^sn3kenrtefe
 
 
@@ -252,7 +247,7 @@ status: em-leitura
 >
 >Eu não colocaria como MODELAGEM principal, porque aqui o ponto não é representar a planta em si, mas o pipeline de geração model-driven que transforma modelo em software operacional.
 >%%TAGS%%
->#MECANISMO-SOFTWARE-POSITIVO
+>#semantica/MECANISMO-SOFTWARE-POSITIVO
 ^l5d941d9boe
 
 
@@ -270,7 +265,7 @@ status: em-leitura
 >
 >Eu não colocaria como SOFTWARE, porque o ponto principal não é o código em si, mas a independência entre modelo de controle e plataforma/fabricante.
 >%%TAGS%%
->#MECANISMO-INTEGRACAO_INDUSTRIAL-POSITIVO
+>#semantica/MECANISMO-INTEGRACAO_INDUSTRIAL-POSITIVO
 ^7us7x8xs8uw
 
 
@@ -286,7 +281,7 @@ status: em-leitura
 >
 >Porque há uma troca clara: ganha-se abstração, padronização e geração estruturada, mas perde-se eficiência de execução para controle muito rápido/crítico.
 >%%TAGS%%
->#TRADEOFF-SOFTWARE-NEGATIVO
+>#semantica/TRADEOFF-SOFTWARE-NEGATIVO
 ^eotr9swkd6f
 
 
@@ -302,7 +297,7 @@ status: em-leitura
 >
 >Porque explica como a padronização dos objetos melhora operação, troubleshooting, testes e resposta a falhas: o operador interage com objetos coerentes, não com lógica dispersa.
 >%%TAGS%%
->#MECANISMO-SUPERVISAO-POSITIVO
+>#semantica/MECANISMO-SUPERVISAO-POSITIVO
 ^taduh53pcl
 
 
@@ -318,5 +313,5 @@ status: em-leitura
 >
 >Porque há perda de liberdade individual do programador, mas ganho em homogeneidade, transferibilidade e manutenção por qualquer membro da equipe.
 >%%TAGS%%
->#TRADEOFF-SOFTWARE-POSITIVO
+>#semantica/TRADEOFF-SOFTWARE-POSITIVO
 ^gyecal1zim

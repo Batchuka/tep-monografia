@@ -14,15 +14,11 @@ data: 2026-06-12
 
 Vá em: `Configurações → Plugins da comunidade → Procurar`
 
-| Plugin        | Para quê                                                 | Obrigatório? |
-| ------------- | -------------------------------------------------------- | ------------ |
-| **Templater** | Insere templates com data automática e prompts           | Sim          |
-| **Dataview**  | Cria tabelas automáticas a partir dos campos frontmatter | Sim          |
-| **Annotator** | Lê PDFs com highlight e salva anotações como Markdown    | Sim          |
-| **Calendar**  | Navegação por data em notas diárias                      | Opcional     |
-
-Após instalar o Templater:
-`Configurações → Templater → Template folder location → .obsidian/templates`
+| Plugin       | Para quê                                                 | Obrigatório? |
+| ------------ | -------------------------------------------------------- | ------------ |
+| **Dataview** | Cria tabelas automáticas a partir dos campos frontmatter | Sim          |
+| **Annotator**| Lê PDFs com highlight e salva anotações como Markdown    | Sim          |
+| **Calendar** | Navegação por data em notas diárias                      | Opcional     |
 
 ---
 
@@ -58,7 +54,7 @@ O comentário do highlight **é indexado pelo Obsidian** — wikilinks e tags es
 **Após a leitura (5 min):**
 1. Abra `Ctrl+G` (Graph View)
 2. Identifique os nós órfãos (cinza, sem arestas) criados pelos seus links `[[nt_]]`
-3. Para cada nó que merece existir: crie a nota `nt_` via `Alt+N → nt.md`
+3. Para cada nó que merece existir: crie a nota `nt_` (novo arquivo em `referencial/notes/`)
 4. Para os que eram só marcadores descartáveis: ignore — ficam no grafo mas não atrapalham
 
 ### Alternar entre PDF e Markdown
@@ -96,13 +92,17 @@ O comentário do highlight **é indexado pelo Obsidian** — wikilinks e tags es
 
 ---
 
-## Onde ficam os templates
+## Estrutura do vault
 
-`C:\Projetos\tep\Monografia\notes\templates\`
+Todos os arquivos ficam em `referencial/`:
 
-| Template                  | Prefixo | Tipo de nota                       |
-| ------------------------- | ------- | ---------------------------------- |
-| [[ft\|ft.md]]   | `ft_`   | Nota de fonte (artigo/livro + PDF) |
-| [[nt\|nt.md]]   | `nt_`   | Nota atômica de conceito           |
-| [[doc\|doc.md]] | `doc_`  | Documentação do projeto            |
-| [[br\|br.md]]   | `bs_`   | Brainstorming                      |
+```
+referencial/
+├── .obsidian/      # configuração interna do Obsidian
+├── articles/       # PDFs de artigos
+├── books/          # PDFs de livros
+├── notes/          # todas as notas (ft_, nt_, doc_, bs_)
+└── standard/       # PDFs de normas
+```
+
+Não há templates — as notas são criadas manualmente seguindo as convenções documentadas no README.

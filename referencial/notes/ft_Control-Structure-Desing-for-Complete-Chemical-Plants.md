@@ -1,15 +1,10 @@
 ---
-type: ft
 annotation-target: articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf
 titulo: Control structure design for complete chemical plants
 autor: Skogestad, S.
 ano:
 fonte:
-tema:
-conecta-com: []
-tags: [POLITICA_PROPOSTA]
-lido-em:
-status: pendente
+tema: politica_supervisao/espirito
 ---
 
 ## O que diz
@@ -45,7 +40,7 @@ status: pendente
 >Control structure design é anterior ao projeto do controlador. O problema não é ainda “como sintonizar PID/MPC”, mas decidir o que manipular, o que controlar, o que medir e como parear variáveis.
 >
 >%%TAGS%%
->#MECANISMO-SUPERVISAO-NEUTRO
+>#semantica/MECANISMO-SUPERVISAO-NEUTRO
 ^2lt3sfn0kxg
 
 
@@ -60,7 +55,7 @@ status: pendente
 >Plantas químicas são organizadas em camadas temporais de controle. Scheduling, otimização, supervisório e regulatório operam em escalas de tempo diferentes.
 >
 >%%TAGS%%
->#MECANISMO-SUPERVISAO-NEUTRO
+>#semantica/MECANISMO-SUPERVISAO-NEUTRO
 ^x9h81m63di
 
 
@@ -75,7 +70,7 @@ status: pendente
 >O procedimento proposto é dividido em duas partes: top-down e bottom-up. Primeiro vêm objetivos econômicos, graus de liberdade e variáveis controladas primárias; depois vem controle regulatório, pareamento e validação.
 >
 >%%TAGS%%
->#MECANISMO-INTEGRACAO_INDUSTRIAL-NEUTRO
+>#semantica/MECANISMO-INTEGRACAO_INDUSTRIAL-NEUTRO
 ^kes71j9de1
 
 
@@ -90,7 +85,7 @@ status: pendente
 >A definição dos objetivos operacionais vem antes de qualquer estrutura de controle. Skogestad insiste que a planta deve ter uma função custo J, restrições e objetivos explícitos antes de decidir malhas.
 >
 >%%TAGS%%
->#REQUISITO-SUPERVISAO-NEUTRO
+>#semantica/REQUISITO-SUPERVISAO-NEUTRO
 ^n31flm3x1e
 
 
@@ -105,7 +100,7 @@ status: pendente
 >Graus de liberdade são centrais. O número de variáveis manipuladas não é igual automaticamente ao número de graus de liberdade econômicos em regime permanente. Alguns manipuladores ou saídas só têm efeito dinâmico/local.
 >
 >%%TAGS%%
->#MECANISMO-CONTROLE_AUTOMATICO-NEUTRO
+>#semantica/MECANISMO-CONTROLE_AUTOMATICO-NEUTRO
 ^mj7aq1aingq
 
 
@@ -120,7 +115,7 @@ status: pendente
 >A primeira regra econômica é controlar restrições ativas. Se uma restrição está ativa no ótimo econômico, ela deve virar variável controlada primária.
 >
 >%%TAGS%%
->#MECANISMO-SUPERVISAO-NEUTRO
+>#semantica/MECANISMO-SUPERVISAO-NEUTRO
 ^u591wvfc468
 
 
@@ -135,7 +130,7 @@ status: pendente
 >Self-optimizing control é a ideia-chave do artigo. A meta é escolher variáveis que, mantidas em setpoint constante, mantenham a planta próxima do ótimo mesmo com distúrbios.
 >
 >%%TAGS%%
->#MECANISMO-SUPERVISAO-NEUTRO
+>#semantica/MECANISMO-SUPERVISAO-NEUTRO
 ^ajcnh20yj4e
 
 
@@ -150,7 +145,7 @@ status: pendente
 >Bons candidatos a variáveis controladas têm critérios claros. Elas devem ser pouco sensíveis a distúrbios, fáceis de medir/controlar, sensíveis aos manipuladores e independentes entre si.
 >
 >%%TAGS%%
->#METRICA-CONTROLE_AUTOMATICO-NEUTRO
+>#semantica/METRICA-CONTROLE_AUTOMATICO-NEUTRO
 ^pflvacg8fe9
 
 
@@ -165,7 +160,7 @@ status: pendente
 >A localização da taxa de produção determina a estrutura de controle de inventário. Controlar nível com entrada ou saída depende de onde a produção é “setada” na planta; idealmente, no gargalo principal.
 >
 >%%TAGS%%
->#MECANISMO-INTEGRACAO_INDUSTRIAL-NEUTRO
+>#semantica/MECANISMO-INTEGRACAO_INDUSTRIAL-NEUTRO
 ^lp5c1tcqr5m
 
 
@@ -180,5 +175,5 @@ status: pendente
 >MPC não elimina a necessidade de escolher boas variáveis controladas. Controle multivariável ajuda em interações e restrições móveis, mas exige modelo dinâmico, é menos transparente e mais sensível a incertezas.
 >
 >%%TAGS%%
->#TRADEOFF-CONTROLE_AUTOMATICO-NEUTRO
+>#semantica/TRADEOFF-CONTROLE_AUTOMATICO-NEUTRO
 ^g6rqbc165z5

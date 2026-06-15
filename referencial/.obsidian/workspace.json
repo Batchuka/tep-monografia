@@ -4,19 +4,19 @@
     "type": "split",
     "children": [
       {
-        "id": "e7f759a12f7f4eb8",
+        "id": "186c2e332340dfb2",
         "type": "tabs",
         "children": [
           {
-            "id": "4eb713a5ee2627f3",
+            "id": "b6970c673f765beb",
             "type": "leaf",
             "state": {
               "type": "pdf-annotator",
               "state": {
-                "file": "notes/ft_Cloud-Native-Computing-A-Survey-from-the-Perspective-of-Services_Shuiguang_et_al.md"
+                "file": "notes/ft_Borg-Omega-and-Kubernetes.md"
               },
               "icon": "lucide-file",
-              "title": "ft_Cloud-Native-Computing-A-Survey-from-the-Perspective-of-Services_Shuiguang_et_al"
+              "title": "ft_Borg-Omega-and-Kubernetes"
             }
           }
         ]
@@ -93,6 +93,7 @@
             "state": {
               "type": "backlink",
               "state": {
+                "file": "notes/ft_Borg-Omega-and-Kubernetes.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +103,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Links inversos"
+              "title": "Links inversos para ft_Borg-Omega-and-Kubernetes"
             }
           },
           {
@@ -166,13 +167,14 @@
             "type": "leaf",
             "state": {
               "type": "file-properties",
-              "state": {},
+              "state": {
+                "file": "notes/ft_Borg-Omega-and-Kubernetes.md"
+              },
               "icon": "lucide-info",
-              "title": "Propriedades dos arquivos"
+              "title": "Propriedades do arquivo ft_Borg-Omega-and-Kubernetes"
             }
           }
-        ],
-        "currentTab": 4
+        ]
       }
     ],
     "direction": "horizontal",
@@ -190,20 +192,22 @@
       "bases:Criar nova base": false
     }
   },
-  "active": "4eb713a5ee2627f3",
+  "active": "b6970c673f765beb",
   "lastOpenFiles": [
+    "bibTex/art5_Borg-Omega-and-Kubernetes_Burns_Grant_Oppenheimer_Brewer_Wilkes.bib",
+    "bibTex/art5_.bibtex",
+    "notes/ft_Borg-Omega-and-Kubernetes.md",
+    "notes/ft_A-Plantwide-Industrial-Process-Control-Problem.md",
+    "notes/ft_An-Expert-Knowledge-Based-Methodology-for-Online-Detection-of-Signal-Oscillations.md",
+    "notes/ft_Assessment-of-Control-Loop-Performance.md",
     "notes/ft_Cloud-Native-Computing-A-Survey-from-the-Perspective-of-Services_Shuiguang_et_al.md",
     "Sem título.base",
     "notes/ft_UNICOS-A-Framework-to-Build-Industry-Like-Control-Systems.md",
     "notes/ft_Control-Structure-Desing-for-Complete-Chemical-Plants.md",
     "notes/ft_Design-of-an-IoT-PLC_Mellado_Nunez.md",
     "notes/ft_Cloud-Native-Computing-A-Survey-from-the-Perspective-of-Services_Shuiguang_et_al.md.tmp.35964.3968c177abdd",
-    "notes/ft_A-Plantwide-Industrial-Process-Control-Problem.md",
-    "notes/ft_Borg-Omega-and-Kubernetes.md",
-    "notes/ft_Assessment-of-Control-Loop-Performance.md",
     "notes/ft_Model-Learning-Algorithms-for-Anomaly-Detection-in-CERN-Control-Systems.md",
     "notes/ft_Mechatronic-Futures_Hehenberger_Bradley.md",
-    "notes/ft_An-Expert-Knowledge-Based-Methodology-for-Online-Detection-of-Signal-Oscillations.md",
     "notes/ft_IEC_61512-1.md",
     "articles/art12_Cloud-Native-Computing-A-Survey-from-the-Perspective-of-Services_Shuiguang_et_al.pdf",
     "bibTex/art12_Cloud-Native-Computing-A-Survey-from-the-Perspective-of-Services_Shuiguang_et_al.bib",
@@ -212,7 +216,6 @@
     "articles/art12_.pdf",
     "articles/Não confirmado 98880.crdownload",
     "bibTex/art11_Design-of-an-IoT-PLC-A-Containerized-Programmeble-Logical-Controller-for-the-Industry-4_Mellado_Nunez.bib",
-    "bibTex/S2452414X21000492.bib",
     "notes/ft_Kubernetes-Orchestration-of-High-Availability_Johansson_et_al.md",
     "notes/ft_OPC-Unified-Architecture_Mahnke_Leitner_Damm.md",
     "notes/ft_Plantwide-Control-A-Review-and-a-new-Design-Procedure.md",

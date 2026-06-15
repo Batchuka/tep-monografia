@@ -4,11 +4,11 @@
     "type": "split",
     "children": [
       {
-        "id": "4decd58b99a3d0f8",
+        "id": "e7f759a12f7f4eb8",
         "type": "tabs",
         "children": [
           {
-            "id": "8ed9f8d06934b14f",
+            "id": "4eb713a5ee2627f3",
             "type": "leaf",
             "state": {
               "type": "pdf-annotator",
@@ -76,7 +76,8 @@
       }
     ],
     "direction": "horizontal",
-    "width": 371.5
+    "width": 371.5,
+    "collapsed": true
   },
   "right": {
     "id": "2b1e6e84b0c00a82",
@@ -189,10 +190,10 @@
       "bases:Criar nova base": false
     }
   },
-  "active": "8ed9f8d06934b14f",
+  "active": "4eb713a5ee2627f3",
   "lastOpenFiles": [
-    "Sem título.base",
     "notes/ft_Cloud-Native-Computing-A-Survey-from-the-Perspective-of-Services_Shuiguang_et_al.md",
+    "Sem título.base",
     "notes/ft_UNICOS-A-Framework-to-Build-Industry-Like-Control-Systems.md",
     "notes/ft_Control-Structure-Desing-for-Complete-Chemical-Plants.md",
     "notes/ft_Design-of-an-IoT-PLC_Mellado_Nunez.md",

@@ -4,19 +4,19 @@
     "type": "split",
     "children": [
       {
-        "id": "3115daf54854c51d",
+        "id": "8d226705b9300fa9",
         "type": "tabs",
         "children": [
           {
-            "id": "1c3682a89fe93d11",
+            "id": "aaffecf928d8bc5f",
             "type": "leaf",
             "state": {
               "type": "pdf-annotator",
               "state": {
-                "file": "notes/ft_Control-Structure-Desing-for-Complete-Chemical-Plants.md"
+                "file": "notes/ft_Plantwide-Control-A-Review-and-a-new-Design-Procedure.md"
               },
               "icon": "lucide-file",
-              "title": "ft_Control-Structure-Desing-for-Complete-Chemical-Plants"
+              "title": "ft_Plantwide-Control-A-Review-and-a-new-Design-Procedure"
             }
           }
         ]
@@ -92,7 +92,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "notes/ft_Control-Structure-Desing-for-Complete-Chemical-Plants.md",
+                "file": "notes/ft_Plantwide-Control-A-Review-and-a-new-Design-Procedure.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Links inversos para ft_Control-Structure-Desing-for-Complete-Chemical-Plants"
+              "title": "Links inversos para ft_Plantwide-Control-A-Review-and-a-new-Design-Procedure"
             }
           },
           {
@@ -167,10 +167,10 @@
             "state": {
               "type": "file-properties",
               "state": {
-                "file": "notes/ft_Control-Structure-Desing-for-Complete-Chemical-Plants.md"
+                "file": "notes/ft_Plantwide-Control-A-Review-and-a-new-Design-Procedure.md"
               },
               "icon": "lucide-info",
-              "title": "Propriedades do arquivo ft_Control-Structure-Desing-for-Complete-Chemical-Plants"
+              "title": "Propriedades do arquivo ft_Plantwide-Control-A-Review-and-a-new-Design-Procedure"
             }
           }
         ]
@@ -191,14 +191,16 @@
       "bases:Criar nova base": false
     }
   },
-  "active": "1c3682a89fe93d11",
+  "active": "aaffecf928d8bc5f",
   "lastOpenFiles": [
-    "notes/ft_Cloud-Native-Computing-A-Survey-from-the-Perspective-of-Services_Shuiguang_et_al.md",
+    "notes/ft_Plantwide-Control-A-Review-and-a-new-Design-Procedure.md",
+    "notes/ft_UNICOS-A-Framework-to-Build-Industry-Like-Control-Systems.md",
+    "notes/ft_OPC-Unified-Architecture_Mahnke_Leitner_Damm.md",
     "notes/ft_Control-Structure-Desing-for-Complete-Chemical-Plants.md",
+    "notes/ft_Cloud-Native-Computing-A-Survey-from-the-Perspective-of-Services_Shuiguang_et_al.md",
     "notes/ft_Design-of-an-IoT-PLC_Mellado_Nunez.md",
     "notes/ft_Kubernetes-Orchestration-of-High-Availability_Johansson_et_al.md",
     "notes/ft_Mechatronic-Futures_Hehenberger_Bradley.md",
-    "notes/ft_UNICOS-A-Framework-to-Build-Industry-Like-Control-Systems.md",
     "notes/ft_Borg-Omega-and-Kubernetes.md",
     "bibTex/art5_Borg-Omega-and-Kubernetes_Burns_Grant_Oppenheimer_Brewer_Wilkes.bib",
     "bibTex/art5_.bibtex",
@@ -215,8 +217,6 @@
     "articles/art12_Cloud-Native-Computing-A-Survey-from-the-Perspective-of-Services_.pdf",
     "articles/art12_.pdf",
     "articles/Não confirmado 98880.crdownload",
-    "notes/ft_OPC-Unified-Architecture_Mahnke_Leitner_Damm.md",
-    "notes/ft_Plantwide-Control-A-Review-and-a-new-Design-Procedure.md",
     "notes/ft_IEC_61512.md",
     "notes/ft_Automatic-PID-Performance-Monitoring-Applied-to-LHC-Cryogenics.md",
     "notes/ft_IEC_62541.md",

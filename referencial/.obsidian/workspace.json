@@ -4,20 +4,35 @@
     "type": "split",
     "children": [
       {
-        "id": "c12f13103c3c3765",
+        "id": "313d8eb6f419631e",
         "type": "tabs",
         "children": [
           {
-            "id": "c7b72de7a0675770",
+            "id": "9ed69b11654ed4e8",
             "type": "leaf",
             "state": {
-              "type": "graph",
-              "state": {},
-              "icon": "lucide-git-fork",
-              "title": "Graph view"
+              "type": "pdf-annotator",
+              "state": {
+                "file": "notes/ft_Kubernetes-Orchestration-of-High-Availability_Johansson_et_al.md"
+              },
+              "icon": "lucide-file",
+              "title": "ft_Kubernetes-Orchestration-of-High-Availability_Johansson_et_al"
+            }
+          },
+          {
+            "id": "220c8f94cbd990e4",
+            "type": "leaf",
+            "state": {
+              "type": "pdf-annotator",
+              "state": {
+                "file": "notes/ft_Design-of-an-IoT-PLC_Mellado_Nunez.md"
+              },
+              "icon": "lucide-file",
+              "title": "ft_Design-of-an-IoT-PLC_Mellado_Nunez"
             }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "vertical"
@@ -74,7 +89,8 @@
       }
     ],
     "direction": "horizontal",
-    "width": 391.5
+    "width": 371.5,
+    "collapsed": true
   },
   "right": {
     "id": "2b1e6e84b0c00a82",
@@ -187,12 +203,24 @@
       "bases:Create new base": false
     }
   },
-  "active": "c7b72de7a0675770",
+  "active": "220c8f94cbd990e4",
   "lastOpenFiles": [
+    "articles/art12_Cloud-Native-Computing-A-Survey-from-the-Perspective-of-Services_Shuiguang_et_al.pdf",
+    "bibTex/art12_Cloud-Native-Computing-A-Survey-from-the-Perspective-of-Services_Shuiguang_et_al.bib",
+    "bibTex/art12_Cloud-Native-Computing-A-Survey-from-the-Perspective-of-Services_.bib",
+    "articles/art12_Cloud-Native-Computing-A-Survey-from-the-Perspective-of-Services_.pdf",
+    "articles/art12_.pdf",
+    "articles/Não confirmado 98880.crdownload",
+    "bibTex/art11_Design-of-an-IoT-PLC-A-Containerized-Programmeble-Logical-Controller-for-the-Industry-4_Mellado_Nunez.bib",
+    "bibTex/S2452414X21000492.bib",
+    "bibTex/Não confirmado 929643.crdownload",
+    "bibTex",
+    "Nova pasta",
+    "notes/ft_Kubernetes-Orchestration-of-High-Availability_Johansson_et_al.md",
+    "notes/ft_A-Plantwide-Industrial-Process-Control-Problem.md",
     "notes/ft_UNICOS-A-Framework-to-Build-Industry-Like-Control-Systems.md",
     "notes/ft_OPC-Unified-Architecture_Mahnke_Leitner_Damm.md",
     "notes/ft_Plantwide-Control-A-Review-and-a-new-Design-Procedure.md",
-    "notes/ft_Kubernetes-Orchestration-of-High-Availability_Johansson_et_al.md",
     "notes/ft_Mechatronic-Futures_Hehenberger_Bradley.md",
     "notes/ft_Model-Learning-Algorithms-for-Anomaly-Detection-in-CERN-Control-Systems.md",
     "notes/ft_Control-Structure-Desing-for-Complete-Chemical-Plants.md",
@@ -203,20 +231,9 @@
     "notes/ft_Automatic-PID-Performance-Monitoring-Applied-to-LHC-Cryogenics.md",
     "notes/ft_Assessment-of-Control-Loop-Performance.md",
     "notes/ft_An-Expert-Knowledge-Based-Methodology-for-Online-Detection-of-Signal-Oscillations.md",
-    "notes/ft_A-Plantwide-Industrial-Process-Control-Problem.md",
     "notes/ft_IEC_62541.md",
-    "Untitled 1.base",
-    "Untitled.base",
-    "notes",
-    "notes/standard/ft_IEC_62541.md.tmp.22716.6e2d80bd42ae",
-    "notes/standard/ft_IEC_61512.md.tmp.22716.dbf6d4ee8430",
-    "notes/books/book2_OPC Unified Architecture -- Wolfgang Mahnke, Stefan-Helmut Leitner, Matthias Damm -- Springer Nature, Berlin, 2009.pdf",
-    "notes/standard/book2_OPC Unified Architecture -- Wolfgang Mahnke, Stefan-Helmut Leitner, Matthias Damm -- Springer Nature, Berlin, 2009.pdf",
-    "notes/standard/Não confirmado 476842.crdownload",
     "notes/bs_exploracao-tecnologias_20260606.md",
     "README.md",
-    "docs",
-    "notes/ft_Assessment-of-Control-Loop-Performance.md.tmp.22716.5a71988b6918",
     "Plantwide Control.md",
     "notes/standard/IEC 61512.md",
     "Mudei de ideia.md",

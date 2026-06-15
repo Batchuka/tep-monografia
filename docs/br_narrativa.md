@@ -2,7 +2,7 @@
 
 ## Cap1 — Introdução
 
-Se eu fosse explicar de forma simples, eu diria assim: eu sou engenheiro de Controle e Automação, então comecei procurando um problema de engenharia de controle e automação para resolver. Com isso, cheguei no artigo do Downs e Vogel sobre o Tennessee Eastman Process, 'art1_A-Plantwide-Industrial-Process-Control-Problem_Downs_Vogel'. Ele foi o benchmark perfeito, além de ter um problema perfeito ele tem um largo histórico de trabalhos de colegas que podem ser usados para comparação e revisão. Esse artigo propõe uma planta inteira, com modos de operação, objetivos econômicos, restrições, perturbações, variáveis manipuladas e medições.
+Se eu fosse explicar de forma simples, eu diria assim: eu sou engenheiro de Controle e Automação, então comecei procurando um problema de engenharia de controle e automação para resolver. Com isso, cheguei no artigo 'art1_A-Plantwide-Industrial-Process-Control-Problem_Downs_Vogel'. Ele foi o benchmark perfeito; além de ter um problema perfeito ele tem um largo histórico de trabalhos de colegas que podem ser usados para comparação e revisão. Esse artigo propõe uma planta inteira, com modos de operação, objetivos econômicos, restrições, perturbações, variáveis manipuladas e medições.
 
     Então, para mim, o ponto forte do TEP é que ele força uma pergunta maior: quem decide como a planta deve operar? Não é só manter uma variável em um setpoint. A planta pode operar em diferentes modos, com diferentes proporções de produto, diferentes metas de produção e diferentes restrições. Isso já coloca o problema em um nível supervisório. O controle automático continua existindo, mas ele atua dentro de uma política operacional maior.
 
@@ -15,50 +15,24 @@ Se eu fosse explicar de forma simples, eu diria assim: eu sou engenheiro de Cont
     Essa supervisão, embora descrita por abstrações como aplicações, serviços, réplicas e configurações, tem efeitos físicos sobre a infraestrutura computacional. Quando uma política é declarada, o Kubernetes pode decidir em quais servidores os processos vão rodar, criar ou remover instâncias, reiniciar processos falhos, substituir cargas em máquinas indisponíveis, aplicar configurações ao ambiente de execução, limitar consumo de CPU e memória, organizar rotas de comunicação e preservar a disponibilidade do serviço. Portanto, sua atuação não é apenas lógica ou administrativa: ela altera concretamente a ocupação de máquinas, o uso de recursos, o tráfego de rede e a continuidade operacional das aplicações cloud-native.
 
 Achei que seria estratégico buscar o que a comunidade de engenharia de controle está propondo de uso, se é que estava né. Para minha surpresa, encontrei dois artigos que, parando para pensar, são bem ousados:
-- 'art10_Kubernetes-Orchestration-of-High-Availability_Johansson_et_al' → 
-- 'art11_Design-of-an-IoT-PLC-A-Containerized-Programmeble-Logical-Controller-for-the-Industry-4_Mellado_Nunez' →
+- 'art10_Kubernetes-Orchestration-of-High-Availability_Johansson_et_al' → Esse artigo simplesmente confiou ao k8s a orquestração de VDCN, literalmente um controlador industrial virtualizado, literalmente o componente que mantém a malha estável. Então, deixar o k8s ligar ou desligar um componente como esse é até mais agressivo do que o que eu estou proponto.
+- 'art11_Design-of-an-IoT-PLC-A-Containerized-Programmeble-Logical-Controller-for-the-Industry-4_Mellado_Nunez' → Esse artigo, por sua vez, propõe e implementa um PLC especial que ele chama de IoT-PLC, filosoficamente pensado para ser 'cloud-native'. A ideia é justamente facilitar esse tipo de abordagem onde uma função é implantada remotamente, o que é, novamente, ainda mais agressivo do que o que eu estou propondo.
+
+Então, para mim já ficou claro que não só é viável, será uma demanda! Eu comecei a pensar então em como o k8s poderia ser um supervisor. Que tipo de coisas ele estaria observando da planta? como ele saberia que algo precisa ser alterado? O que exatamente ele iria manipular ness planta? Então eu me voltei para o problema original da TEP mais uma vez e tornei a refletir sobre ele. 
+    
+    Foi ai que eu percebi que precisava entender melhor o que era a ideia de 'Plantwide'. Lendo 'art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad', eu entendi que para implementar uma camada de supervisão com k8s eu precisaria representar a planta como um sistema operacionalmente observável: 
+      - quais variáveis são estados críticos, 
+      - quais medições indicam qualidade, produção, segurança e estabilidade, 
+      - quais atuadores ainda possuem autoridade de controle, 
+      - quais restrições estão ativas, 
+      - quais malhas estão saturadas, 
+      - quais distúrbios estão deslocando a planta e ;
+      - quais objetivos globais continuam válidos naquele modo de operação. 
+
+    Em outras palavras, o Kubernetes não poderia apenas “mandar um novo valor” para um PID; ele teria que reconciliar uma política operacional desejada com o estado real observado da planta. Isso envolve decidir quando uma malha local já não é suficiente, quando um setpoint deixou de ser economicamente ou dinamicamente adequado, quando uma restrição passou a dominar a operação, quando um atuador perdeu grau de liberdade e quando a estratégia de controle precisa mudar de configuração. Foi aí que ficou claro para mim que seria necessário uam metodologia de observação.
+
+Eu precisava de duas coisas
+
+---
 
 A minha ideia é trazer essa lógica para a planta simulada. Em vez de usar Kubernetes apenas para manter aplicações rodando, eu quero usá-lo como uma camada supervisória sobre a digital twin do Tennessee Eastman. Ou seja: eu declaro uma política de operação da planta — modo de operação, setpoints, restrições, perturbações permitidas, estratégia de controle ativa — e um supervisor inspirado em Kubernetes observa o estado da planta e aplica ações para manter a operação coerente com essa política.
-
----
-
-**Abertura:** supervisão de múltiplas malhas é inviável manualmente em escala industrial (CERN LHC como exemplo extremo: 5000 malhas PID).
-
-**Gêmeo digital** como solução: permite introduzir distúrbios e degradar controladores deliberadamente, sem risco à planta real.
-
-**TEP** como benchmark: planta química realista, não-linear, 20 distúrbios programados, amplamente adotada — resultados comparáveis à literatura.
-
-**Plantwide control** (Skogestad): hierarquia de três camadas — regulatório → supervisório → otimização em tempo real. É exatamente o que o lab pretende implementar.
-
-**Ênfase do trabalho:** Integração de Sistemas de Controle — interoperabilidade, protocolos abertos, arquitetura de sistemas heterogêneos (não automação pura).
-
-**Kubernetes + Operators** como plataforma supervisória: reconciliação declarativa, separação entre política (CRD) e execução (controller loop).
-
-**Proposta concreta:**
-- núcleo validado: simulador Rust (gRPC) + IHM (FastAPI/WebSocket) + 17 experimentos
-- extensões não validadas: Operator K8s, plantwide control, OPC UA, Índice de Preditividade
-
----
-
-**Seções do capítulo:**
-1. Problema — ambiente de experimentação seguro e reprodutível
-2. A Proposta — o que foi entregue e o que ficou em aberto
-3. Objetivos — geral + 5 específicos
-4. Organização do trabalho
-
----
-
-## Cap2 — Referencial Teórico
-
-**Fio condutor declarado:** TEP + IEC 61499 + Kubernetes/Operators + gRPC + RK4 + Gêmeo Digital
-
-**Seções, em ordem:**
-
-1. **TEP** — o processo (5 unidades, reações, 50 EDOs), XMEAS/XMV, distúrbios IDV, condições de shutdown (ISD)
-2. **Controle P + Índice de Preditividade** — controlador P (3 malhas na planta), PI como métrica de qualidade de malha (CERN), motivação de longo prazo do lab
-3. **Kubernetes e Operators** — reconciliação declarativa, CRDs (spec/status), loop Observar–Avaliar–Agir, Kubebuilder
-4. **gRPC** — protobuf, HTTP/2, 4 modalidades (unário, server streaming, client streaming, bidirecional), escolha motivada por streaming + tipagem + poliglota (Rust/Go/Python)
-5. **OPC UA / IEC 62541** — contexto histórico (antes: protocolos proprietários), arquitetura (espaço de endereçamento, nós, referências), partes relevantes da norma (3, 4, 6, 8, 9, 11, 14), papel futuro no lab (expor XMEAS como AnalogItemType, IDV como métodos)
-6. **RK4** — integração das 50 EDOs, erro O(h⁴), dt=0,001h, deriv_norm como indicador de saúde
-7. **Gêmeo Digital** — origem (NASA Apollo / Iron Bird), 3 níveis (modelo digital → shadow → completo), ciclo de vida, uso para geração de dados de qualidade de malha, enquadramento do lab (shadow em transição para completo)
-8. **Considerações finais** — amarra as escolhas tecnológicas

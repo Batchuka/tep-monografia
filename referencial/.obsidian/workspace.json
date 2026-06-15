@@ -4,19 +4,19 @@
     "type": "split",
     "children": [
       {
-        "id": "71041e4ff759b1b5",
+        "id": "3115daf54854c51d",
         "type": "tabs",
         "children": [
           {
-            "id": "157595d4da2d2608",
+            "id": "1c3682a89fe93d11",
             "type": "leaf",
             "state": {
               "type": "pdf-annotator",
               "state": {
-                "file": "notes/ft_Kubernetes-Orchestration-of-High-Availability_Johansson_et_al.md"
+                "file": "notes/ft_Control-Structure-Desing-for-Complete-Chemical-Plants.md"
               },
               "icon": "lucide-file",
-              "title": "ft_Kubernetes-Orchestration-of-High-Availability_Johansson_et_al"
+              "title": "ft_Control-Structure-Desing-for-Complete-Chemical-Plants"
             }
           }
         ]
@@ -76,8 +76,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 371.5,
-    "collapsed": true
+    "width": 371.5
   },
   "right": {
     "id": "2b1e6e84b0c00a82",
@@ -93,7 +92,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "notes/ft_Kubernetes-Orchestration-of-High-Availability_Johansson_et_al.md",
+                "file": "notes/ft_Control-Structure-Desing-for-Complete-Chemical-Plants.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -103,7 +102,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Links inversos para ft_Kubernetes-Orchestration-of-High-Availability_Johansson_et_al"
+              "title": "Links inversos para ft_Control-Structure-Desing-for-Complete-Chemical-Plants"
             }
           },
           {
@@ -168,10 +167,10 @@
             "state": {
               "type": "file-properties",
               "state": {
-                "file": "notes/ft_Kubernetes-Orchestration-of-High-Availability_Johansson_et_al.md"
+                "file": "notes/ft_Control-Structure-Desing-for-Complete-Chemical-Plants.md"
               },
               "icon": "lucide-info",
-              "title": "Propriedades do arquivo ft_Kubernetes-Orchestration-of-High-Availability_Johansson_et_al"
+              "title": "Propriedades do arquivo ft_Control-Structure-Desing-for-Complete-Chemical-Plants"
             }
           }
         ]
@@ -192,21 +191,21 @@
       "bases:Criar nova base": false
     }
   },
-  "active": "157595d4da2d2608",
+  "active": "1c3682a89fe93d11",
   "lastOpenFiles": [
+    "notes/ft_Cloud-Native-Computing-A-Survey-from-the-Perspective-of-Services_Shuiguang_et_al.md",
+    "notes/ft_Control-Structure-Desing-for-Complete-Chemical-Plants.md",
+    "notes/ft_Design-of-an-IoT-PLC_Mellado_Nunez.md",
+    "notes/ft_Kubernetes-Orchestration-of-High-Availability_Johansson_et_al.md",
     "notes/ft_Mechatronic-Futures_Hehenberger_Bradley.md",
     "notes/ft_UNICOS-A-Framework-to-Build-Industry-Like-Control-Systems.md",
-    "notes/ft_Kubernetes-Orchestration-of-High-Availability_Johansson_et_al.md",
     "notes/ft_Borg-Omega-and-Kubernetes.md",
     "bibTex/art5_Borg-Omega-and-Kubernetes_Burns_Grant_Oppenheimer_Brewer_Wilkes.bib",
     "bibTex/art5_.bibtex",
     "notes/ft_A-Plantwide-Industrial-Process-Control-Problem.md",
     "notes/ft_An-Expert-Knowledge-Based-Methodology-for-Online-Detection-of-Signal-Oscillations.md",
     "notes/ft_Assessment-of-Control-Loop-Performance.md",
-    "notes/ft_Cloud-Native-Computing-A-Survey-from-the-Perspective-of-Services_Shuiguang_et_al.md",
     "Sem título.base",
-    "notes/ft_Control-Structure-Desing-for-Complete-Chemical-Plants.md",
-    "notes/ft_Design-of-an-IoT-PLC_Mellado_Nunez.md",
     "notes/ft_Cloud-Native-Computing-A-Survey-from-the-Perspective-of-Services_Shuiguang_et_al.md.tmp.35964.3968c177abdd",
     "notes/ft_Model-Learning-Algorithms-for-Anomaly-Detection-in-CERN-Control-Systems.md",
     "notes/ft_IEC_61512-1.md",

@@ -29,151 +29,208 @@ tema: politica_supervisao/espirito
 ```
 
 
->%%
->```annotation-json
->{"created":"2026-06-08T19:51:20.147Z","text":"Control structure design é anterior ao projeto do controlador. O problema não é ainda “como sintonizar PID/MPC”, mas decidir o que manipular, o que controlar, o que medir e como parear variáveis.","updated":"2026-06-08T19:51:20.147Z","document":{"title":"doi:10.1016/j.compchemeng.2003.08.002","link":[{"href":"urn:x-pdf:c069c7c026c50215a7f0f80117423978"},{"href":"vault:/notes/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf"}],"documentFingerprint":"c069c7c026c50215a7f0f80117423978"},"uri":"vault:/notes/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf","target":[{"source":"vault:/notes/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf","selector":[{"type":"TextPositionSelector","start":193,"end":354},{"type":"TextQuoteSelector","exact":"Control structure design deals with the structural decisions of the control system, including what to control and how to pair thevariables to form control loops.","prefix":", 7491 Trondheim, NorwayAbstract","suffix":" Although these are very importa"}]}]}
->```
->%%
->*%%PREFIX%%, 7491 Trondheim, NorwayAbstract%%HIGHLIGHT%% ==Control structure design deals with the structural decisions of the control system, including what to control and how to pair thevariables to form control loops.== %%POSTFIX%%Although these are very importa*
->%%LINK%%[[#^2lt3sfn0kxg|show annotation]]
->%%COMMENT%%
->Control structure design é anterior ao projeto do controlador. O problema não é ainda “como sintonizar PID/MPC”, mas decidir o que manipular, o que controlar, o que medir e como parear variáveis.
->
->%%TAGS%%
->#semantica/MECANISMO-SUPERVISAO-NEUTRO
-^2lt3sfn0kxg
+
+
+
+
+
+
+
+
 
 
 >%%
 >```annotation-json
->{"created":"2026-06-08T19:51:49.941Z","text":"Plantas químicas são organizadas em camadas temporais de controle. Scheduling, otimização, supervisório e regulatório operam em escalas de tempo diferentes.","updated":"2026-06-08T19:51:49.941Z","document":{"title":"doi:10.1016/j.compchemeng.2003.08.002","link":[{"href":"urn:x-pdf:c069c7c026c50215a7f0f80117423978"},{"href":"vault:/notes/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf"}],"documentFingerprint":"c069c7c026c50215a7f0f80117423978"},"uri":"vault:/notes/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf","target":[{"source":"vault:/notes/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf","selector":[{"type":"TextPositionSelector","start":1379,"end":1545},{"type":"TextQuoteSelector","exact":". scheduling (weeks),. site-wide optimization (days),. local optimization (hours),. supervisory (predictive, advanced) control (minutes),. regulatory control (seconds","prefix":"mescale, including (see Fig. 1):","suffix":")Here, we consider the lower thr"}]}]}
+>{"created":"2026-06-15T20:33:02.044Z","text":"Mostra que o problema não é sintonia fina; é estrutura de controle. A planta não fica boa porque cada PID foi “bem ajustado”, mas porque alguém escolheu corretamente quais variáveis entram na arquitetura de controle.","updated":"2026-06-15T20:33:02.044Z","document":{"title":"doi:10.1016/j.compchemeng.2003.08.002","link":[{"href":"urn:x-pdf:c069c7c026c50215a7f0f80117423978"},{"href":"vault:/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf"}],"documentFingerprint":"c069c7c026c50215a7f0f80117423978"},"uri":"vault:/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf","target":[{"source":"vault:/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf","selector":[{"type":"TextPositionSelector","start":286,"end":678},{"type":"TextQuoteSelector","exact":" what to control and how to pair thevariables to form control loops. Although these are very important issues, these decisions are in most cases made in an ad hocfashion, based on experience and engineering insight, without considering the details of each problem. In the paper, a systematicprocedure for control structure design for complete chemical plants (plantwide control) is presented.","prefix":"of the control system, including","suffix":" It starts with carefully defini"}]}]}
 >```
 >%%
->*%%PREFIX%%mescale, including (see Fig. 1):%%HIGHLIGHT%% ==. scheduling (weeks),. site-wide optimization (days),. local optimization (hours),. supervisory (predictive, advanced) control (minutes),. regulatory control (seconds== %%POSTFIX%%)Here, we consider the lower thr*
->%%LINK%%[[#^x9h81m63di|show annotation]]
+>*%%PREFIX%%of the control system, including%%HIGHLIGHT%% ==what to control and how to pair thevariables to form control loops. Although these are very important issues, these decisions are in most cases made in an ad hocfashion, based on experience and engineering insight, without considering the details of each problem. In the paper, a systematicprocedure for control structure design for complete chemical plants (plantwide control) is presented.== %%POSTFIX%%It starts with carefully defini*
+>%%LINK%%[[#^16dvvhh36kb|show annotation]]
 >%%COMMENT%%
->Plantas químicas são organizadas em camadas temporais de controle. Scheduling, otimização, supervisório e regulatório operam em escalas de tempo diferentes.
->
+>Mostra que o problema não é sintonia fina; é estrutura de controle. A planta não fica boa porque cada PID foi “bem ajustado”, mas porque alguém escolheu corretamente quais variáveis entram na arquitetura de controle.
 >%%TAGS%%
->#semantica/MECANISMO-SUPERVISAO-NEUTRO
-^x9h81m63di
+>
+^16dvvhh36kb
 
 
 >%%
 >```annotation-json
->{"created":"2026-06-08T19:52:45.808Z","text":"O procedimento proposto é dividido em duas partes: top-down e bottom-up. Primeiro vêm objetivos econômicos, graus de liberdade e variáveis controladas primárias; depois vem controle regulatório, pareamento e validação.","updated":"2026-06-08T19:52:45.808Z","document":{"title":"doi:10.1016/j.compchemeng.2003.08.002","link":[{"href":"urn:x-pdf:c069c7c026c50215a7f0f80117423978"},{"href":"vault:/notes/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf"}],"documentFingerprint":"c069c7c026c50215a7f0f80117423978"},"uri":"vault:/notes/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf","target":[{"source":"vault:/notes/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf","selector":[{"type":"TextPositionSelector","start":5546,"end":5859},{"type":"TextQuoteSelector","exact":"I. Top-down analysis, including definition of opera-tional objectives and consideration of degrees offreedom available to meet these (tasks 1 and 2above; steps 1 \u0002/4 in Table 1).II. Bottom-up design of the control system, startingwith the stabilizing control layer (tasks 3, 4 and 5above; steps 5 \u0002/8 in Table 1).","prefix":"ure is divided intwo main parts:","suffix":"The procedure is generally itera"}]}]}
+>{"created":"2026-06-15T20:34:02.373Z","text":"Excelente para defender que supervisão é uma camada própria, com escala de tempo e função diferente da camada regulatória. O PID atua em segundos; a supervisão decide setpoints e política operacional em escala mais lenta.","updated":"2026-06-15T20:34:02.373Z","document":{"title":"doi:10.1016/j.compchemeng.2003.08.002","link":[{"href":"urn:x-pdf:c069c7c026c50215a7f0f80117423978"},{"href":"vault:/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf"}],"documentFingerprint":"c069c7c026c50215a7f0f80117423978"},"uri":"vault:/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf","target":[{"source":"vault:/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf","selector":[{"type":"TextPositionSelector","start":1261,"end":1546},{"type":"TextQuoteSelector","exact":"In practice, the control systemis usually divided into several layers, separated by timescale, including (see Fig. 1):. scheduling (weeks),. site-wide optimization (days),. local optimization (hours),. supervisory (predictive, advanced) control (minutes),. regulatory control (seconds)","prefix":"easure-ments and control loops. ","suffix":"Here, we consider the lower thre"}]}]}
 >```
 >%%
->*%%PREFIX%%ure is divided intwo main parts:%%HIGHLIGHT%% ==I. Top-down analysis, including definition of opera-tional objectives and consideration of degrees offreedom available to meet these (tasks 1 and 2above; steps 1 /4 in Table 1).II. Bottom-up design of the control system, startingwith the stabilizing control layer (tasks 3, 4 and 5above; steps 5 /8 in Table 1).== %%POSTFIX%%The procedure is generally itera*
->%%LINK%%[[#^kes71j9de1|show annotation]]
+>*%%PREFIX%%easure-ments and control loops.%%HIGHLIGHT%% ==In practice, the control systemis usually divided into several layers, separated by timescale, including (see Fig. 1):. scheduling (weeks),. site-wide optimization (days),. local optimization (hours),. supervisory (predictive, advanced) control (minutes),. regulatory control (seconds)== %%POSTFIX%%Here, we consider the lower thre*
+>%%LINK%%[[#^ojwd4nbeit|show annotation]]
 >%%COMMENT%%
->O procedimento proposto é dividido em duas partes: top-down e bottom-up. Primeiro vêm objetivos econômicos, graus de liberdade e variáveis controladas primárias; depois vem controle regulatório, pareamento e validação.
->
+>Excelente para defender que supervisão é uma camada própria, com escala de tempo e função diferente da camada regulatória. O PID atua em segundos; a supervisão decide setpoints e política operacional em escala mais lenta.
 >%%TAGS%%
->#semantica/MECANISMO-INTEGRACAO_INDUSTRIAL-NEUTRO
-^kes71j9de1
+>
+^ojwd4nbeit
 
 
 >%%
 >```annotation-json
->{"created":"2026-06-08T19:53:37.257Z","text":"A definição dos objetivos operacionais vem antes de qualquer estrutura de controle. Skogestad insiste que a planta deve ter uma função custo J, restrições e objetivos explícitos antes de decidir malhas.","updated":"2026-06-08T19:53:37.257Z","document":{"title":"doi:10.1016/j.compchemeng.2003.08.002","link":[{"href":"urn:x-pdf:c069c7c026c50215a7f0f80117423978"},{"href":"vault:/notes/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf"}],"documentFingerprint":"c069c7c026c50215a7f0f80117423978"},"uri":"vault:/notes/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf","target":[{"source":"vault:/notes/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf","selector":[{"type":"TextPositionSelector","start":12083,"end":12238},{"type":"TextQuoteSelector","exact":"operational objectives must be clearly definedbefore attempting to design a control system. Althoughthis seems obvious, this step is frequently overlooked.","prefix":"ives and constraints(step 1)The ","suffix":"Preferably, the operational obje"}]}]}
+>{"created":"2026-06-15T20:35:10.164Z","text":"Essa é uma passagem forte porque coloca o tipo de controlador — PID, MPC, LQG etc. — como apenas o último item. Antes disso vem a arquitetura: entradas, saídas, medições e pareamento.","updated":"2026-06-15T20:35:10.164Z","document":{"title":"doi:10.1016/j.compchemeng.2003.08.002","link":[{"href":"urn:x-pdf:c069c7c026c50215a7f0f80117423978"},{"href":"vault:/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf"}],"documentFingerprint":"c069c7c026c50215a7f0f80117423978"},"uri":"vault:/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf","target":[{"source":"vault:/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf","selector":[{"type":"TextPositionSelector","start":2114,"end":2571},{"type":"TextQuoteSelector","exact":"1. selection of manipulated variables m (‘‘inputs’’);2. selection of controlled variables (‘‘outputs’’; vari-ables with setpoints);3. selection of (extra) measurements (for controlpurposes including stabilization);4. selection of control configuration (the structure ofthe overall controller that interconnects the con-trolled, manipulated and measured variables);5. selection of controller type (control law specifica-tion, e.g. PID, decoupler, LQG, etc.).","prefix":"kogestad & Postlethwaite, 1996):","suffix":"Control structure design for com"}]}]}
 >```
 >%%
->*%%PREFIX%%ives and constraints(step 1)The%%HIGHLIGHT%% ==operational objectives must be clearly definedbefore attempting to design a control system. Althoughthis seems obvious, this step is frequently overlooked.== %%POSTFIX%%Preferably, the operational obje*
->%%LINK%%[[#^n31flm3x1e|show annotation]]
+>*%%PREFIX%%kogestad & Postlethwaite, 1996):%%HIGHLIGHT%% ==1. selection of manipulated variables m (‘‘inputs’’);2. selection of controlled variables (‘‘outputs’’; vari-ables with setpoints);3. selection of (extra) measurements (for controlpurposes including stabilization);4. selection of control configuration (the structure ofthe overall controller that interconnects the con-trolled, manipulated and measured variables);5. selection of controller type (control law specifica-tion, e.g. PID, decoupler, LQG, etc.).== %%POSTFIX%%Control structure design for com*
+>%%LINK%%[[#^ch83fnlngw6|show annotation]]
 >%%COMMENT%%
->A definição dos objetivos operacionais vem antes de qualquer estrutura de controle. Skogestad insiste que a planta deve ter uma função custo J, restrições e objetivos explícitos antes de decidir malhas.
->
+>Essa é uma passagem forte porque coloca o tipo de controlador — PID, MPC, LQG etc. — como apenas o último item. Antes disso vem a arquitetura: entradas, saídas, medições e pareamento.
 >%%TAGS%%
->#semantica/REQUISITO-SUPERVISAO-NEUTRO
-^n31flm3x1e
+>
+^ch83fnlngw6
 
 
 >%%
 >```annotation-json
->{"created":"2026-06-08T19:56:03.418Z","text":"Graus de liberdade são centrais. O número de variáveis manipuladas não é igual automaticamente ao número de graus de liberdade econômicos em regime permanente. Alguns manipuladores ou saídas só têm efeito dinâmico/local.","updated":"2026-06-08T19:56:03.418Z","document":{"title":"doi:10.1016/j.compchemeng.2003.08.002","link":[{"href":"urn:x-pdf:c069c7c026c50215a7f0f80117423978"},{"href":"vault:/notes/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf"}],"documentFingerprint":"c069c7c026c50215a7f0f80117423978"},"uri":"vault:/notes/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf","target":[{"source":"vault:/notes/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf","selector":[{"type":"TextPositionSelector","start":13122,"end":13371},{"type":"TextQuoteSelector","exact":"we must identify the Nopt optimization degreesof freedom , that is, the degrees of freedom that affect theoperational cost J . In most cases, the cost depends onthe steady-state only, and Nopt equals the number ofsteady-state degrees of freedom Nss.","prefix":"always extensivevariables.Next, ","suffix":" To obtain thenumber of steady-s"}]}]}
+>{"created":"2026-06-15T20:35:59.689Z","text":"Plantwide control deve começar de cima, pelos objetivos econômicos e graus de liberdade, e só depois descer para a camada regulatória. Isso sustenta que supervisão não é ajuste local.","updated":"2026-06-15T20:35:59.689Z","document":{"title":"doi:10.1016/j.compchemeng.2003.08.002","link":[{"href":"urn:x-pdf:c069c7c026c50215a7f0f80117423978"},{"href":"vault:/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf"}],"documentFingerprint":"c069c7c026c50215a7f0f80117423978"},"uri":"vault:/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf","target":[{"source":"vault:/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf","selector":[{"type":"TextPositionSelector","start":5504,"end":5859},{"type":"TextQuoteSelector","exact":"The procedure is divided intwo main parts:I. Top-down analysis, including definition of opera-tional objectives and consideration of degrees offreedom available to meet these (tasks 1 and 2above; steps 1 \u0002/4 in Table 1).II. Bottom-up design of the control system, startingwith the stabilizing control layer (tasks 3, 4 and 5above; steps 5 \u0002/8 in Table 1).","prefix":"n thesupervisory control layer. ","suffix":"The procedure is generally itera"}]}]}
 >```
 >%%
->*%%PREFIX%%always extensivevariables.Next,%%HIGHLIGHT%% ==we must identify the Nopt optimization degreesof freedom , that is, the degrees of freedom that affect theoperational cost J . In most cases, the cost depends onthe steady-state only, and Nopt equals the number ofsteady-state degrees of freedom Nss.== %%POSTFIX%%To obtain thenumber of steady-s*
->%%LINK%%[[#^mj7aq1aingq|show annotation]]
+>*%%PREFIX%%n thesupervisory control layer.%%HIGHLIGHT%% ==The procedure is divided intwo main parts:I. Top-down analysis, including definition of opera-tional objectives and consideration of degrees offreedom available to meet these (tasks 1 and 2above; steps 1 /4 in Table 1).II. Bottom-up design of the control system, startingwith the stabilizing control layer (tasks 3, 4 and 5above; steps 5 /8 in Table 1).== %%POSTFIX%%The procedure is generally itera*
+>%%LINK%%[[#^n1gdxsucbhh|show annotation]]
 >%%COMMENT%%
->Graus de liberdade são centrais. O número de variáveis manipuladas não é igual automaticamente ao número de graus de liberdade econômicos em regime permanente. Alguns manipuladores ou saídas só têm efeito dinâmico/local.
->
+>Plantwide control deve começar de cima, pelos objetivos econômicos e graus de liberdade, e só depois descer para a camada regulatória. Isso sustenta que supervisão não é ajuste local.
 >%%TAGS%%
->#semantica/MECANISMO-CONTROLE_AUTOMATICO-NEUTRO
-^mj7aq1aingq
+>
+^n1gdxsucbhh
 
 
 >%%
 >```annotation-json
->{"created":"2026-06-08T19:57:28.254Z","text":"A primeira regra econômica é controlar restrições ativas. Se uma restrição está ativa no ótimo econômico, ela deve virar variável controlada primária.","updated":"2026-06-08T19:57:28.254Z","document":{"title":"doi:10.1016/j.compchemeng.2003.08.002","link":[{"href":"urn:x-pdf:c069c7c026c50215a7f0f80117423978"},{"href":"vault:/notes/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf"}],"documentFingerprint":"c069c7c026c50215a7f0f80117423978"},"uri":"vault:/notes/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf","target":[{"source":"vault:/notes/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf","selector":[{"type":"TextPositionSelector","start":16950,"end":17209},{"type":"TextQuoteSelector","exact":". Control active constraints (Maarleveld & Rijnsdrop,1970; Skogestad, 2000).. Select unconstrained controlled variables so that withconstant setpoints the process is kept close to itsoptimum in spite of disturbances and implementationerrors (Skogestad, 2000).","prefix":"lled variables y1 \u001ec in step 3):","suffix":" These are the less intuitiveone"}]}]}
+>{"created":"2026-06-15T20:37:20.910Z","text":"Skogestad basicamente diz: mesmo com poder computacional, um “controlador mágico” não é a melhor solução, por custo de modelagem, sintonia e complexidade.","updated":"2026-06-15T20:37:20.910Z","document":{"title":"doi:10.1016/j.compchemeng.2003.08.002","link":[{"href":"urn:x-pdf:c069c7c026c50215a7f0f80117423978"},{"href":"vault:/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf"}],"documentFingerprint":"c069c7c026c50215a7f0f80117423978"},"uri":"vault:/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf","target":[{"source":"vault:/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf","selector":[{"type":"TextPositionSelector","start":11435,"end":12016},{"type":"TextQuoteSelector","exact":"Most of the steps in Table 1 could be avoided bydesigning a single optimizing controller that stabilizesthe process and at the same time perfectly coordinatesall the manipulated variables based on dynamic on-lineoptimization. There are fundamental reasons why such asolution is not the best, even with tomorrows computingpower. One fundamental reason is the cost of modelingand tuning this controller, which must be balancedagainst the fact that the hierarchical structuring pro-posed in this paper, without much need for models, isused effectively to control most chemical plants.","prefix":"le big multivariable controller?","suffix":"3. Definition of operational obj"}]}]}
 >```
 >%%
->*%%PREFIX%%lled variables y1 c in step 3):%%HIGHLIGHT%% ==. Control active constraints (Maarleveld & Rijnsdrop,1970; Skogestad, 2000).. Select unconstrained controlled variables so that withconstant setpoints the process is kept close to itsoptimum in spite of disturbances and implementationerrors (Skogestad, 2000).== %%POSTFIX%%These are the less intuitiveone*
->%%LINK%%[[#^u591wvfc468|show annotation]]
+>*%%PREFIX%%le big multivariable controller?%%HIGHLIGHT%% ==Most of the steps in Table 1 could be avoided bydesigning a single optimizing controller that stabilizesthe process and at the same time perfectly coordinatesall the manipulated variables based on dynamic on-lineoptimization. There are fundamental reasons why such asolution is not the best, even with tomorrows computingpower. One fundamental reason is the cost of modelingand tuning this controller, which must be balancedagainst the fact that the hierarchical structuring pro-posed in this paper, without much need for models, isused effectively to control most chemical plants.== %%POSTFIX%%3. Definition of operational obj*
+>%%LINK%%[[#^eg6pdby85nk|show annotation]]
 >%%COMMENT%%
->A primeira regra econômica é controlar restrições ativas. Se uma restrição está ativa no ótimo econômico, ela deve virar variável controlada primária.
->
+>Skogestad basicamente diz: mesmo com poder computacional, um “controlador mágico” não é a melhor solução, por custo de modelagem, sintonia e complexidade.
 >%%TAGS%%
->#semantica/MECANISMO-SUPERVISAO-NEUTRO
-^u591wvfc468
+>
+^eg6pdby85nk
 
 
 >%%
 >```annotation-json
->{"created":"2026-06-08T19:59:33.964Z","text":"Self-optimizing control é a ideia-chave do artigo. A meta é escolher variáveis que, mantidas em setpoint constante, mantenham a planta próxima do ótimo mesmo com distúrbios.","updated":"2026-06-08T19:59:33.964Z","document":{"title":"doi:10.1016/j.compchemeng.2003.08.002","link":[{"href":"urn:x-pdf:c069c7c026c50215a7f0f80117423978"},{"href":"vault:/notes/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf"}],"documentFingerprint":"c069c7c026c50215a7f0f80117423978"},"uri":"vault:/notes/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf","target":[{"source":"vault:/notes/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf","selector":[{"type":"TextPositionSelector","start":19222,"end":19395},{"type":"TextQuoteSelector","exact":"Self-optimizing control (Skogestad, 2000) is achieved if a constant setpoint policy results inan acceptable loss L (without the need to reopti-mize when disturbances occur).","prefix":"; d) \u001cJopt(d) where u \u001ef (c;d):/","suffix":"The main issue here is not to fi"}]}]}
+>{"created":"2026-06-15T20:38:08.717Z","text":"Perfeito para argumentar que sem política operacional explícita não existe controle plantwide. A sintonia dos loops não sabe sozinha o que significa “operar bem”: custo, segurança, produção, restrições e qualidade precisam ser definidos antes.","updated":"2026-06-15T20:38:08.717Z","document":{"title":"doi:10.1016/j.compchemeng.2003.08.002","link":[{"href":"urn:x-pdf:c069c7c026c50215a7f0f80117423978"},{"href":"vault:/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf"}],"documentFingerprint":"c069c7c026c50215a7f0f80117423978"},"uri":"vault:/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf","target":[{"source":"vault:/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf","selector":[{"type":"TextPositionSelector","start":12079,"end":12538},{"type":"TextQuoteSelector","exact":"The operational objectives must be clearly definedbefore attempting to design a control system. Althoughthis seems obvious, this step is frequently overlooked.Preferably, the operational objectives should be com-bined into a scalar cost function J to be minimized. Inmany cases, J may be simply selected as the operationalcost, but there are many other possibilities. Otherobjectives, including safety constraints, should normallybe formulated as constraints.","prefix":"jectives and constraints(step 1)","suffix":"4. Selection of manipulated vari"}]}]}
 >```
 >%%
->*%%PREFIX%%; d) Jopt(d) where u f (c;d):/%%HIGHLIGHT%% ==Self-optimizing control (Skogestad, 2000) is achieved if a constant setpoint policy results inan acceptable loss L (without the need to reopti-mize when disturbances occur).== %%POSTFIX%%The main issue here is not to fi*
->%%LINK%%[[#^ajcnh20yj4e|show annotation]]
+>*%%PREFIX%%jectives and constraints(step 1)%%HIGHLIGHT%% ==The operational objectives must be clearly definedbefore attempting to design a control system. Althoughthis seems obvious, this step is frequently overlooked.Preferably, the operational objectives should be com-bined into a scalar cost function J to be minimized. Inmany cases, J may be simply selected as the operationalcost, but there are many other possibilities. Otherobjectives, including safety constraints, should normallybe formulated as constraints.== %%POSTFIX%%4. Selection of manipulated vari*
+>%%LINK%%[[#^o80zla8rb|show annotation]]
 >%%COMMENT%%
->Self-optimizing control é a ideia-chave do artigo. A meta é escolher variáveis que, mantidas em setpoint constante, mantenham a planta próxima do ótimo mesmo com distúrbios.
->
+>Perfeito para argumentar que sem política operacional explícita não existe controle plantwide. A sintonia dos loops não sabe sozinha o que significa “operar bem”: custo, segurança, produção, restrições e qualidade precisam ser definidos antes.
 >%%TAGS%%
->#semantica/MECANISMO-SUPERVISAO-NEUTRO
-^ajcnh20yj4e
+>
+^o80zla8rb
 
 
 >%%
 >```annotation-json
->{"created":"2026-06-08T20:01:05.538Z","text":"Bons candidatos a variáveis controladas têm critérios claros. Elas devem ser pouco sensíveis a distúrbios, fáceis de medir/controlar, sensíveis aos manipuladores e independentes entre si.","updated":"2026-06-08T20:01:05.538Z","document":{"title":"doi:10.1016/j.compchemeng.2003.08.002","link":[{"href":"urn:x-pdf:c069c7c026c50215a7f0f80117423978"},{"href":"vault:/notes/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf"}],"documentFingerprint":"c069c7c026c50215a7f0f80117423978"},"uri":"vault:/notes/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf","target":[{"source":"vault:/notes/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf","selector":[{"type":"TextPositionSelector","start":22166,"end":22620},{"type":"TextQuoteSelector","exact":"1. The optimal value of c should be insensitive todisturbances2. c should be easy to measure and control (so that theimplementation error is acceptable).3. The value of c should be sensitive to changes in themanipulated variables (the steady-state degrees offreedom). Equivalently, the optimum (J as a func-tion of c ) should be flat.4. For cases with more than one unconstrained degreesof freedom, the selected controlled variables shouldbe independent.","prefix":" requirements (Skogestad, 2000):","suffix":"At least ‘‘locally’’ (for small "}]}]}
+>{"created":"2026-06-15T20:40:40.019Z","text":"Essa passagem é muito boa porque revela o ponto filosófico: muitas variáveis internas são controladas não porque tenham setpoint “natural”, mas porque mantêm a planta próxima do ótimo e estável. Isso é supervisão/estrutura, não mera sintonia.","updated":"2026-06-15T20:40:40.019Z","document":{"title":"doi:10.1016/j.compchemeng.2003.08.002","link":[{"href":"urn:x-pdf:c069c7c026c50215a7f0f80117423978"},{"href":"vault:/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf"}],"documentFingerprint":"c069c7c026c50215a7f0f80117423978"},"uri":"vault:/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf","target":[{"source":"vault:/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf","selector":[{"type":"TextPositionSelector","start":16584,"end":16889},{"type":"TextQuoteSelector","exact":"‘‘Why do we control all these variables in a chemicalplant, like internal temperatures, pressures or composi-tions, when there are no a priori specifications on manyof them?’’. The answer to this question is that we firstneed to control the variables directly related to ensuringoptimal economic operation","prefix":"t puzzled me for many years was:","suffix":" (these are the primarycontrolle"}]}]}
 >```
 >%%
->*%%PREFIX%%requirements (Skogestad, 2000):%%HIGHLIGHT%% ==1. The optimal value of c should be insensitive todisturbances2. c should be easy to measure and control (so that theimplementation error is acceptable).3. The value of c should be sensitive to changes in themanipulated variables (the steady-state degrees offreedom). Equivalently, the optimum (J as a func-tion of c ) should be flat.4. For cases with more than one unconstrained degreesof freedom, the selected controlled variables shouldbe independent.== %%POSTFIX%%At least ‘‘locally’’ (for small*
->%%LINK%%[[#^pflvacg8fe9|show annotation]]
+>*%%PREFIX%%t puzzled me for many years was:%%HIGHLIGHT%% ==‘‘Why do we control all these variables in a chemicalplant, like internal temperatures, pressures or composi-tions, when there are no a priori specifications on manyof them?’’. The answer to this question is that we firstneed to control the variables directly related to ensuringoptimal economic operation== %%POSTFIX%%(these are the primarycontrolle*
+>%%LINK%%[[#^cs24uqh0yy8|show annotation]]
 >%%COMMENT%%
->Bons candidatos a variáveis controladas têm critérios claros. Elas devem ser pouco sensíveis a distúrbios, fáceis de medir/controlar, sensíveis aos manipuladores e independentes entre si.
->
+>Essa passagem é muito boa porque revela o ponto filosófico: muitas variáveis internas são controladas não porque tenham setpoint “natural”, mas porque mantêm a planta próxima do ótimo e estável. Isso é supervisão/estrutura, não mera sintonia.
 >%%TAGS%%
->#semantica/METRICA-CONTROLE_AUTOMATICO-NEUTRO
-^pflvacg8fe9
+>
+^cs24uqh0yy8
 
 
 >%%
 >```annotation-json
->{"created":"2026-06-08T20:02:24.220Z","text":"A localização da taxa de produção determina a estrutura de controle de inventário. Controlar nível com entrada ou saída depende de onde a produção é “setada” na planta; idealmente, no gargalo principal.","updated":"2026-06-08T20:02:24.220Z","document":{"title":"doi:10.1016/j.compchemeng.2003.08.002","link":[{"href":"urn:x-pdf:c069c7c026c50215a7f0f80117423978"},{"href":"vault:/notes/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf"}],"documentFingerprint":"c069c7c026c50215a7f0f80117423978"},"uri":"vault:/notes/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf","target":[{"source":"vault:/notes/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf","selector":[{"type":"TextPositionSelector","start":27562,"end":27739},{"type":"TextQuoteSelector","exact":"Identify the main bottleneck in the plant byoptimizing the operation with the feedrate as adegree of freedom (steady-state, see step 3). Set theproduction rate at this location.","prefix":"We then have the following rule:","suffix":"The justification for this rule "}]}]}
+>{"created":"2026-06-15T20:42:28.185Z","text":"Aqui está a negativa que você quer: manter uma política fixa tem loss. Não existe operação ótima automática sem sacrifício; a escolha das variáveis controladas define quanto se perde quando a planta é perturbada.","updated":"2026-06-15T20:42:28.185Z","document":{"title":"doi:10.1016/j.compchemeng.2003.08.002","link":[{"href":"urn:x-pdf:c069c7c026c50215a7f0f80117423978"},{"href":"vault:/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf"}],"documentFingerprint":"c069c7c026c50215a7f0f80117423978"},"uri":"vault:/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf","target":[{"source":"vault:/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf","selector":[{"type":"TextPositionSelector","start":18864,"end":19395},{"type":"TextQuoteSelector","exact":"‘‘we want to find a function c of the processvariables which when held constant, leads automaticallyto the optimal adjustments of the manipulated vari-ables.’’ To quantify this more precisely, we define the(economic) loss L as the difference between the actualvalue of the cost function and the truly optimal value,i.e. L \u001eJ(u; d) \u001cJopt(d) where u \u001ef (c;d):/Self-optimizing control (Skogestad, 2000) is achieved if a constant setpoint policy results inan acceptable loss L (without the need to reopti-mize when disturbances occur).","prefix":"ari et al. (1980) whowrite that ","suffix":"The main issue here is not to fi"}]}]}
 >```
 >%%
->*%%PREFIX%%We then have the following rule:%%HIGHLIGHT%% ==Identify the main bottleneck in the plant byoptimizing the operation with the feedrate as adegree of freedom (steady-state, see step 3). Set theproduction rate at this location.== %%POSTFIX%%The justification for this rule*
->%%LINK%%[[#^lp5c1tcqr5m|show annotation]]
+>*%%PREFIX%%ari et al. (1980) whowrite that%%HIGHLIGHT%% ==‘‘we want to find a function c of the processvariables which when held constant, leads automaticallyto the optimal adjustments of the manipulated vari-ables.’’ To quantify this more precisely, we define the(economic) loss L as the difference between the actualvalue of the cost function and the truly optimal value,i.e. L J(u; d) Jopt(d) where u f (c;d):/Self-optimizing control (Skogestad, 2000) is achieved if a constant setpoint policy results inan acceptable loss L (without the need to reopti-mize when disturbances occur).== %%POSTFIX%%The main issue here is not to fi*
+>%%LINK%%[[#^75omkw368yc|show annotation]]
 >%%COMMENT%%
->A localização da taxa de produção determina a estrutura de controle de inventário. Controlar nível com entrada ou saída depende de onde a produção é “setada” na planta; idealmente, no gargalo principal.
->
+>Aqui está a negativa que você quer: manter uma política fixa tem loss. Não existe operação ótima automática sem sacrifício; a escolha das variáveis controladas define quanto se perde quando a planta é perturbada.
 >%%TAGS%%
->#semantica/MECANISMO-INTEGRACAO_INDUSTRIAL-NEUTRO
-^lp5c1tcqr5m
+>
+^75omkw368yc
 
 
 >%%
 >```annotation-json
->{"created":"2026-06-08T20:06:02.689Z","text":"MPC não elimina a necessidade de escolher boas variáveis controladas. Controle multivariável ajuda em interações e restrições móveis, mas exige modelo dinâmico, é menos transparente e mais sensível a incertezas.","updated":"2026-06-08T20:06:02.689Z","document":{"title":"doi:10.1016/j.compchemeng.2003.08.002","link":[{"href":"urn:x-pdf:c069c7c026c50215a7f0f80117423978"},{"href":"vault:/notes/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf"}],"documentFingerprint":"c069c7c026c50215a7f0f80117423978"},"uri":"vault:/notes/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf","target":[{"source":"vault:/notes/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf","selector":[{"type":"TextPositionSelector","start":44457,"end":44785},{"type":"TextQuoteSelector","exact":"Multivariable control is preferred forinteracting processes and for processes with changesin active constraint. For the cases where theconstraints may change, one needs a multivariablecontroller with explicit constraint handling(e.g. MPC). This avoids the need for logic, andgives a smooth transition between activeconstraints. ","prefix":"if the active constraintschange.","suffix":"Advantages with multivariable co"}]}]}
+>{"created":"2026-06-15T20:45:33.809Z","text":"Essa passagem mostra que uma decisão supervisória — onde definir a taxa de produção — reorganiza o controle de inventário inteiro. A regra de definir a produção no gargalo principal da planta.","updated":"2026-06-15T20:45:33.809Z","document":{"title":"doi:10.1016/j.compchemeng.2003.08.002","link":[{"href":"urn:x-pdf:c069c7c026c50215a7f0f80117423978"},{"href":"vault:/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf"}],"documentFingerprint":"c069c7c026c50215a7f0f80117423978"},"uri":"vault:/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf","target":[{"source":"vault:/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf","selector":[{"type":"TextPositionSelector","start":26275,"end":26457},{"type":"TextQuoteSelector","exact":"As we increase the feedrate wereach a point where some flow variable E internally inthe plant reaches its constraint Emax and becomes abottleneck for further increase in production. ","prefix":" optimalto maximize production. ","suffix":"In addi-tion, as we reach the co"}]}]}
 >```
 >%%
->*%%PREFIX%%if the active constraintschange.%%HIGHLIGHT%% ==Multivariable control is preferred forinteracting processes and for processes with changesin active constraint. For the cases where theconstraints may change, one needs a multivariablecontroller with explicit constraint handling(e.g. MPC). This avoids the need for logic, andgives a smooth transition between activeconstraints.== %%POSTFIX%%Advantages with multivariable co*
->%%LINK%%[[#^g6rqbc165z5|show annotation]]
+>*%%PREFIX%%optimalto maximize production.%%HIGHLIGHT%% ==As we increase the feedrate wereach a point where some flow variable E internally inthe plant reaches its constraint Emax and becomes abottleneck for further increase in production.== %%POSTFIX%%In addi-tion, as we reach the co*
+>%%LINK%%[[#^78vkvka6mns|show annotation]]
 >%%COMMENT%%
->MPC não elimina a necessidade de escolher boas variáveis controladas. Controle multivariável ajuda em interações e restrições móveis, mas exige modelo dinâmico, é menos transparente e mais sensível a incertezas.
->
+>Essa passagem mostra que uma decisão supervisória — onde definir a taxa de produção — reorganiza o controle de inventário inteiro. A regra de definir a produção no gargalo principal da planta.
 >%%TAGS%%
->#semantica/TRADEOFF-CONTROLE_AUTOMATICO-NEUTRO
-^g6rqbc165z5
+>
+^78vkvka6mns
+
+
+
+>%%
+>```annotation-json
+>{"created":"2026-06-15T20:52:20.377Z","text":"A camada supervisória existe para manter as variáveis primárias nos setpoints ótimos usando como graus de liberdade os setpoints da camada regulatória e manipuladas não usadas. Isso mostra que supervisão atua sobre a política operacional da planta, não apenas sobre válvulas ou ganhos PID.","updated":"2026-06-15T20:52:20.377Z","document":{"title":"doi:10.1016/j.compchemeng.2003.08.002","link":[{"href":"urn:x-pdf:c069c7c026c50215a7f0f80117423978"},{"href":"vault:/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf"}],"documentFingerprint":"c069c7c026c50215a7f0f80117423978"},"uri":"vault:/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf","target":[{"source":"vault:/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf","selector":[{"type":"TextPositionSelector","start":42708,"end":42929},{"type":"TextQuoteSelector","exact":"The purpose of the supervisor control layer is to keepthe (primary) controlled outputs c at their optimalsetpoints cs, using as degrees of freedom the setpointsy2s in the regulatory layer and any unused manipulatedinputs.","prefix":".8. Supervisory control (step 6)","suffix":" Which variables to control and "}]}]}
+>```
+>%%
+>*%%PREFIX%%.8. Supervisory control (step 6)%%HIGHLIGHT%% ==The purpose of the supervisor control layer is to keepthe (primary) controlled outputs c at their optimalsetpoints cs, using as degrees of freedom the setpointsy2s in the regulatory layer and any unused manipulatedinputs.== %%POSTFIX%%Which variables to control and*
+>%%LINK%%[[#^nm3m0mwehih|show annotation]]
+>%%COMMENT%%
+>A camada supervisória existe para manter as variáveis primárias nos setpoints ótimos usando como graus de liberdade os setpoints da camada regulatória e manipuladas não usadas. Isso mostra que supervisão atua sobre a política operacional da planta, não apenas sobre válvulas ou ganhos PID.
+>%%TAGS%%
+>
+^nm3m0mwehih
+
+
+>%%
+>```annotation-json
+>{"created":"2026-06-15T20:52:30.977Z","text":"Essa é uma passagem-chave: o supervisório não inventa setpoints localmente; ele executa uma decisão que vem de uma camada de otimização. Portanto, plantwide control exige uma cadeia: objetivo econômico → variáveis controladas → setpoints → camada regulatória.","updated":"2026-06-15T20:52:30.977Z","document":{"title":"doi:10.1016/j.compchemeng.2003.08.002","link":[{"href":"urn:x-pdf:c069c7c026c50215a7f0f80117423978"},{"href":"vault:/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf"}],"documentFingerprint":"c069c7c026c50215a7f0f80117423978"},"uri":"vault:/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf","target":[{"source":"vault:/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf","selector":[{"type":"TextPositionSelector","start":42930,"end":43023},{"type":"TextQuoteSelector","exact":"Which variables to control and their setpointsare determined by the optimization layer above.","prefix":"d any unused manipulatedinputs. ","suffix":" Notethat the variables to contr"}]}]}
+>```
+>%%
+>*%%PREFIX%%d any unused manipulatedinputs.%%HIGHLIGHT%% ==Which variables to control and their setpointsare determined by the optimization layer above.== %%POSTFIX%%Notethat the variables to contr*
+>%%LINK%%[[#^stxw97zhh2|show annotation]]
+>%%COMMENT%%
+>Essa é uma passagem-chave: o supervisório não inventa setpoints localmente; ele executa uma decisão que vem de uma camada de otimização. Portanto, plantwide control exige uma cadeia: objetivo econômico → variáveis controladas → setpoints → camada regulatória.
+>%%TAGS%%
+>
+^stxw97zhh2
+
+
+>%%
+>```annotation-json
+>{"created":"2026-06-15T20:53:20.252Z","text":"Aqui Skogestad define a questão estrutural da supervisão: escolher entre controle descentralizado e controle multivariável. Isso serve para argumentar que o problema supervisório não é “sintonizar melhor”, mas decidir qual arquitetura de coordenação é adequada para a planta","updated":"2026-06-15T20:53:20.252Z","document":{"title":"doi:10.1016/j.compchemeng.2003.08.002","link":[{"href":"urn:x-pdf:c069c7c026c50215a7f0f80117423978"},{"href":"vault:/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf"}],"documentFingerprint":"c069c7c026c50215a7f0f80117423978"},"uri":"vault:/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf","target":[{"source":"vault:/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf","selector":[{"type":"TextPositionSelector","start":43101,"end":43370},{"type":"TextQuoteSelector","exact":"For the supervisory control layer, the first structuralissue is deciding on whether to use decentralized ormultivariable control. Note that there is usually somedecentralization, that is, there is often a combination ofseveral multivariable and single-loop controllers.","prefix":"if the activeconstraints change.","suffix":"Decentralized single-loop contro"}]}]}
+>```
+>%%
+>*%%PREFIX%%if the activeconstraints change.%%HIGHLIGHT%% ==For the supervisory control layer, the first structuralissue is deciding on whether to use decentralized ormultivariable control. Note that there is usually somedecentralization, that is, there is often a combination ofseveral multivariable and single-loop controllers.== %%POSTFIX%%Decentralized single-loop contro*
+>%%LINK%%[[#^qsnl231dzqf|show annotation]]
+>%%COMMENT%%
+>Aqui Skogestad define a questão estrutural da supervisão: escolher entre controle descentralizado e controle multivariável. Isso serve para argumentar que o problema supervisório não é “sintonizar melhor”, mas decidir qual arquitetura de coordenação é adequada para a planta
+>%%TAGS%%
+>
+^qsnl231dzqf
+
+
+>%%
+>```annotation-json
+>{"created":"2026-06-15T20:54:03.472Z","text":"Essa passagem é ótima para mostrar o limite do controle descentralizado: ele é simples, exige pouco modelo e é fácil de ajustar, mas perde desempenho, exige pareamento e fica complicado quando restrições ativas mudam. Isso mata a ideia de que loops individuais bem sintonizados bastam para plantwide.","updated":"2026-06-15T20:54:03.472Z","document":{"title":"doi:10.1016/j.compchemeng.2003.08.002","link":[{"href":"urn:x-pdf:c069c7c026c50215a7f0f80117423978"},{"href":"vault:/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf"}],"documentFingerprint":"c069c7c026c50215a7f0f80117423978"},"uri":"vault:/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf","target":[{"source":"vault:/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf","selector":[{"type":"TextPositionSelector","start":43370,"end":43813},{"type":"TextQuoteSelector","exact":"Decentralized single-loop control is the simplest. It ispreferred for non-interacting process and cases whereactive constraints remain constant. Advantages withdecentralized control:. tuning may be done on-line;. no or minimal model requirements;. easy to fix and change.Disadvantages:. need to determine pairing;. performance loss compared to multivariable control;. complicated logic required for reconfiguration whenactive constraints move.","prefix":"ble and single-loop controllers.","suffix":"The decision on how to pair inpu"}]}]}
+>```
+>%%
+>*%%PREFIX%%ble and single-loop controllers.%%HIGHLIGHT%% ==Decentralized single-loop control is the simplest. It ispreferred for non-interacting process and cases whereactive constraints remain constant. Advantages withdecentralized control:. tuning may be done on-line;. no or minimal model requirements;. easy to fix and change.Disadvantages:. need to determine pairing;. performance loss compared to multivariable control;. complicated logic required for reconfiguration whenactive constraints move.== %%POSTFIX%%The decision on how to pair inpu*
+>%%LINK%%[[#^mh6tmrekrkt|show annotation]]
+>%%COMMENT%%
+>Essa passagem é ótima para mostrar o limite do controle descentralizado: ele é simples, exige pouco modelo e é fácil de ajustar, mas perde desempenho, exige pareamento e fica complicado quando restrições ativas mudam. Isso mata a ideia de que loops individuais bem sintonizados bastam para plantwide.
+>%%TAGS%%
+>
+^mh6tmrekrkt
+
+
+>%%
+>```annotation-json
+>{"created":"2026-06-15T20:55:00.478Z","text":"Esse é o bloco mais forte para sua proposta: controle multivariável/MPC é indicado para processos interativos e restrições móveis, porque coordena variáveis e lida melhor com restrições. Mas o artigo também freia a expectativa: exige modelo dinâmico, é difícil de sintonizar, menos transparente e mais sensível a incertezas.","updated":"2026-06-15T20:55:00.478Z","document":{"title":"doi:10.1016/j.compchemeng.2003.08.002","link":[{"href":"urn:x-pdf:c069c7c026c50215a7f0f80117423978"},{"href":"vault:/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf"}],"documentFingerprint":"c069c7c026c50215a7f0f80117423978"},"uri":"vault:/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf","target":[{"source":"vault:/articles/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.pdf","selector":[{"type":"TextPositionSelector","start":44457,"end":44783},{"type":"TextQuoteSelector","exact":"Multivariable control is preferred forinteracting processes and for processes with changesin active constraint. For the cases where theconstraints may change, one needs a multivariablecontroller with explicit constraint handling(e.g. MPC). This avoids the need for logic, andgives a smooth transition between activeconstraints","prefix":"if the active constraintschange.","suffix":". Advantages with multivariable "}]}]}
+>```
+>%%
+>*%%PREFIX%%if the active constraintschange.%%HIGHLIGHT%% ==Multivariable control is preferred forinteracting processes and for processes with changesin active constraint. For the cases where theconstraints may change, one needs a multivariablecontroller with explicit constraint handling(e.g. MPC). This avoids the need for logic, andgives a smooth transition between activeconstraints== %%POSTFIX%%. Advantages with multivariable*
+>%%LINK%%[[#^s3j8mvk7hyl|show annotation]]
+>%%COMMENT%%
+>Esse é o bloco mais forte para sua proposta: controle multivariável/MPC é indicado para processos interativos e restrições móveis, porque coordena variáveis e lida melhor com restrições. Mas o artigo também freia a expectativa: exige modelo dinâmico, é difícil de sintonizar, menos transparente e mais sensível a incertezas.
+>%%TAGS%%
+>
+^s3j8mvk7hyl

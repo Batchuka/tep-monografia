@@ -38,21 +38,6 @@ tema: runtime_supervisao/espirito
 
 
 
->%%
->```annotation-json
->{"created":"2026-06-14T22:59:01.527Z","text":"O artigo identifica uma lacuna: o PLC tradicional não foi suficientemente redesenhado para as exigências da Indústria 4.0. \n- Isso abre espaço para arquiteturas de controle mais integradas, modularizadas e gerenciáveis externamente;\n- Isso justifica investigar formas mais modulares, conectadas e externamente gerenciáveis de automação.","updated":"2026-06-14T22:59:01.527Z","document":{"title":"Design of an IoT-PLC: A containerized programmable logical controller for the industry 4.0","link":[{"href":"urn:x-pdf:bb405b6cfe145fb7930f250051b7b7a0"},{"href":"vault:/articles/art11_Design-of-an-IoT-PLC-A-Containerized-Programmeble-Logical-Controller-for-the-Industry-4_Mellado_Nunez.pdf"}],"documentFingerprint":"bb405b6cfe145fb7930f250051b7b7a0"},"uri":"vault:/articles/art11_Design-of-an-IoT-PLC-A-Containerized-Programmeble-Logical-Controller-for-the-Industry-4_Mellado_Nunez.pdf","target":[{"source":"vault:/articles/art11_Design-of-an-IoT-PLC-A-Containerized-Programmeble-Logical-Controller-for-the-Industry-4_Mellado_Nunez.pdf","selector":[{"type":"TextPositionSelector","start":1051,"end":1177},{"type":"TextQuoteSelector","exact":" the PLC has not seen yet a modernized version targetingthe functionalities an Industry 4.0-oriented control system requires. ","prefix":"d its hyper-connected ecosystem,","suffix":"In this work, a device named IoT"}]}]}
->```
->%%
->*%%PREFIX%%d its hyper-connected ecosystem,%%HIGHLIGHT%% ==the PLC has not seen yet a modernized version targetingthe functionalities an Industry 4.0-oriented control system requires.== %%POSTFIX%%In this work, a device named IoT*
->%%LINK%%[[#^l6dlbynpyh|show annotation]]
->%%COMMENT%%
->O artigo identifica uma lacuna: o PLC tradicional não foi suficientemente redesenhado para as exigências da Indústria 4.0. 
->- Isso abre espaço para arquiteturas de controle mais integradas, modularizadas e gerenciáveis externamente;
->- Isso justifica investigar formas mais modulares, conectadas e externamente gerenciáveis de automação.
->%%TAGS%%
->
-^l6dlbynpyh
-
 
 >%%
 >```annotation-json
@@ -70,74 +55,77 @@ tema: runtime_supervisao/espirito
 ^wkwd7va1fcc
 
 
->%%
->```annotation-json
->{"created":"2026-06-14T23:03:16.284Z","text":"Esta é a passagem mais direta: o PLC não é tratado apenas como hardware fechado, mas como equipamento industrial cujas funções internas podem ser empacotadas em containers.\n\nDaí vem minha provocação: se toda a lógica do PLC pode ser implantada remotamente, porque eu não poderia ajustar parâmetros de operação do algoritmo segundo uma mudança de política?","updated":"2026-06-14T23:03:16.284Z","document":{"title":"Design of an IoT-PLC: A containerized programmable logical controller for the industry 4.0","link":[{"href":"urn:x-pdf:bb405b6cfe145fb7930f250051b7b7a0"},{"href":"vault:/articles/art11_Design-of-an-IoT-PLC-A-Containerized-Programmeble-Logical-Controller-for-the-Industry-4_Mellado_Nunez.pdf"}],"documentFingerprint":"bb405b6cfe145fb7930f250051b7b7a0"},"uri":"vault:/articles/art11_Design-of-an-IoT-PLC-A-Containerized-Programmeble-Logical-Controller-for-the-Industry-4_Mellado_Nunez.pdf","target":[{"source":"vault:/articles/art11_Design-of-an-IoT-PLC-A-Containerized-Programmeble-Logical-Controller-for-the-Industry-4_Mellado_Nunez.pdf","selector":[{"type":"TextPositionSelector","start":1314,"end":1442},{"type":"TextQuoteSelector","exact":"The proposedIoT-PLC operates as a containerized piece of equipment, with each functionality packaged within a separatecontainer.","prefix":"or the Industry 4.0 revolution. ","suffix":" The IoT-PLC has regulatory cont"}]}]}
->```
->%%
->*%%PREFIX%%or the Industry 4.0 revolution.%%HIGHLIGHT%% ==The proposedIoT-PLC operates as a containerized piece of equipment, with each functionality packaged within a separatecontainer.== %%POSTFIX%%The IoT-PLC has regulatory cont*
->%%LINK%%[[#^54sgvo3ehxo|show annotation]]
->%%COMMENT%%
->Esta é a passagem mais direta: o PLC não é tratado apenas como hardware fechado, mas como equipamento industrial cujas funções internas podem ser empacotadas em containers.
->
->Daí vem minha provocação: se toda a lógica do PLC pode ser implantada remotamente, porque eu não poderia ajustar parâmetros de operação do algoritmo segundo uma mudança de política?
->%%TAGS%%
->
-^54sgvo3ehxo
 
 
->%%
->```annotation-json
->{"created":"2026-06-14T23:07:03.830Z","text":"Aqui aparece o motivo da mudança: a arquitetura clássica do PLC precisa se adaptar a instrumentação sem fio, gerenciamento baseado em nuvem e elementos autônomos de campo.","updated":"2026-06-14T23:07:03.830Z","document":{"title":"Design of an IoT-PLC: A containerized programmable logical controller for the industry 4.0","link":[{"href":"urn:x-pdf:bb405b6cfe145fb7930f250051b7b7a0"},{"href":"vault:/articles/art11_Design-of-an-IoT-PLC-A-Containerized-Programmeble-Logical-Controller-for-the-Industry-4_Mellado_Nunez.pdf"}],"documentFingerprint":"bb405b6cfe145fb7930f250051b7b7a0"},"uri":"vault:/articles/art11_Design-of-an-IoT-PLC-A-Containerized-Programmeble-Logical-Controller-for-the-Industry-4_Mellado_Nunez.pdf","target":[{"source":"vault:/articles/art11_Design-of-an-IoT-PLC-A-Containerized-Programmeble-Logical-Controller-for-the-Industry-4_Mellado_Nunez.pdf","selector":[{"type":"TextPositionSelector","start":6217,"end":6431},{"type":"TextQuoteSelector","exact":"this architecture should be updated to accommodatenew technologies as: wireless instrumentation, cloud-based manage-ment systems, and autonomous field elements, while maintaining areliable and predictable behavior.","prefix":"r the upcomingIndustry 4.0 era, ","suffix":"Fulfilling tight timeliness cons"}]}]}
->```
->%%
->*%%PREFIX%%r the upcomingIndustry 4.0 era,%%HIGHLIGHT%% ==this architecture should be updated to accommodatenew technologies as: wireless instrumentation, cloud-based manage-ment systems, and autonomous field elements, while maintaining areliable and predictable behavior.== %%POSTFIX%%Fulfilling tight timeliness cons*
->%%LINK%%[[#^abu1w3hv5m|show annotation]]
->%%COMMENT%%
->Aqui aparece o motivo da mudança: a arquitetura clássica do PLC precisa se adaptar a instrumentação sem fio, gerenciamento baseado em nuvem e elementos autônomos de campo.
->%%TAGS%%
->
-^abu1w3hv5m
+
 
 
 
 >%%
 >```annotation-json
->{"created":"2026-06-14T23:09:31.530Z","updated":"2026-06-14T23:09:31.530Z","document":{"title":"Design of an IoT-PLC: A containerized programmable logical controller for the industry 4.0","link":[{"href":"urn:x-pdf:bb405b6cfe145fb7930f250051b7b7a0"},{"href":"vault:/articles/art11_Design-of-an-IoT-PLC-A-Containerized-Programmeble-Logical-Controller-for-the-Industry-4_Mellado_Nunez.pdf"}],"documentFingerprint":"bb405b6cfe145fb7930f250051b7b7a0"},"uri":"vault:/articles/art11_Design-of-an-IoT-PLC-A-Containerized-Programmeble-Logical-Controller-for-the-Industry-4_Mellado_Nunez.pdf","target":[{"source":"vault:/articles/art11_Design-of-an-IoT-PLC-A-Containerized-Programmeble-Logical-Controller-for-the-Industry-4_Mellado_Nunez.pdf","selector":[{"type":"TextPositionSelector","start":7011,"end":7137},{"type":"TextQuoteSelector","exact":"Therefore, a modern PLC is by definition anelement facilitating the OT-IT integration, which is a difficult problemitself [7].","prefix":"mmu-nications are not critical. ","suffix":"To solve the integration problem"}]}]}
+>{"created":"2026-06-15T20:07:45.026Z","text":"É a afirmação mais direta: o artigo propõe explicitamente um PLC cujas funcionalidades são empacotadas em containers. Isso legitima a aproximação entre runtime industrial e filosofia de aplicações containerizadas.","updated":"2026-06-15T20:07:45.026Z","document":{"title":"Design of an IoT-PLC: A containerized programmable logical controller for the industry 4.0","link":[{"href":"urn:x-pdf:bb405b6cfe145fb7930f250051b7b7a0"},{"href":"vault:/articles/art11_Design-of-an-IoT-PLC-A-Containerized-Programmeble-Logical-Controller-for-the-Industry-4_Mellado_Nunez.pdf"}],"documentFingerprint":"bb405b6cfe145fb7930f250051b7b7a0"},"uri":"vault:/articles/art11_Design-of-an-IoT-PLC-A-Containerized-Programmeble-Logical-Controller-for-the-Industry-4_Mellado_Nunez.pdf","target":[{"source":"vault:/articles/art11_Design-of-an-IoT-PLC-A-Containerized-Programmeble-Logical-Controller-for-the-Industry-4_Mellado_Nunez.pdf","selector":[{"type":"TextPositionSelector","start":1314,"end":1613},{"type":"TextQuoteSelector","exact":"The proposedIoT-PLC operates as a containerized piece of equipment, with each functionality packaged within a separatecontainer. The IoT-PLC has regulatory control capabilities, fog-computing functionalities as filtering and fielddata storage, and multiple wireless interfaces managed independently.","prefix":"or the Industry 4.0 revolution. ","suffix":" Moreover, it uses a virtual dev"}]}]}
 >```
 >%%
->*%%PREFIX%%mmu-nications are not critical.%%HIGHLIGHT%% ==Therefore, a modern PLC is by definition anelement facilitating the OT-IT integration, which is a difficult problemitself [7].== %%POSTFIX%%To solve the integration problem*
->%%LINK%%[[#^otvwqgivi2d|show annotation]]
+>*%%PREFIX%%or the Industry 4.0 revolution.%%HIGHLIGHT%% ==The proposedIoT-PLC operates as a containerized piece of equipment, with each functionality packaged within a separatecontainer. The IoT-PLC has regulatory control capabilities, fog-computing functionalities as filtering and fielddata storage, and multiple wireless interfaces managed independently.== %%POSTFIX%%Moreover, it uses a virtual dev*
+>%%LINK%%[[#^lxwo2uhtktb|show annotation]]
 >%%COMMENT%%
->
+>É a afirmação mais direta: o artigo propõe explicitamente um PLC cujas funcionalidades são empacotadas em containers. Isso legitima a aproximação entre runtime industrial e filosofia de aplicações containerizadas.
 >%%TAGS%%
 >
-^otvwqgivi2d
+^lxwo2uhtktb
 
 
 >%%
 >```annotation-json
->{"created":"2026-06-14T23:17:00.742Z","text":"O artigo lança essa interpretação do PLC como sendo um componente da camada de borda/fog. Isso aproxima bastante o PLC de um equipamento gerenciável por uma arquitetura 'cloud-native' de 'sistemas distribuídos'.","updated":"2026-06-14T23:17:00.742Z","document":{"title":"Design of an IoT-PLC: A containerized programmable logical controller for the industry 4.0","link":[{"href":"urn:x-pdf:bb405b6cfe145fb7930f250051b7b7a0"},{"href":"vault:/articles/art11_Design-of-an-IoT-PLC-A-Containerized-Programmeble-Logical-Controller-for-the-Industry-4_Mellado_Nunez.pdf"}],"documentFingerprint":"bb405b6cfe145fb7930f250051b7b7a0"},"uri":"vault:/articles/art11_Design-of-an-IoT-PLC-A-Containerized-Programmeble-Logical-Controller-for-the-Industry-4_Mellado_Nunez.pdf","target":[{"source":"vault:/articles/art11_Design-of-an-IoT-PLC-A-Containerized-Programmeble-Logical-Controller-for-the-Industry-4_Mellado_Nunez.pdf","selector":[{"type":"TextPositionSelector","start":7579,"end":7651},{"type":"TextQuoteSelector","exact":". In this context, conceivinga modern PLC as a fog node seems promising.","prefix":"er to sensors and actuators [11]","suffix":"This work proposes a container-b"}]}]}
+>{"created":"2026-06-15T20:08:58.515Z","text":"Aqui está o motivo histórico: a arquitetura tradicional do PLC precisa ser atualizada para acomodar gerenciamento em nuvem, instrumentação sem fio e elementos autônomos, sem perder previsibilidade.","updated":"2026-06-15T20:08:58.515Z","document":{"title":"Design of an IoT-PLC: A containerized programmable logical controller for the industry 4.0","link":[{"href":"urn:x-pdf:bb405b6cfe145fb7930f250051b7b7a0"},{"href":"vault:/articles/art11_Design-of-an-IoT-PLC-A-Containerized-Programmeble-Logical-Controller-for-the-Industry-4_Mellado_Nunez.pdf"}],"documentFingerprint":"bb405b6cfe145fb7930f250051b7b7a0"},"uri":"vault:/articles/art11_Design-of-an-IoT-PLC-A-Containerized-Programmeble-Logical-Controller-for-the-Industry-4_Mellado_Nunez.pdf","target":[{"source":"vault:/articles/art11_Design-of-an-IoT-PLC-A-Containerized-Programmeble-Logical-Controller-for-the-Industry-4_Mellado_Nunez.pdf","selector":[{"type":"TextPositionSelector","start":7651,"end":7964},{"type":"TextQuoteSelector","exact":"This work proposes a container-based architecture for an Industry4.0-oriented PLC inspired in the Internet of Things (IoT) paradigm,called IoT-PLC, that allows flexible deployment of controllers, directintegration with cloud-based management systems, and efficient com-munications with wireless instrumentation. T","prefix":"C as a fog node seems promising.","suffix":"he proposed IoT-PLC de-scribes e"}]}]}
 >```
 >%%
->*%%PREFIX%%er to sensors and actuators [11]%%HIGHLIGHT%% ==. In this context, conceivinga modern PLC as a fog node seems promising.== %%POSTFIX%%This work proposes a container-b*
->%%LINK%%[[#^xd7q5alugm|show annotation]]
+>*%%PREFIX%%C as a fog node seems promising.%%HIGHLIGHT%% ==This work proposes a container-based architecture for an Industry4.0-oriented PLC inspired in the Internet of Things (IoT) paradigm,called IoT-PLC, that allows flexible deployment of controllers, directintegration with cloud-based management systems, and efficient com-munications with wireless instrumentation. T== %%POSTFIX%%he proposed IoT-PLC de-scribes e*
+>%%LINK%%[[#^7trt522mp1b|show annotation]]
 >%%COMMENT%%
->O artigo lança essa interpretação do PLC como sendo um componente da camada de borda/fog. Isso aproxima bastante o PLC de um equipamento gerenciável por uma arquitetura 'cloud-native' de 'sistemas distribuídos'.
+>Aqui está o motivo histórico: a arquitetura tradicional do PLC precisa ser atualizada para acomodar gerenciamento em nuvem, instrumentação sem fio e elementos autônomos, sem perder previsibilidade.
 >%%TAGS%%
 >
-^xd7q5alugm
+^7trt522mp1b
 
 
 >%%
 >```annotation-json
->{"created":"2026-06-14T23:49:07.699Z","updated":"2026-06-14T23:49:07.699Z","document":{"title":"Design of an IoT-PLC: A containerized programmable logical controller for the industry 4.0","link":[{"href":"urn:x-pdf:bb405b6cfe145fb7930f250051b7b7a0"},{"href":"vault:/articles/art11_Design-of-an-IoT-PLC-A-Containerized-Programmeble-Logical-Controller-for-the-Industry-4_Mellado_Nunez.pdf"}],"documentFingerprint":"bb405b6cfe145fb7930f250051b7b7a0"},"uri":"vault:/articles/art11_Design-of-an-IoT-PLC-A-Containerized-Programmeble-Logical-Controller-for-the-Industry-4_Mellado_Nunez.pdf","target":[{"source":"vault:/articles/art11_Design-of-an-IoT-PLC-A-Containerized-Programmeble-Logical-Controller-for-the-Industry-4_Mellado_Nunez.pdf","selector":[{"type":"TextPositionSelector","start":2891,"end":3030},{"type":"TextQuoteSelector","exact":"The Industry 4.0 imposes several design principles that must be con-sidered in the automation or digitalization of production processes [6]","prefix":" in which they are involved [5].","suffix":",namely: (i) integration, partic"}]}]}
+>{"created":"2026-06-15T20:10:15.233Z","text":"Essa passagem reposiciona o PLC como nó de borda/fog. Ou seja: ele continua perto da planta, mas passa a fazer parte de uma arquitetura distribuída, integrada e gerenciável.","updated":"2026-06-15T20:10:15.233Z","document":{"title":"Design of an IoT-PLC: A containerized programmable logical controller for the industry 4.0","link":[{"href":"urn:x-pdf:bb405b6cfe145fb7930f250051b7b7a0"},{"href":"vault:/articles/art11_Design-of-an-IoT-PLC-A-Containerized-Programmeble-Logical-Controller-for-the-Industry-4_Mellado_Nunez.pdf"}],"documentFingerprint":"bb405b6cfe145fb7930f250051b7b7a0"},"uri":"vault:/articles/art11_Design-of-an-IoT-PLC-A-Containerized-Programmeble-Logical-Controller-for-the-Industry-4_Mellado_Nunez.pdf","target":[{"source":"vault:/articles/art11_Design-of-an-IoT-PLC-A-Containerized-Programmeble-Logical-Controller-for-the-Industry-4_Mellado_Nunez.pdf","selector":[{"type":"TextPositionSelector","start":7137,"end":7651},{"type":"TextQuoteSelector","exact":"To solve the integration problem between the IT and OT domains,while satisfying their requirements, the fog computing paradigm hasappeared as an appealing option to deploy control systems, storageand communications closer to the field devices. Using this paradigm,response times and non-deterministic behaviors of the IT layers canbe reduced, given that part of the tasks performed in the IT area aremoved closer to sensors and actuators [11]. In this context, conceivinga modern PLC as a fog node seems promising.","prefix":"s a difficult problemitself [7].","suffix":"This work proposes a container-b"}]}]}
 >```
 >%%
->*%%PREFIX%%in which they are involved [5].%%HIGHLIGHT%% ==The Industry 4.0 imposes several design principles that must be con-sidered in the automation or digitalization of production processes [6]== %%POSTFIX%%,namely: (i) integration, partic*
->%%LINK%%[[#^e43z2q5p0a|show annotation]]
+>*%%PREFIX%%s a difficult problemitself [7].%%HIGHLIGHT%% ==To solve the integration problem between the IT and OT domains,while satisfying their requirements, the fog computing paradigm hasappeared as an appealing option to deploy control systems, storageand communications closer to the field devices. Using this paradigm,response times and non-deterministic behaviors of the IT layers canbe reduced, given that part of the tasks performed in the IT area aremoved closer to sensors and actuators [11]. In this context, conceivinga modern PLC as a fog node seems promising.== %%POSTFIX%%This work proposes a container-b*
+>%%LINK%%[[#^uk8ahqf0q7|show annotation]]
 >%%COMMENT%%
->
+>Essa passagem reposiciona o PLC como nó de borda/fog. Ou seja: ele continua perto da planta, mas passa a fazer parte de uma arquitetura distribuída, integrada e gerenciável.
 >%%TAGS%%
 >
-^e43z2q5p0a
+^uk8ahqf0q7
+
+
+>%%
+>```annotation-json
+>{"created":"2026-06-15T20:11:16.560Z","text":"Essa é a defesa funcional da containerização: permitir migração, reconfiguração de malhas e ajuste de recursos sem tratar o PLC como bloco fixo e monolítico.","updated":"2026-06-15T20:11:16.560Z","document":{"title":"Design of an IoT-PLC: A containerized programmable logical controller for the industry 4.0","link":[{"href":"urn:x-pdf:bb405b6cfe145fb7930f250051b7b7a0"},{"href":"vault:/articles/art11_Design-of-an-IoT-PLC-A-Containerized-Programmeble-Logical-Controller-for-the-Industry-4_Mellado_Nunez.pdf"}],"documentFingerprint":"bb405b6cfe145fb7930f250051b7b7a0"},"uri":"vault:/articles/art11_Design-of-an-IoT-PLC-A-Containerized-Programmeble-Logical-Controller-for-the-Industry-4_Mellado_Nunez.pdf","target":[{"source":"vault:/articles/art11_Design-of-an-IoT-PLC-A-Containerized-Programmeble-Logical-Controller-for-the-Industry-4_Mellado_Nunez.pdf","selector":[{"type":"TextPositionSelector","start":8157,"end":8402},{"type":"TextQuoteSelector","exact":" Containerization allows live migrationof applications between IoT-PLCs, enabling hot reconfiguration of con-trol loops, and fine tuning of computing resources assigned to eachprocess inside the IoT-PLC, increasing robustness and predictability.","prefix":"mation flow from field to cloud.","suffix":"The rest of this paper is organi"}]}]}
+>```
+>%%
+>*%%PREFIX%%mation flow from field to cloud.%%HIGHLIGHT%% ==Containerization allows live migrationof applications between IoT-PLCs, enabling hot reconfiguration of con-trol loops, and fine tuning of computing resources assigned to eachprocess inside the IoT-PLC, increasing robustness and predictability.== %%POSTFIX%%The rest of this paper is organi*
+>%%LINK%%[[#^vx61ngsoctj|show annotation]]
+>%%COMMENT%%
+>Essa é a defesa funcional da containerização: permitir migração, reconfiguração de malhas e ajuste de recursos sem tratar o PLC como bloco fixo e monolítico.
+>%%TAGS%%
+>
+^vx61ngsoctj
+
+
+>%%
+>```annotation-json
+>{"created":"2026-06-15T20:12:17.011Z","text":"Cada bloco rodando em container pode ser gerenciado externamente. É praticamente a ponte conceitual para uma camada supervisória cloud-native, como Kubernetes.","updated":"2026-06-15T20:12:17.011Z","document":{"title":"Design of an IoT-PLC: A containerized programmable logical controller for the industry 4.0","link":[{"href":"urn:x-pdf:bb405b6cfe145fb7930f250051b7b7a0"},{"href":"vault:/articles/art11_Design-of-an-IoT-PLC-A-Containerized-Programmeble-Logical-Controller-for-the-Industry-4_Mellado_Nunez.pdf"}],"documentFingerprint":"bb405b6cfe145fb7930f250051b7b7a0"},"uri":"vault:/articles/art11_Design-of-an-IoT-PLC-A-Containerized-Programmeble-Logical-Controller-for-the-Industry-4_Mellado_Nunez.pdf","target":[{"source":"vault:/articles/art11_Design-of-an-IoT-PLC-A-Containerized-Programmeble-Logical-Controller-for-the-Industry-4_Mellado_Nunez.pdf","selector":[{"type":"TextPositionSelector","start":16853,"end":17288},{"type":"TextQuoteSelector","exact":"By running each block in a container it is possible to managethem directly from the cloud. This gives the IoT-PLC flexibility forchanging on-the-fly the configuration of the controller without stoppingthe control process, only the controller block needs to be reloaded.In addition, containerization allows assigning resources to each blockdepending on the role they have in the control system, increasingreliability and predictability.","prefix":"s, other IoT-PLCs and the cloud.","suffix":"An important aspect of ICPSs is "}]}]}
+>```
+>%%
+>*%%PREFIX%%s, other IoT-PLCs and the cloud.%%HIGHLIGHT%% ==By running each block in a container it is possible to managethem directly from the cloud. This gives the IoT-PLC flexibility forchanging on-the-fly the configuration of the controller without stoppingthe control process, only the controller block needs to be reloaded.In addition, containerization allows assigning resources to each blockdepending on the role they have in the control system, increasingreliability and predictability.== %%POSTFIX%%An important aspect of ICPSs is*
+>%%LINK%%[[#^snsiuo401k|show annotation]]
+>%%COMMENT%%
+>Cada bloco rodando em container pode ser gerenciado externamente. É praticamente a ponte conceitual para uma camada supervisória cloud-native, como Kubernetes.
+>%%TAGS%%
+>
+^snsiuo401k

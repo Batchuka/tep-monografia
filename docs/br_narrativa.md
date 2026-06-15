@@ -14,7 +14,9 @@ Se eu fosse explicar de forma simples, eu diria assim: eu sou engenheiro de Cont
 
     Essa supervisão, embora descrita por abstrações como aplicações, serviços, réplicas e configurações, tem efeitos físicos sobre a infraestrutura computacional. Quando uma política é declarada, o Kubernetes pode decidir em quais servidores os processos vão rodar, criar ou remover instâncias, reiniciar processos falhos, substituir cargas em máquinas indisponíveis, aplicar configurações ao ambiente de execução, limitar consumo de CPU e memória, organizar rotas de comunicação e preservar a disponibilidade do serviço. Portanto, sua atuação não é apenas lógica ou administrativa: ela altera concretamente a ocupação de máquinas, o uso de recursos, o tráfego de rede e a continuidade operacional das aplicações cloud-native.
 
-Achei que seria estratégico buscar na comunidade de engenharia propostas de uso, eu fui buscar por aplicações do k8s na industria. Eu encontrei dois artigos: 'art10_Kubernetes-Orchestration-of-High-Availability_Johansson_et_al' e 'art11_Design-of-an-IoT-PLC-A-Containerized-Programmeble-Logical-Controller-for-the-Industry-4_Mellado_Nunez'
+Achei que seria estratégico buscar o que a comunidade de engenharia de controle está propondo de uso, se é que estava né. Para minha surpresa, encontrei dois artigos que, parando para pensar, são bem ousados:
+- 'art10_Kubernetes-Orchestration-of-High-Availability_Johansson_et_al' → 
+- 'art11_Design-of-an-IoT-PLC-A-Containerized-Programmeble-Logical-Controller-for-the-Industry-4_Mellado_Nunez' →
 
 A minha ideia é trazer essa lógica para a planta simulada. Em vez de usar Kubernetes apenas para manter aplicações rodando, eu quero usá-lo como uma camada supervisória sobre a digital twin do Tennessee Eastman. Ou seja: eu declaro uma política de operação da planta — modo de operação, setpoints, restrições, perturbações permitidas, estratégia de controle ativa — e um supervisor inspirado em Kubernetes observa o estado da planta e aplica ações para manter a operação coerente com essa política.
 

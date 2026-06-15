@@ -4,19 +4,19 @@
     "type": "split",
     "children": [
       {
-        "id": "186c2e332340dfb2",
+        "id": "71041e4ff759b1b5",
         "type": "tabs",
         "children": [
           {
-            "id": "b6970c673f765beb",
+            "id": "157595d4da2d2608",
             "type": "leaf",
             "state": {
               "type": "pdf-annotator",
               "state": {
-                "file": "notes/ft_Borg-Omega-and-Kubernetes.md"
+                "file": "notes/ft_Kubernetes-Orchestration-of-High-Availability_Johansson_et_al.md"
               },
               "icon": "lucide-file",
-              "title": "ft_Borg-Omega-and-Kubernetes"
+              "title": "ft_Kubernetes-Orchestration-of-High-Availability_Johansson_et_al"
             }
           }
         ]
@@ -93,7 +93,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "notes/ft_Borg-Omega-and-Kubernetes.md",
+                "file": "notes/ft_Kubernetes-Orchestration-of-High-Availability_Johansson_et_al.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -103,7 +103,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Links inversos para ft_Borg-Omega-and-Kubernetes"
+              "title": "Links inversos para ft_Kubernetes-Orchestration-of-High-Availability_Johansson_et_al"
             }
           },
           {
@@ -168,10 +168,10 @@
             "state": {
               "type": "file-properties",
               "state": {
-                "file": "notes/ft_Borg-Omega-and-Kubernetes.md"
+                "file": "notes/ft_Kubernetes-Orchestration-of-High-Availability_Johansson_et_al.md"
               },
               "icon": "lucide-info",
-              "title": "Propriedades do arquivo ft_Borg-Omega-and-Kubernetes"
+              "title": "Propriedades do arquivo ft_Kubernetes-Orchestration-of-High-Availability_Johansson_et_al"
             }
           }
         ]
@@ -192,22 +192,23 @@
       "bases:Criar nova base": false
     }
   },
-  "active": "b6970c673f765beb",
+  "active": "157595d4da2d2608",
   "lastOpenFiles": [
+    "notes/ft_Mechatronic-Futures_Hehenberger_Bradley.md",
+    "notes/ft_UNICOS-A-Framework-to-Build-Industry-Like-Control-Systems.md",
+    "notes/ft_Kubernetes-Orchestration-of-High-Availability_Johansson_et_al.md",
+    "notes/ft_Borg-Omega-and-Kubernetes.md",
     "bibTex/art5_Borg-Omega-and-Kubernetes_Burns_Grant_Oppenheimer_Brewer_Wilkes.bib",
     "bibTex/art5_.bibtex",
-    "notes/ft_Borg-Omega-and-Kubernetes.md",
     "notes/ft_A-Plantwide-Industrial-Process-Control-Problem.md",
     "notes/ft_An-Expert-Knowledge-Based-Methodology-for-Online-Detection-of-Signal-Oscillations.md",
     "notes/ft_Assessment-of-Control-Loop-Performance.md",
     "notes/ft_Cloud-Native-Computing-A-Survey-from-the-Perspective-of-Services_Shuiguang_et_al.md",
     "Sem título.base",
-    "notes/ft_UNICOS-A-Framework-to-Build-Industry-Like-Control-Systems.md",
     "notes/ft_Control-Structure-Desing-for-Complete-Chemical-Plants.md",
     "notes/ft_Design-of-an-IoT-PLC_Mellado_Nunez.md",
     "notes/ft_Cloud-Native-Computing-A-Survey-from-the-Perspective-of-Services_Shuiguang_et_al.md.tmp.35964.3968c177abdd",
     "notes/ft_Model-Learning-Algorithms-for-Anomaly-Detection-in-CERN-Control-Systems.md",
-    "notes/ft_Mechatronic-Futures_Hehenberger_Bradley.md",
     "notes/ft_IEC_61512-1.md",
     "articles/art12_Cloud-Native-Computing-A-Survey-from-the-Perspective-of-Services_Shuiguang_et_al.pdf",
     "bibTex/art12_Cloud-Native-Computing-A-Survey-from-the-Perspective-of-Services_Shuiguang_et_al.bib",
@@ -215,8 +216,6 @@
     "articles/art12_Cloud-Native-Computing-A-Survey-from-the-Perspective-of-Services_.pdf",
     "articles/art12_.pdf",
     "articles/Não confirmado 98880.crdownload",
-    "bibTex/art11_Design-of-an-IoT-PLC-A-Containerized-Programmeble-Logical-Controller-for-the-Industry-4_Mellado_Nunez.bib",
-    "notes/ft_Kubernetes-Orchestration-of-High-Availability_Johansson_et_al.md",
     "notes/ft_OPC-Unified-Architecture_Mahnke_Leitner_Damm.md",
     "notes/ft_Plantwide-Control-A-Review-and-a-new-Design-Procedure.md",
     "notes/ft_IEC_61512.md",

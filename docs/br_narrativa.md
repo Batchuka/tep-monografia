@@ -20,18 +20,20 @@ Achei que seria estratégico buscar o que a comunidade de engenharia de controle
 
 Então, para mim já ficou claro que não só é viável, será uma demanda! Eu comecei a pensar então em como o k8s poderia ser um supervisor. Que tipo de coisas ele estaria observando da planta? como ele saberia que algo precisa ser alterado? O que exatamente ele iria manipular ness planta? Então eu me voltei para o problema original da TEP mais uma vez e tornei a refletir sobre ele. 
     
-    Foi ai que eu percebi que precisava entender melhor o que era a ideia de 'Plantwide'. Lendo 'art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad', eu entendi que para implementar uma camada de supervisão com k8s eu precisaria representar a planta como um sistema operacionalmente observável: 
-      - quais variáveis são estados críticos, 
-      - quais medições indicam qualidade, produção, segurança e estabilidade, 
-      - quais atuadores ainda possuem autoridade de controle, 
-      - quais restrições estão ativas, 
-      - quais malhas estão saturadas, 
-      - quais distúrbios estão deslocando a planta e ;
-      - quais objetivos globais continuam válidos naquele modo de operação. 
+Foi ai que eu percebi que precisava entender melhor o que era a ideia de 'Plantwide'. Lendo 'art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad', eu entendi que para implementar uma camada de supervisão com k8s eu precisaria representar a planta como um sistema operacionalmente observável: 
+  - quais variáveis são estados críticos, 
+  - quais medições indicam qualidade, produção, segurança e estabilidade, 
+  - quais atuadores ainda possuem autoridade de controle, 
+  - quais restrições estão ativas, 
+  - quais malhas estão saturadas, 
+  - quais distúrbios estão deslocando a planta e ;
+  - quais objetivos globais continuam válidos naquele modo de operação. 
 
-    Em outras palavras, o Kubernetes não poderia apenas “mandar um novo valor” para um PID; ele teria que reconciliar uma política operacional desejada com o estado real observado da planta. Isso envolve decidir quando uma malha local já não é suficiente, quando um setpoint deixou de ser economicamente ou dinamicamente adequado, quando uma restrição passou a dominar a operação, quando um atuador perdeu grau de liberdade e quando a estratégia de controle precisa mudar de configuração. Foi aí que ficou claro para mim que seria necessário uam metodologia de observação.
+Em outras palavras, o Kubernetes não poderia apenas “mandar um novo valor” para um PID; ele teria que reconciliar uma política operacional desejada com o estado real observado da planta. Isso envolve decidir quando uma malha local já não é suficiente, quando um setpoint deixou de ser economicamente ou dinamicamente adequado, quando uma restrição passou a dominar a operação, quando um atuador perdeu grau de liberdade e quando a estratégia de controle precisa mudar de configuração. Foi aí que ficou claro para mim que o buraco era TOTALMENTE mais em baixo e eu tive pela primeira vez a dimensão do tamanho desse problema kkk... Eu comecei a ler 'art4_Plantwide-Control-A-Review-and-a-new-Design-Procedure_Larsson_Skogestad' que parece uma versão mais ampla do artigo 3. Tentei entender melhor as considerações do Skogestad.
 
-Eu precisava de duas coisas
+A essa altura, eu estava entendendo que ia precisar de duas coisas:
+1. Um método para definir as minhas políticas de supervisão → que na minha opinião está bastante abstrato;
+2. Um método para saber quando a planta estava fora das minhas políticas de supervisão → que é relativamente fácil, encontrei 4 excelentes artigos nesse sentido;
 
 ---
 

@@ -4,19 +4,19 @@
     "type": "split",
     "children": [
       {
-        "id": "35cf1f7125fa53e3",
+        "id": "30faca196877121b",
         "type": "tabs",
         "children": [
           {
-            "id": "34a56d126740e045",
+            "id": "db3aa9d0b45bfc13",
             "type": "leaf",
             "state": {
               "type": "pdf-annotator",
               "state": {
-                "file": "notes/ft_Plantwide-Control-A-Review-and-a-new-Design-Procedure.md"
+                "file": "notes/ft_Automatic-PID-Performance-Monitoring-Applied-to-LHC-Cryogenics.md"
               },
               "icon": "lucide-file",
-              "title": "ft_Plantwide-Control-A-Review-and-a-new-Design-Procedure"
+              "title": "ft_Automatic-PID-Performance-Monitoring-Applied-to-LHC-Cryogenics"
             }
           }
         ]
@@ -190,8 +190,9 @@
       "bases:Create new base": false
     }
   },
-  "active": "34a56d126740e045",
+  "active": "db3aa9d0b45bfc13",
   "lastOpenFiles": [
+    "notes/ft_Plantwide-Control-A-Review-and-a-new-Design-Procedure.md",
     "bibTex/book2_System-Architecture-OPC-Unified-Architecture_Mahnke,_Leitner_Damm.bib",
     "bibTex/Não confirmado 964985.crdownload",
     "bibTex/book2_Services-OPC-Unified-Architecture_Mahnke,_Leitner_Damm.bib",
@@ -202,14 +203,12 @@
     "bibTex/Não confirmado 369173.crdownload",
     "bibTex/art10_Kubernetes-Orchestration-of-High-Availability_Johansson_et_al.bib",
     "bibTex/Não confirmado 712403.crdownload",
-    "bibTex/art9_Assessment-of-Control-Loop-Performance_Harris.bib",
     "notes/ft_Kubernetes-Orchestration-of-High-Availability_Johansson_et_al.md",
     "notes/ft_Design-of-an-IoT-PLC_Mellado_Nunez.md",
     "notes/ft_Cloud-Native-Computing-A-Survey-from-the-Perspective-of-Services_Shuiguang_et_al.md",
     "notes/ft_A-Plantwide-Industrial-Process-Control-Problem.md",
     "notes/ft_UNICOS-A-Framework-to-Build-Industry-Like-Control-Systems.md",
     "notes/ft_OPC-Unified-Architecture_Mahnke_Leitner_Damm.md",
-    "notes/ft_Plantwide-Control-A-Review-and-a-new-Design-Procedure.md",
     "notes/ft_Mechatronic-Futures_Hehenberger_Bradley.md",
     "notes/ft_Model-Learning-Algorithms-for-Anomaly-Detection-in-CERN-Control-Systems.md",
     "notes/ft_Control-Structure-Desing-for-Complete-Chemical-Plants.md",

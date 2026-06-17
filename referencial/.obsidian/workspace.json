@@ -4,19 +4,19 @@
     "type": "split",
     "children": [
       {
-        "id": "dcf5692646626c36",
+        "id": "227f4cdb93229f4f",
         "type": "tabs",
         "children": [
           {
-            "id": "3541d2a610d6cc6d",
+            "id": "b8c1df590675e8b2",
             "type": "leaf",
             "state": {
               "type": "pdf-annotator",
               "state": {
-                "file": "notes/ft_Automatic-PID-Performance-Monitoring-Applied-to-LHC-Cryogenics.md"
+                "file": "notes/ft_An-Expert-Knowledge-Based-Methodology-for-Online-Detection-of-Signal-Oscillations.md"
               },
               "icon": "lucide-file",
-              "title": "ft_Automatic-PID-Performance-Monitoring-Applied-to-LHC-Cryogenics"
+              "title": "ft_An-Expert-Knowledge-Based-Methodology-for-Online-Detection-of-Signal-Oscillations"
             }
           }
         ]
@@ -92,7 +92,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "notes/ft_Automatic-PID-Performance-Monitoring-Applied-to-LHC-Cryogenics.md",
+                "file": "notes/ft_An-Expert-Knowledge-Based-Methodology-for-Online-Detection-of-Signal-Oscillations.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Links inversos para ft_Automatic-PID-Performance-Monitoring-Applied-to-LHC-Cryogenics"
+              "title": "Links inversos para ft_An-Expert-Knowledge-Based-Methodology-for-Online-Detection-of-Signal-Oscillations"
             }
           },
           {
@@ -167,10 +167,10 @@
             "state": {
               "type": "file-properties",
               "state": {
-                "file": "notes/ft_Automatic-PID-Performance-Monitoring-Applied-to-LHC-Cryogenics.md"
+                "file": "notes/ft_An-Expert-Knowledge-Based-Methodology-for-Online-Detection-of-Signal-Oscillations.md"
               },
               "icon": "lucide-info",
-              "title": "Propriedades do arquivo ft_Automatic-PID-Performance-Monitoring-Applied-to-LHC-Cryogenics"
+              "title": "Propriedades do arquivo ft_An-Expert-Knowledge-Based-Methodology-for-Online-Detection-of-Signal-Oscillations"
             }
           }
         ]
@@ -191,7 +191,7 @@
       "bases:Criar nova base": false
     }
   },
-  "active": "3541d2a610d6cc6d",
+  "active": "b8c1df590675e8b2",
   "lastOpenFiles": [
     "notes/ft_Automatic-PID-Performance-Monitoring-Applied-to-LHC-Cryogenics.md",
     "articles/art2_Automatic-PID-Performance-Monitoring-Applied-to-LHC-Cryogenics_Bradu_Vinuela_Tilaro.pdf",

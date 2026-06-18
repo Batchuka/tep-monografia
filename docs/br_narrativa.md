@@ -35,6 +35,20 @@ A essa altura, eu estava entendendo que ia precisar de duas coisas:
 1. Um método para definir as minhas políticas de supervisão → que na minha opinião está bastante abstrato;
 2. Um método para saber quando a planta estava fora das minhas políticas de supervisão → que é relativamente fácil, encontrei 4 excelentes artigos nesse sentido;
 
+Ao ler:
+- 'art2_Automatic-PID-Performance-Monitoring-Applied-to-LHC-Cryogenics_Bradu_Vinuela_Tilaro'
+- 'art9_Assessment-of-Control-Loop-Performance_Harris'
+- 'art7_An-Expert-Knowledge-Based-Methodology-for-Online-Detection-of-Signal-Oscillations_Tilaro_Bradu_Berges_Roshchin'
+- 'art8_Model-Learning-Algorithms-for-Anomaly-Detection-in-CERN-Control-Systems_Tilaro_Bradu_Berges_Varela_Roshchin'
+
+Eu tive muitos insights sobre como o k8s poderia ser implementado. Eu percebi que ele seria um ente que iria consultar várias coisas para entender se uma política estaria sendo aplicada na planta, uma política de alto nível. E ele encontraria muitos subsídios para tal. O método da definição da política é perfeito porque ele parte do exato objetivo de alto nível do controle, a função de custo. E os diversos métodos de qualidade do controle são perfeitos porque eles dão ao k8s o poder de concluir se a planta está na política e o que pode ser feito para levar ela até a política.
+
+
+Em `art2` eu sei se uma malha está "controlada". Em `art9` eu sei se o controle dela pode ser aprimorado ou não. Em `art7` comportamento anômalo observável, como oscilação. 
+
+
 ---
+
+Uma das coisas mais top é que, quando você para pra pensar, você entende que a supervisão é feita sob medida e fica "queimada" no supervisório e na cabeça do operador. Ter o k8s seria uma mudança bem grande nesse paradigma, porque controle sairia da cabeça e dos limites de uma implantação. A abstração permitiria difundir o controle para mais pessoas. Digamos que a curva de adaptação seria bem menor.
 
 A minha ideia é trazer essa lógica para a planta simulada. Em vez de usar Kubernetes apenas para manter aplicações rodando, eu quero usá-lo como uma camada supervisória sobre a digital twin do Tennessee Eastman. Ou seja: eu declaro uma política de operação da planta — modo de operação, setpoints, restrições, perturbações permitidas, estratégia de controle ativa — e um supervisor inspirado em Kubernetes observa o estado da planta e aplica ações para manter a operação coerente com essa política.

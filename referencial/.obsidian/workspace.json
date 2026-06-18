@@ -4,19 +4,19 @@
     "type": "split",
     "children": [
       {
-        "id": "bd6eebf892849f7b",
+        "id": "ccef00621d3eb324",
         "type": "tabs",
         "children": [
           {
-            "id": "f26ce9f546f63d1b",
+            "id": "2bc4e0c09f4f99d9",
             "type": "leaf",
             "state": {
               "type": "pdf-annotator",
               "state": {
-                "file": "notes/ft_Assessment-of-Control-Loop-Performance.md"
+                "file": "notes/ft_An-Expert-Knowledge-Based-Methodology-for-Online-Detection-of-Signal-Oscillations.md"
               },
               "icon": "lucide-file",
-              "title": "ft_Assessment-of-Control-Loop-Performance"
+              "title": "ft_An-Expert-Knowledge-Based-Methodology-for-Online-Detection-of-Signal-Oscillations"
             }
           }
         ]
@@ -190,8 +190,10 @@
       "bases:Create new base": false
     }
   },
-  "active": "f26ce9f546f63d1b",
+  "active": "2bc4e0c09f4f99d9",
   "lastOpenFiles": [
+    "notes/ft_An-Expert-Knowledge-Based-Methodology-for-Online-Detection-of-Signal-Oscillations.md",
+    "notes/ft_Assessment-of-Control-Loop-Performance.md",
     "notes/ft_Automatic-PID-Performance-Monitoring-Applied-to-LHC-Cryogenics.md",
     "notes/ft_Plantwide-Control-A-Review-and-a-new-Design-Procedure.md",
     "bibTex/book2_System-Architecture-OPC-Unified-Architecture_Mahnke,_Leitner_Damm.bib",
@@ -216,8 +218,6 @@
     "notes/ft_IEC_61512.md",
     "notes/ft_IEC_61512-1.md",
     "notes/ft_Borg-Omega-and-Kubernetes.md",
-    "notes/ft_Assessment-of-Control-Loop-Performance.md",
-    "notes/ft_An-Expert-Knowledge-Based-Methodology-for-Online-Detection-of-Signal-Oscillations.md",
     "notes/ft_IEC_62541.md",
     "notes/bs_exploracao-tecnologias_20260606.md",
     "README.md",

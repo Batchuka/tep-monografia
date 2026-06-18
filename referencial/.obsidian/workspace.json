@@ -4,19 +4,19 @@
     "type": "split",
     "children": [
       {
-        "id": "227f4cdb93229f4f",
+        "id": "bd6eebf892849f7b",
         "type": "tabs",
         "children": [
           {
-            "id": "b8c1df590675e8b2",
+            "id": "f26ce9f546f63d1b",
             "type": "leaf",
             "state": {
               "type": "pdf-annotator",
               "state": {
-                "file": "notes/ft_An-Expert-Knowledge-Based-Methodology-for-Online-Detection-of-Signal-Oscillations.md"
+                "file": "notes/ft_Assessment-of-Control-Loop-Performance.md"
               },
               "icon": "lucide-file",
-              "title": "ft_An-Expert-Knowledge-Based-Methodology-for-Online-Detection-of-Signal-Oscillations"
+              "title": "ft_Assessment-of-Control-Loop-Performance"
             }
           }
         ]
@@ -42,7 +42,7 @@
                 "autoReveal": false
               },
               "icon": "lucide-folder-closed",
-              "title": "Explorador de arquivos"
+              "title": "Files"
             }
           },
           {
@@ -76,7 +76,8 @@
       }
     ],
     "direction": "horizontal",
-    "width": 371.5
+    "width": 371.5,
+    "collapsed": true
   },
   "right": {
     "id": "2b1e6e84b0c00a82",
@@ -92,7 +93,6 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "notes/ft_An-Expert-Knowledge-Based-Methodology-for-Online-Detection-of-Signal-Oscillations.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Links inversos para ft_An-Expert-Knowledge-Based-Methodology-for-Online-Detection-of-Signal-Oscillations"
+              "title": "Links inversos"
             }
           },
           {
@@ -166,14 +166,13 @@
             "type": "leaf",
             "state": {
               "type": "file-properties",
-              "state": {
-                "file": "notes/ft_An-Expert-Knowledge-Based-Methodology-for-Online-Detection-of-Signal-Oscillations.md"
-              },
+              "state": {},
               "icon": "lucide-info",
-              "title": "Propriedades do arquivo ft_An-Expert-Knowledge-Based-Methodology-for-Online-Detection-of-Signal-Oscillations"
+              "title": "Propriedades dos arquivos"
             }
           }
-        ]
+        ],
+        "currentTab": 4
       }
     ],
     "direction": "horizontal",
@@ -182,43 +181,43 @@
   },
   "left-ribbon": {
     "hiddenItems": {
-      "switcher:Abrir a troca rápida": false,
-      "graph:Abrir visualização em gráfico": false,
-      "canvas:Criar novo canvas": false,
-      "daily-notes:Abrir a nota de hoje": false,
-      "templates:Inserir modelo": false,
-      "command-palette:Abrir paleta de comandos": false,
-      "bases:Criar nova base": false
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
     }
   },
-  "active": "b8c1df590675e8b2",
+  "active": "f26ce9f546f63d1b",
   "lastOpenFiles": [
     "notes/ft_Automatic-PID-Performance-Monitoring-Applied-to-LHC-Cryogenics.md",
-    "articles/art2_Automatic-PID-Performance-Monitoring-Applied-to-LHC-Cryogenics_Bradu_Vinuela_Tilaro.pdf",
     "notes/ft_Plantwide-Control-A-Review-and-a-new-Design-Procedure.md",
     "bibTex/book2_System-Architecture-OPC-Unified-Architecture_Mahnke,_Leitner_Damm.bib",
+    "bibTex/Não confirmado 964985.crdownload",
     "bibTex/book2_Services-OPC-Unified-Architecture_Mahnke,_Leitner_Damm.bib",
+    "bibTex/Não confirmado 817238.crdownload",
     "bibTex/book2_Introduction-OPC-Unified-Architecture_Mahnke,_Leitner_Damm.bib",
+    "bibTex/Não confirmado 165986.crdownload",
     "bibTex/book1_Mechatronic-Futures_Hehenberger_Bradley.bib",
-    "bibTex/art9_Assessment-of-Control-Loop-Performance_Harris.bib",
-    "bibTex/art8_Model-Learning-Algorithms-for-Anomaly-Detection-in-CERN-Control-Systems_Tilaro_Bradu_Berges_Varela_Roshchin.bib",
-    "bibTex/art7_An-Expert-Knowledge-Based-Methodology-for-Online-Detection-of-Signal-Oscillations_Tilaro_Bradu_Berges_Roshchin.bib",
-    "bibTex/art4_Plantwide-Control-A-Review-and-a-new-Design-Procedure_Larsson_Skogestad.bib",
-    "bibTex/art3_Control-Structure-Desing-for-Complete-Chemical-Plants_Skogestad.bib",
+    "bibTex/Não confirmado 369173.crdownload",
+    "bibTex/art10_Kubernetes-Orchestration-of-High-Availability_Johansson_et_al.bib",
+    "bibTex/Não confirmado 712403.crdownload",
+    "notes/ft_Kubernetes-Orchestration-of-High-Availability_Johansson_et_al.md",
+    "notes/ft_Design-of-an-IoT-PLC_Mellado_Nunez.md",
+    "notes/ft_Cloud-Native-Computing-A-Survey-from-the-Perspective-of-Services_Shuiguang_et_al.md",
+    "notes/ft_A-Plantwide-Industrial-Process-Control-Problem.md",
     "notes/ft_UNICOS-A-Framework-to-Build-Industry-Like-Control-Systems.md",
     "notes/ft_OPC-Unified-Architecture_Mahnke_Leitner_Damm.md",
-    "notes/ft_Control-Structure-Desing-for-Complete-Chemical-Plants.md",
-    "notes/ft_Cloud-Native-Computing-A-Survey-from-the-Perspective-of-Services_Shuiguang_et_al.md",
-    "notes/ft_Design-of-an-IoT-PLC_Mellado_Nunez.md",
-    "notes/ft_Kubernetes-Orchestration-of-High-Availability_Johansson_et_al.md",
     "notes/ft_Mechatronic-Futures_Hehenberger_Bradley.md",
-    "notes/ft_Borg-Omega-and-Kubernetes.md",
-    "notes/ft_A-Plantwide-Industrial-Process-Control-Problem.md",
-    "notes/ft_An-Expert-Knowledge-Based-Methodology-for-Online-Detection-of-Signal-Oscillations.md",
-    "notes/ft_Assessment-of-Control-Loop-Performance.md",
     "notes/ft_Model-Learning-Algorithms-for-Anomaly-Detection-in-CERN-Control-Systems.md",
-    "notes/ft_IEC_61512-1.md",
+    "notes/ft_Control-Structure-Desing-for-Complete-Chemical-Plants.md",
     "notes/ft_IEC_61512.md",
+    "notes/ft_IEC_61512-1.md",
+    "notes/ft_Borg-Omega-and-Kubernetes.md",
+    "notes/ft_Assessment-of-Control-Loop-Performance.md",
+    "notes/ft_An-Expert-Knowledge-Based-Methodology-for-Online-Detection-of-Signal-Oscillations.md",
     "notes/ft_IEC_62541.md",
     "notes/bs_exploracao-tecnologias_20260606.md",
     "README.md",

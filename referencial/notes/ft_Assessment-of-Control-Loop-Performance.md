@@ -30,201 +30,254 @@ tema: politica_supervisao/tecnica
 
 
 
->%%
->```annotation-json
->{"created":"2026-06-10T00:39:09.656Z","text":"Aqui Harris estabelece uma ideia fundamental: antes de trocar controlador, retunar PID ou propor uma arquitetura supervisória, é preciso ter uma referência objetiva de desempenho. Sem benchmark, qualquer melhora percebida pode ser apenas impressão visual da resposta temporal.\n\nNo meu TCC, isso justifica que a camada supervisória não deve agir apenas porque “parece ruim”. Ela precisa comparar o desempenho observado da malha com algum limite ou referência formal de desempenho.\n\n","updated":"2026-06-10T00:39:09.656Z","document":{"title":"Assessment of control loop performance","link":[{"href":"urn:x-pdf:74e243065d2ababf171208423d1f4f1b"},{"href":"vault:/notes/articles/art9_Assessment-of-Control-Loop-Performance_Harris.pdf"}],"documentFingerprint":"74e243065d2ababf171208423d1f4f1b"},"uri":"vault:/notes/articles/art9_Assessment-of-Control-Loop-Performance_Harris.pdf","target":[{"source":"vault:/notes/articles/art9_Assessment-of-Control-Loop-Performance_Harris.pdf","selector":[{"type":"TextPositionSelector","start":1616,"end":1739},{"type":"TextQuoteSelector","exact":"Regardless ofthè control strategy , it is important to have some benchmarkagainst which its performance can be evaluated. T","prefix":"d linear quadratic controllers. ","suffix":"he theo-retical ‘best achievable"}]}]}
->```
->%%
->*%%PREFIX%%d linear quadratic controllers.%%HIGHLIGHT%% ==Regardless ofthè control strategy , it is important to have some benchmarkagainst which its performance can be evaluated. T== %%POSTFIX%%he theo-retical ‘best achievable*
->%%LINK%%[[#^qf04ncgd319|show annotation]]
->%%COMMENT%%
->Aqui Harris estabelece uma ideia fundamental: antes de trocar controlador, retunar PID ou propor uma arquitetura supervisória, é preciso ter uma referência objetiva de desempenho. Sem benchmark, qualquer melhora percebida pode ser apenas impressão visual da resposta temporal.
->
->No meu TCC, isso justifica que a camada supervisória não deve agir apenas porque “parece ruim”. Ela precisa comparar o desempenho observado da malha com algum limite ou referência formal de desempenho.
->
->
->%%TAGS%%
->#semantica/REQUISITO-BENCHMARKING-POSITIVO
-^qf04ncgd319
 
 
->%%
->```annotation-json
->{"created":"2026-06-10T00:39:32.612Z","text":"O artigo define desempenho de controle em termos de variância/erro quadrático médio da saída. Isso desloca a avaliação da malha de uma percepção qualitativa para uma métrica estatística: quanto a variável controlada oscila ao redor do setpoint.\n\nPara o Tennessee Eastman, posso avaliar uma malha não apenas por overshoot ou settling time, mas também pela variabilidade residual da variável controlada durante operação contínua.","updated":"2026-06-10T00:39:32.612Z","document":{"title":"Assessment of control loop performance","link":[{"href":"urn:x-pdf:74e243065d2ababf171208423d1f4f1b"},{"href":"vault:/notes/articles/art9_Assessment-of-Control-Loop-Performance_Harris.pdf"}],"documentFingerprint":"74e243065d2ababf171208423d1f4f1b"},"uri":"vault:/notes/articles/art9_Assessment-of-Control-Loop-Performance_Harris.pdf","target":[{"source":"vault:/notes/articles/art9_Assessment-of-Control-Loop-Performance_Harris.pdf","selector":[{"type":"TextPositionSelector","start":1782,"end":1839},{"type":"TextQuoteSelector","exact":"as measured by thè meansquare error, is such a benchmark.","prefix":"ical ‘best achievable’ control, ","suffix":" If thè theoretical bestachievab"}]}]}
->```
->%%
->*%%PREFIX%%ical ‘best achievable’ control,%%HIGHLIGHT%% ==as measured by thè meansquare error, is such a benchmark.== %%POSTFIX%%If thè theoretical bestachievab*
->%%LINK%%[[#^a8foveplqev|show annotation]]
->%%COMMENT%%
->O artigo define desempenho de controle em termos de variância/erro quadrático médio da saída. Isso desloca a avaliação da malha de uma percepção qualitativa para uma métrica estatística: quanto a variável controlada oscila ao redor do setpoint.
->
->Para o Tennessee Eastman, posso avaliar uma malha não apenas por overshoot ou settling time, mas também pela variabilidade residual da variável controlada durante operação contínua.
->%%TAGS%%
->#semantica/METRICA-BENCHMARKING-POSITIVO
-^a8foveplqev
 
 
->%%
->```annotation-json
->{"created":"2026-06-10T00:45:22.535Z","text":"Comentário:\nHarris usa o controle de variância mínima como referência teórica de melhor desempenho. O ponto não é necessariamente implementar esse controlador, mas usar seu desempenho como limite inferior para comparar uma malha real.\n\nEu posso tratar o Harris Benchmark como uma régua de comparação para os PIDs simulados: não para substituir o PID imediatamente, mas para medir se ele está muito distante do melhor desempenho possível.\n\nHarris propõe estimar o desempenho possível usando dados coletados durante operação normal em malha fechada. Isso é muito relevante industrialmente, porque evita forçar testes invasivos na planta.\n\nConclusão para meu TCC:\nIsso conversa diretamente com o meu TCC: o digital twin pode gerar dados contínuos de operação e permitir que o supervisor avalie malhas sem precisar interromper ou perturbar artificialmente a planta.","updated":"2026-06-10T00:45:22.535Z","document":{"title":"Assessment of control loop performance","link":[{"href":"urn:x-pdf:74e243065d2ababf171208423d1f4f1b"},{"href":"vault:/notes/articles/art9_Assessment-of-Control-Loop-Performance_Harris.pdf"}],"documentFingerprint":"74e243065d2ababf171208423d1f4f1b"},"uri":"vault:/notes/articles/art9_Assessment-of-Control-Loop-Performance_Harris.pdf","target":[{"source":"vault:/notes/articles/art9_Assessment-of-Control-Loop-Performance_Harris.pdf","selector":[{"type":"TextPositionSelector","start":3037,"end":3540},{"type":"TextQuoteSelector","exact":"This is followed by a briefderivation of a minimum variance controller, and of thèresulting properties of a process operating under minimum var-iance control. It is then shown that thè theoretical best achiev-able performance in thè mean square sense can be estimatedfrom process data collected under ‘normal’ closed loop condi-tions. A method for estimating this mean square performanceis discussed. This is followed by a Monte-Carlo simulation toillustrate thè statistical properties of thè estimator.","prefix":"è process description is given. ","suffix":" Finally, thistechnique is appli"}]}]}
->```
->%%
->*%%PREFIX%%è process description is given.%%HIGHLIGHT%% ==This is followed by a briefderivation of a minimum variance controller, and of thèresulting properties of a process operating under minimum var-iance control. It is then shown that thè theoretical best achiev-able performance in thè mean square sense can be estimatedfrom process data collected under ‘normal’ closed loop condi-tions. A method for estimating this mean square performanceis discussed. This is followed by a Monte-Carlo simulation toillustrate thè statistical properties of thè estimator.== %%POSTFIX%%Finally, thistechnique is appli*
->%%LINK%%[[#^m6gi5eb406|show annotation]]
->%%COMMENT%%
->Comentário:
->Harris usa o controle de variância mínima como referência teórica de melhor desempenho. O ponto não é necessariamente implementar esse controlador, mas usar seu desempenho como limite inferior para comparar uma malha real.
->
->Eu posso tratar o Harris Benchmark como uma régua de comparação para os PIDs simulados: não para substituir o PID imediatamente, mas para medir se ele está muito distante do melhor desempenho possível.
->
->Harris propõe estimar o desempenho possível usando dados coletados durante operação normal em malha fechada. Isso é muito relevante industrialmente, porque evita forçar testes invasivos na planta.
->
->Conclusão para meu TCC:
->Isso conversa diretamente com o meu TCC: o digital twin pode gerar dados contínuos de operação e permitir que o supervisor avalie malhas sem precisar interromper ou perturbar artificialmente a planta.
->%%TAGS%%
->#semantica/MECANISMO-BENCHMARKING-POSITIVO
-^m6gi5eb406
+
+
+
 
 
 
 >%%
 >```annotation-json
->{"created":"2026-06-10T00:51:16.168Z","text":"Comentário\n\nA formulação matemática de Harris é mais importante do que parece. Ele escreve a saída controlada como a soma de dois efeitos: a dinâmica causada pela variável manipulada e a perturbação que entra no processo. Em termos conceituais, isso separa o que o controlador consegue influenciar diretamente daquilo que chega como excitação externa ou incerteza dinâmica.\n\nA equação tem a forma de um modelo discreto entrada-saída: a função de transferência em z^-1 representa a dinâmica da planta, U representa a ação manipulada, b representa o atraso inteiro do processo, e D representa a perturbação. Isso transforma o problema de desempenho de controle em uma pergunta matemática precisa: quanto da variabilidade de Y vem de uma perturbação que poderia ser prevista e compensada, e quanto vem de uma parte inevitável por causa do atraso e do ruído?\n\nO ponto forte é que Harris não precisa abrir a planta em estados internos físicos. Ele trabalha com uma decomposição externa: saída, entrada manipulada e perturbação. Depois, a perturbação é modelada como uma série temporal ARIMA, isto é, como ruído branco passando por uma dinâmica estatística. Assim, o problema de controle vira também um problema de previsão: se a perturbação tem estrutura temporal, parte dela pode ser prevista; se não pode ser prevista dentro do horizonte imposto pelo atraso, ela vira erro inevitável.\n\nO Monte Carlo entra justamente para dar peso estatístico a essa ideia. Harris não apenas propõe uma decomposição matemática; ele testa, por simulação repetida, se o estimador do desempenho mínimo se comporta bem quando os dados vêm de um processo estocástico conhecido. Ou seja, ele gera várias realizações da mesma planta com diferentes sequências de ruído e observa se o método consegue recuperar de forma confiável a variância mínima esperada.\n\nConclusão para meu TCC\n\nNo meu TCC, essa equação justifica uma separação arquitetural e matemática essencial: a planta simulada não deve ser tratada como uma caixa única onde tudo é “sinal”. Eu preciso distinguir estado interno da planta, variável manipulada, variável medida e perturbação. Para o Tennessee Eastman, isso significa tratar XMV como ação de controle, XMEAS como observação da planta e IDV como fonte explícita de perturbação.\n\nEssa separação também sustenta a futura camada supervisória. O supervisor não deve olhar apenas para a saída e concluir que a malha está ruim. Ele precisa perguntar: a variabilidade observada vem de má atuação do controlador, de uma perturbação previsível não compensada, de atraso inevitável ou de ruído estatístico? O valor do digital twin é justamente permitir repetir esse experimento várias vezes, como um Monte Carlo controlado, mudando sementes, perturbações e janelas de observação para testar se o diagnóstico da malha é robusto.","updated":"2026-06-10T00:51:16.168Z","document":{"title":"Assessment of control loop performance","link":[{"href":"urn:x-pdf:74e243065d2ababf171208423d1f4f1b"},{"href":"vault:/notes/articles/art9_Assessment-of-Control-Loop-Performance_Harris.pdf"}],"documentFingerprint":"74e243065d2ababf171208423d1f4f1b"},"uri":"vault:/notes/articles/art9_Assessment-of-Control-Loop-Performance_Harris.pdf","target":[{"source":"vault:/notes/articles/art9_Assessment-of-Control-Loop-Performance_Harris.pdf","selector":[{"type":"TextPositionSelector","start":1300,"end":1340},{"type":"TextQuoteSelector","exact":"Y, = w ( z -' ) / 8 ( z -' ) U , _ b + D","prefix":"lysis, control loop performance.","suffix":",T here are many techniques avai"}]}]}
+>{"created":"2026-06-17T23:23:47.853Z","text":"Isso é uma abstração supervisória, podemos dizer que é uma espécie de 'Loop Performance State'.\n```\nloop.performance = good | degraded | poor\n```\nExemplo:\n\n```yaml\nloop:\n  name: reactor_pressure_control\n  desiredPerformance: near_minimum_variance\n```\nobservado:\n``` yaml\nobserved:\n  harris_ratio: 2.8\n  status: degraded\n```\n\ndaí a ação de reconciliação é gerar um alerta ou solicitar diagnóstico de sintonia, sem k8s atuar diretamente no PID. \n\nNão acho que a ideia se restrinja apenas a mexer no PID, podem haver outros elementos associados as quais o k8s também orquestra algo.\n","updated":"2026-06-17T23:23:47.853Z","document":{"title":"Assessment of control loop performance","link":[{"href":"urn:x-pdf:74e243065d2ababf171208423d1f4f1b"},{"href":"vault:/articles/art9_Assessment-of-Control-Loop-Performance_Harris.pdf"}],"documentFingerprint":"74e243065d2ababf171208423d1f4f1b"},"uri":"vault:/articles/art9_Assessment-of-Control-Loop-Performance_Harris.pdf","target":[{"source":"vault:/articles/art9_Assessment-of-Control-Loop-Performance_Harris.pdf","selector":[{"type":"TextPositionSelector","start":1616,"end":1839},{"type":"TextQuoteSelector","exact":"Regardless ofthè control strategy , it is important to have some benchmarkagainst which its performance can be evaluated. The theo-retical ‘best achievable’ control, as measured by thè meansquare error, is such a benchmark.","prefix":"d linear quadratic controllers. ","suffix":" If thè theoretical bestachievab"}]}]}
 >```
 >%%
->*%%PREFIX%%lysis, control loop performance.%%HIGHLIGHT%% ==Y, = w ( z -' ) / 8 ( z -' ) U , _ b + D== %%POSTFIX%%,T here are many techniques avai*
->%%LINK%%[[#^324iz2ep1xm|show annotation]]
+>*%%PREFIX%%d linear quadratic controllers.%%HIGHLIGHT%% ==Regardless ofthè control strategy , it is important to have some benchmarkagainst which its performance can be evaluated. The theo-retical ‘best achievable’ control, as measured by thè meansquare error, is such a benchmark.== %%POSTFIX%%If thè theoretical bestachievab*
+>%%LINK%%[[#^ogx4bci2fp|show annotation]]
 >%%COMMENT%%
->Comentário
+>Isso é uma abstração supervisória, podemos dizer que é uma espécie de 'Loop Performance State'.
+>```
+>loop.performance = good | degraded | poor
+>```
+>Exemplo:
 >
->A formulação matemática de Harris é mais importante do que parece. Ele escreve a saída controlada como a soma de dois efeitos: a dinâmica causada pela variável manipulada e a perturbação que entra no processo. Em termos conceituais, isso separa o que o controlador consegue influenciar diretamente daquilo que chega como excitação externa ou incerteza dinâmica.
+>```yaml
+>loop:
+>  name: reactor_pressure_control
+>  desiredPerformance: near_minimum_variance
+>```
+>observado:
+>``` yaml
+>observed:
+>  harris_ratio: 2.8
+>  status: degraded
+>```
 >
->A equação tem a forma de um modelo discreto entrada-saída: a função de transferência em z^-1 representa a dinâmica da planta, U representa a ação manipulada, b representa o atraso inteiro do processo, e D representa a perturbação. Isso transforma o problema de desempenho de controle em uma pergunta matemática precisa: quanto da variabilidade de Y vem de uma perturbação que poderia ser prevista e compensada, e quanto vem de uma parte inevitável por causa do atraso e do ruído?
+>daí a ação de reconciliação é gerar um alerta ou solicitar diagnóstico de sintonia, sem k8s atuar diretamente no PID. 
 >
->O ponto forte é que Harris não precisa abrir a planta em estados internos físicos. Ele trabalha com uma decomposição externa: saída, entrada manipulada e perturbação. Depois, a perturbação é modelada como uma série temporal ARIMA, isto é, como ruído branco passando por uma dinâmica estatística. Assim, o problema de controle vira também um problema de previsão: se a perturbação tem estrutura temporal, parte dela pode ser prevista; se não pode ser prevista dentro do horizonte imposto pelo atraso, ela vira erro inevitável.
+>Não acho que a ideia se restrinja apenas a mexer no PID, podem haver outros elementos associados as quais o k8s também orquestra algo.
 >
->O Monte Carlo entra justamente para dar peso estatístico a essa ideia. Harris não apenas propõe uma decomposição matemática; ele testa, por simulação repetida, se o estimador do desempenho mínimo se comporta bem quando os dados vêm de um processo estocástico conhecido. Ou seja, ele gera várias realizações da mesma planta com diferentes sequências de ruído e observa se o método consegue recuperar de forma confiável a variância mínima esperada.
->
->Conclusão para meu TCC
->
->No meu TCC, essa equação justifica uma separação arquitetural e matemática essencial: a planta simulada não deve ser tratada como uma caixa única onde tudo é “sinal”. Eu preciso distinguir estado interno da planta, variável manipulada, variável medida e perturbação. Para o Tennessee Eastman, isso significa tratar XMV como ação de controle, XMEAS como observação da planta e IDV como fonte explícita de perturbação.
->
->Essa separação também sustenta a futura camada supervisória. O supervisor não deve olhar apenas para a saída e concluir que a malha está ruim. Ele precisa perguntar: a variabilidade observada vem de má atuação do controlador, de uma perturbação previsível não compensada, de atraso inevitável ou de ruído estatístico? O valor do digital twin é justamente permitir repetir esse experimento várias vezes, como um Monte Carlo controlado, mudando sementes, perturbações e janelas de observação para testar se o diagnóstico da malha é robusto.
 >%%TAGS%%
->#semantica/MECANISMO-SISTEMAS_DINAMICOS-POSITIVO
-^324iz2ep1xm
+>
+^ogx4bci2fp
 
 
 >%%
 >```annotation-json
->{"created":"2026-06-10T00:53:55.832Z","text":"Comentário:\nO artigo mostra que o feedback não consegue corrigir a saída antes que o atraso do processo tenha passado. Isso é importante porque parte do erro não é culpa da sintonia: é consequência da dinâmica temporal da planta.\n\nConclusão para meu TCC:\nMinha camada supervisória não pode interpretar toda variabilidade como falha de controle. Em processos com atraso, existe uma parcela inevitável de erro que nenhum controlador feedback consegue remover instantaneamente.","updated":"2026-06-10T00:53:55.832Z","document":{"title":"Assessment of control loop performance","link":[{"href":"urn:x-pdf:74e243065d2ababf171208423d1f4f1b"},{"href":"vault:/notes/articles/art9_Assessment-of-Control-Loop-Performance_Harris.pdf"}],"documentFingerprint":"74e243065d2ababf171208423d1f4f1b"},"uri":"vault:/notes/articles/art9_Assessment-of-Control-Loop-Performance_Harris.pdf","target":[{"source":"vault:/notes/articles/art9_Assessment-of-Control-Loop-Performance_Harris.pdf","selector":[{"type":"TextPositionSelector","start":13066,"end":13455},{"type":"TextQuoteSelector","exact":"The key feature to note fromEquation (12) is that thè first / moving average terms ofthè closed loop transfer function are not affected by anyform of feedback. The invariance of these parameters tofeedback is simply a recognition that a feedback controlstrategy , linear or nonlinear, cannot return thè processoutput to its target value until thè process deadtime ortime delay has elapsed.","prefix":"quiva-lenti a t -j , for j > /. ","suffix":" The significance of this result"}]}]}
+>{"created":"2026-06-17T23:27:41.225Z","text":"Isso é bem bacana, esse método é coletado em tempo real sobre a operação nominal da planta. É perfeito para o k8s; ele meio que continuaria consumindo a telemetria da planta enquanto o controlador só está lá. \n\n```yaml\ntelemetry:\n  xmeas: reactor_temperature\n  xmv: reactor_cooling_water_flow\n  samplingTime: 1s\n  loopMode: automatic\n```\n\nÉ objetivamente legal né, porque a sintonia da planta muitas vezes requer 'resposta ao degrau', não é o caso aqui.","updated":"2026-06-17T23:27:41.225Z","document":{"title":"Assessment of control loop performance","link":[{"href":"urn:x-pdf:74e243065d2ababf171208423d1f4f1b"},{"href":"vault:/articles/art9_Assessment-of-Control-Loop-Performance_Harris.pdf"}],"documentFingerprint":"74e243065d2ababf171208423d1f4f1b"},"uri":"vault:/articles/art9_Assessment-of-Control-Loop-Performance_Harris.pdf","target":[{"source":"vault:/articles/art9_Assessment-of-Control-Loop-Performance_Harris.pdf","selector":[{"type":"TextPositionSelector","start":3196,"end":3372},{"type":"TextQuoteSelector","exact":"It is then shown that thè theoretical best achiev-able performance in thè mean square sense can be estimatedfrom process data collected under ‘normal’ closed loop condi-tions. ","prefix":"nder minimum var-iance control. ","suffix":"A method for estimating this mea"}]}]}
 >```
 >%%
->*%%PREFIX%%quiva-lenti a t -j , for j > /.%%HIGHLIGHT%% ==The key feature to note fromEquation (12) is that thè first / moving average terms ofthè closed loop transfer function are not affected by anyform of feedback. The invariance of these parameters tofeedback is simply a recognition that a feedback controlstrategy , linear or nonlinear, cannot return thè processoutput to its target value until thè process deadtime ortime delay has elapsed.== %%POSTFIX%%The significance of this result*
->%%LINK%%[[#^cnd1ljt24uv|show annotation]]
+>*%%PREFIX%%nder minimum var-iance control.%%HIGHLIGHT%% ==It is then shown that thè theoretical best achiev-able performance in thè mean square sense can be estimatedfrom process data collected under ‘normal’ closed loop condi-tions.== %%POSTFIX%%A method for estimating this mea*
+>%%LINK%%[[#^hhml4vrs6zw|show annotation]]
 >%%COMMENT%%
->Comentário:
->O artigo mostra que o feedback não consegue corrigir a saída antes que o atraso do processo tenha passado. Isso é importante porque parte do erro não é culpa da sintonia: é consequência da dinâmica temporal da planta.
+>Isso é bem bacana, esse método é coletado em tempo real sobre a operação nominal da planta. É perfeito para o k8s; ele meio que continuaria consumindo a telemetria da planta enquanto o controlador só está lá. 
 >
->Conclusão para meu TCC:
->Minha camada supervisória não pode interpretar toda variabilidade como falha de controle. Em processos com atraso, existe uma parcela inevitável de erro que nenhum controlador feedback consegue remover instantaneamente.
+>```yaml
+>telemetry:
+>  xmeas: reactor_temperature
+>  xmv: reactor_cooling_water_flow
+>  samplingTime: 1s
+>  loopMode: automatic
+>```
+>
+>É objetivamente legal né, porque a sintonia da planta muitas vezes requer 'resposta ao degrau', não é o caso aqui.
 >%%TAGS%%
->#semantica/LIMITE-CONTROLE_AUTOMATICO-POSITIVO
-^cnd1ljt24uv
+>
+^hhml4vrs6zw
 
 
 >%%
 >```annotation-json
->{"created":"2026-06-10T08:42:01.015Z","text":"Comentário:\nO artigo valoriza uma abordagem passiva de diagnóstico: observar a saída da malha e estimar o desempenho possível sem injetar sinais externos. Isso torna o método mais adequado para operação industrial contínua.\n\nConclusão para meu TCC:\nNo meu projeto, isso sustenta a ideia de monitoramento online: o sistema pode observar XMEAS e XMV ao longo do tempo e inferir qualidade de controle sem executar experimentos agressivos na planta.","updated":"2026-06-10T08:42:01.015Z","document":{"title":"Assessment of control loop performance","link":[{"href":"urn:x-pdf:74e243065d2ababf171208423d1f4f1b"},{"href":"vault:/notes/articles/art9_Assessment-of-Control-Loop-Performance_Harris.pdf"}],"documentFingerprint":"74e243065d2ababf171208423d1f4f1b"},"uri":"vault:/notes/articles/art9_Assessment-of-Control-Loop-Performance_Harris.pdf","target":[{"source":"vault:/notes/articles/art9_Assessment-of-Control-Loop-Performance_Harris.pdf","selector":[{"type":"TextPositionSelector","start":13810,"end":14085},{"type":"TextQuoteSelector","exact":"Consequently , i) it isnot necessary to perturb thè manipulated variable to obtaininformation about thè process dynamics and ii) it is notnecessary to insist on any ‘identifiability’ restrictions (Boxand MacGregor, 1976), as is usually thè case for closed loopidentification.","prefix":"ime series fit only to thè Y s. ","suffix":" If a nonlinear controller is us"}]}]}
+>{"created":"2026-06-17T23:31:42.092Z","text":"Sob controle de variância mínima, a saída da malha é o erro de previsão da perturbação. Se a malha está no limite, o que sobra em $Y$ é aquilo que não podia ser previsto e compensado.\n\nIsso é bem bacana porque saber se há margem para sintonia fica tangível, pode ser traduzido para algo como \"ainda existe estrutura previsível sobrando na variável controlada?\" Se existe, a malha pode estar deixando desempenho disponível. Por exemplo:\n\nEstado observado:\n```yaml\nloop:\n  observedPattern:\n    residualPredictability: high\n    autocorrelationAfterDelay: significant\n```\nPolítica:\n```yaml\npolicy:\n  requireResidualPredictability: low\n```\n\n","updated":"2026-06-17T23:31:42.092Z","document":{"title":"Assessment of control loop performance","link":[{"href":"urn:x-pdf:74e243065d2ababf171208423d1f4f1b"},{"href":"vault:/articles/art9_Assessment-of-Control-Loop-Performance_Harris.pdf"}],"documentFingerprint":"74e243065d2ababf171208423d1f4f1b"},"uri":"vault:/articles/art9_Assessment-of-Control-Loop-Performance_Harris.pdf","target":[{"source":"vault:/articles/art9_Assessment-of-Control-Loop-Performance_Harris.pdf","selector":[{"type":"TextPositionSelector","start":9990,"end":10113},{"type":"TextQuoteSelector","exact":"Under minimum variance control, thè process output isthè error in forecasting thè disturbance, i.e., D t + b -D t + h / t .","prefix":"ing for Minimum Variance Control","suffix":" This error is a moving average "}]}]}
 >```
 >%%
->*%%PREFIX%%ime series fit only to thè Y s.%%HIGHLIGHT%% ==Consequently , i) it isnot necessary to perturb thè manipulated variable to obtaininformation about thè process dynamics and ii) it is notnecessary to insist on any ‘identifiability’ restrictions (Boxand MacGregor, 1976), as is usually thè case for closed loopidentification.== %%POSTFIX%%If a nonlinear controller is us*
->%%LINK%%[[#^w6y5d5gr6nr|show annotation]]
+>*%%PREFIX%%ing for Minimum Variance Control%%HIGHLIGHT%% ==Under minimum variance control, thè process output isthè error in forecasting thè disturbance, i.e., D t + b -D t + h / t .== %%POSTFIX%%This error is a moving average*
+>%%LINK%%[[#^24cf002v2az|show annotation]]
 >%%COMMENT%%
->Comentário:
->O artigo valoriza uma abordagem passiva de diagnóstico: observar a saída da malha e estimar o desempenho possível sem injetar sinais externos. Isso torna o método mais adequado para operação industrial contínua.
+>Sob controle de variância mínima, a saída da malha é o erro de previsão da perturbação. Se a malha está no limite, o que sobra em $Y$ é aquilo que não podia ser previsto e compensado.
 >
->Conclusão para meu TCC:
->No meu projeto, isso sustenta a ideia de monitoramento online: o sistema pode observar XMEAS e XMV ao longo do tempo e inferir qualidade de controle sem executar experimentos agressivos na planta.
+>Isso é bem bacana porque saber se há margem para sintonia fica tangível, pode ser traduzido para algo como "ainda existe estrutura previsível sobrando na variável controlada?" Se existe, a malha pode estar deixando desempenho disponível. Por exemplo:
+>
+>Estado observado:
+>```yaml
+>loop:
+>  observedPattern:
+>    residualPredictability: high
+>    autocorrelationAfterDelay: significant
+>```
+>Política:
+>```yaml
+>policy:
+>  requireResidualPredictability: low
+>```
+>
+>
 >%%TAGS%%
->#semantica/MECANISMO-DIAGNOSTICO-POSITIVO
-^w6y5d5gr6nr
+>
+^24cf002v2az
 
 
 >%%
 >```annotation-json
->{"text":"Depois de escrever a planta como função de transferência discreta, ele define b como o atraso inteiro em número de períodos de amostragem/controle.\n\nOu seja: transforma o atraso físico τ_d em atraso discreto usando o intervalo de controle T. Exemplo: se o controlador roda a cada 1 minuto e o processo tem 3,4 minutos de atraso: \n- t_d/T =3.4\n- f = 3\n- b = 1 + 3 = 4\n\nA consequência é: o efeito de U_t só aparece em Y_t depois de algumas amostras. Isso é essencial para o Harris Benchmark.\n","target":[{"source":"vault:/notes/articles/art9_Assessment-of-Control-Loop-Performance_Harris.pdf","selector":[{"type":"TextPositionSelector","start":3846,"end":3878},{"type":"TextQuoteSelector","exact":"b = 1 + / = 1 + integer (r^ / F)","prefix":"process and is calculated as(2)","suffix":"T is thè control interval and is"}]}],"created":"2026-06-10T09:08:10.723Z","updated":"2026-06-10T09:08:10.723Z","document":{"title":"Assessment of control loop performance","link":[{"href":"urn:x-pdf:74e243065d2ababf171208423d1f4f1b"},{"href":"vault:/notes/articles/art9_Assessment-of-Control-Loop-Performance_Harris.pdf"}],"documentFingerprint":"74e243065d2ababf171208423d1f4f1b"},"uri":"vault:/notes/articles/art9_Assessment-of-Control-Loop-Performance_Harris.pdf"}
+>{"created":"2026-06-17T23:45:57.906Z","text":"Outro ponto bem objetivo para o k8s se apropriar. Podemos dizer que se a autocorrelação da variável controlada continua significativa depois do atraso esperado, então a malha pode estar degradada. Exemplo:\n\nNo TEP, uma malha de pressão do reator tem atraso discreto estimado f = 3. Se a autocorrelação continua significativa em lag > 3, o diagnóstico publica:\n\n```yaml\nloopHealth: degraded\nreason: predictable_residual_after_deadtime\n```","updated":"2026-06-17T23:45:57.906Z","document":{"title":"Assessment of control loop performance","link":[{"href":"urn:x-pdf:74e243065d2ababf171208423d1f4f1b"},{"href":"vault:/articles/art9_Assessment-of-Control-Loop-Performance_Harris.pdf"}],"documentFingerprint":"74e243065d2ababf171208423d1f4f1b"},"uri":"vault:/articles/art9_Assessment-of-Control-Loop-Performance_Harris.pdf","target":[{"source":"vault:/articles/art9_Assessment-of-Control-Loop-Performance_Harris.pdf","selector":[{"type":"TextPositionSelector","start":10308,"end":10559},{"type":"TextQuoteSelector","exact":"A moving average process of order/has thè property thatits autocorrelation function is zero beyond lag /. This propertyenables one to check whether a n y control strategy is givingminimum variance control (Astrom, 1970; Astrom and Wit-tenmark , 1973).","prefix":" ( 1 + V' i + . . . 4- t f ) o2a","suffix":" The sample autocorrelations can"}]}]}
 >```
 >%%
->*%%PREFIX%%process and is calculated as(2)%%HIGHLIGHT%% ==b = 1 + / = 1 + integer (r^ / F)== %%POSTFIX%%T is thè control interval and is*
->%%LINK%%[[#^48n1xtlaaws|show annotation]]
+>*%%PREFIX%%( 1 + V' i + . . . 4- t f ) o2a%%HIGHLIGHT%% ==A moving average process of order/has thè property thatits autocorrelation function is zero beyond lag /. This propertyenables one to check whether a n y control strategy is givingminimum variance control (Astrom, 1970; Astrom and Wit-tenmark , 1973).== %%POSTFIX%%The sample autocorrelations can*
+>%%LINK%%[[#^6hc67qx35ef|show annotation]]
 >%%COMMENT%%
->Depois de escrever a planta como função de transferência discreta, ele define b como o atraso inteiro em número de períodos de amostragem/controle.
+>Outro ponto bem objetivo para o k8s se apropriar. Podemos dizer que se a autocorrelação da variável controlada continua significativa depois do atraso esperado, então a malha pode estar degradada. Exemplo:
 >
->Ou seja: transforma o atraso físico τ_d em atraso discreto usando o intervalo de controle T. Exemplo: se o controlador roda a cada 1 minuto e o processo tem 3,4 minutos de atraso: 
->- t_d/T =3.4
->- f = 3
->- b = 1 + 3 = 4
+>No TEP, uma malha de pressão do reator tem atraso discreto estimado f = 3. Se a autocorrelação continua significativa em lag > 3, o diagnóstico publica:
 >
->A consequência é: o efeito de U_t só aparece em Y_t depois de algumas amostras. Isso é essencial para o Harris Benchmark.
->
+>```yaml
+>loopHealth: degraded
+>reason: predictable_residual_after_deadtime
+>```
 >%%TAGS%%
->#semantica/MECANISMO-CALCULO_NUMERICO-POSITIVO
-^48n1xtlaaws
+>
+^6hc67qx35ef
 
 
 >%%
 >```annotation-json
->{"created":"2026-06-12T07:15:12.784Z","text":"Esse é o modelo ARIMA da perturbação. É uma equação de diferenças estocástica. Ela diz que a perturbação D_t é gerada por ruído branco a_t, filtrado por uma dinâmica ARIMA.\n\nHarris quer separar três coisas:\n- O que vem de ação de controle U_r;\n- O que vem da perturbação D_t;\n- O que é inevitável porque o processo tem atraso; \n\nCom essa separação, é possível perguntar: qual é a menor variância possível de Y_t, dado que o controlador só consegue reagir depois do atraso?\n\n## Ligação possível com TCC:\n\n- Y_t → uma XMEAS controlada, por exemplo pressão do reator\n- U_t → uma XMV, por exemplo vazão de água de resfriamento\n- D_t → efeito das IDVs e perturbações não medidas\n- T → passo de controle / amostragem\n- b → atraso discreto efetivo da malha\n\nIsso é importante porque tua planta dinâmica original pode ser não linear e contínua, mas a avaliação de desempenho da malha pode ser feita em cima dos dados amostrados, como série temporal discreta.","updated":"2026-06-12T07:15:12.784Z","document":{"title":"Assessment of control loop performance","link":[{"href":"urn:x-pdf:74e243065d2ababf171208423d1f4f1b"},{"href":"vault:/notes/articles/art9_Assessment-of-Control-Loop-Performance_Harris.pdf"}],"documentFingerprint":"74e243065d2ababf171208423d1f4f1b"},"uri":"vault:/notes/articles/art9_Assessment-of-Control-Loop-Performance_Harris.pdf","target":[{"source":"vault:/notes/articles/art9_Assessment-of-Control-Loop-Performance_Harris.pdf","selector":[{"type":"TextPositionSelector","start":4263,"end":4306},{"type":"TextQuoteSelector","exact":"D, = d ( z ~ l )a, / [ <t> ( z ~' ) v d ) ]","prefix":"ear filter driven bywhite noise:","suffix":" (3)[ a t ] is a sequence of ind"}]}]}
+>{"created":"2026-06-17T23:49:59.663Z","text":"É um jeito tão tangível de identificar se a malha está no seu máximo de controle que pode-se usar para avaliar que ela precisa de outra intervenção, é como se fosse um controle estatístico mesmo — na verdade é exatamente isso.\n\nO k8s poderia classificar o problema em:\n- sintonia\n- atraso\n- estrutura de controle\n- perturbação\n- saturação\n- variável controlada\n\nEu penso no k8s fazendo consultas em camadas:\n1. A malha está degradada? \n→ PI / Predictability Index / métrica de qualidade\n\n2. A degradação parece corrigível por feedback?\n→ Harris Benchmark / Minimum Variance Benchmark\n\n3. Se for corrigível, é sintonia, oscilação, saturação ou agressividade?\n→ autocorrelação, variância de XMV, saturação, modo da malha\n\n4. Se não for corrigível por feedback, é problema estrutural?\n→ atraso, feedforward ausente, variável manipulada ruim, perturbação forte, sensor ruim\n\n---\n\n###  \"A malha está saudável\"\n```yaml\nPI: acceptable\nharris_ratio: close_to_1\nautocorrelation_after_delay: low\nxmv_saturation: false\n```\n**Conclusão**: a variável controlada não apresenta padrão previsível relevante sobrando, e a variância observada está perto do limite estimado.\n**Ação**: não retunar. Apenas continuar monitorando.\n\n\n### “A malha está degradada e há espaço para melhorar por controle”\n```yaml\nPI: poor\nharris_ratio: high\nautocorrelation_after_delay: high\n```\n**Conclusão**: a saída ainda contém estrutura previsível além do atraso. Isso sugere que o controlador não está extraindo todo o desempenho possível.\nAção: abrir diagnóstico de sintonia PID, revisão de parâmetros, oscilação ou estratégia de controle.\n\nAqui sim o Harris ajuda a dizer: talvez seja controle/sintonia.\n\n### “A malha está ruim, mas não parece ser problema de sintonia”\n\n```yaml\nPI: poor\nharris_ratio: close_to_1\nminimum_variance: high\n```\n\n**Conclusão**: a malha está perto do melhor desempenho possível para aquela estrutura, mas esse “melhor possível” ainda é ruim.\n**Ação**: não insistir em retuning. Investigar redução de atraso, feedforward, troca de variável manipulada, sensor, pareamento ou fonte da perturbação.`\n\n### “O controlador tenta corrigir, mas o atuador está no limite”\n```yaml\nPI: poor\nharris_ratio: high\nxmv_saturation: true\nxmv_variability: high\n```\n\n**Conclusão**: existe desempenho perdido, mas o controlador pode estar limitado por saturação, restrição de válvula ou falta de autoridade da variável manipulada.\n**Ação**: não só retunar. Verificar limites de XMV, capacidade do atuador e restrições operacionais.\n\nNo TEP: válvula de água de resfriamento próxima de 100% enquanto a temperatura do reator continua fora do alvo.\n\n### “A malha está oscilando”\n```yaml\nPI: poor\nautocorrelation_pattern: oscillatory\nspectrum_peak: present\nharris_ratio: high\n```\n\n**Conclusão**: a saída tem padrão periódico previsível. Isso pode indicar sintonia agressiva, interação com outra malha ou perturbação periódica.\n**Ação**: classificar como oscilação; depois investigar PID, acoplamento entre malhas ou perturbação externa.\n\n\n### “O problema é atraso”\n```yaml\nPI: poor\nharris_ratio: close_to_1\ndeadtime_fraction: high\nminimum_variance: high\n```\n\n**Conclusão**: o feedback chega tarde demais. Mesmo um controlador bom não consegue remover a variabilidade antes que o atraso passe.\n**Ação**: reduzir atraso de medição/analisador, mudar ponto de medição, usar inferência, ou adicionar feedforward.\n\nNo TEP isso é muito plausível para analisadores de composição, porque há atraso de amostragem/medição.\n\n### “O problema é perturbação não medida”\n```yaml\nPI: poor\nharris_ratio: close_to_1\ndisturbance_activity: high\nfeedforward: absent\n```\n\n**Conclusão**: a malha responde depois que a perturbação já afetou a saída. O feedback sozinho está fazendo o possível.\n**Ação**: criar caminho feedforward ou medir a perturbação antes que ela afete a variável controlada.\n\n## Conclusão aqui\n\nO supervisor tipo Kubernetes não deveria ter uma regra simplista: `if loop_degraded -> retune PID`\n\ntem que ser algo:\n\n```\nif loop_degraded:\n    estimate_minimum_variance()\n    classify_degradation_cause()\n    choose_authorized_action()\n``` ","updated":"2026-06-17T23:49:59.663Z","document":{"title":"Assessment of control loop performance","link":[{"href":"urn:x-pdf:74e243065d2ababf171208423d1f4f1b"},{"href":"vault:/articles/art9_Assessment-of-Control-Loop-Performance_Harris.pdf"}],"documentFingerprint":"74e243065d2ababf171208423d1f4f1b"},"uri":"vault:/articles/art9_Assessment-of-Control-Loop-Performance_Harris.pdf","target":[{"source":"vault:/articles/art9_Assessment-of-Control-Loop-Performance_Harris.pdf","selector":[{"type":"TextPositionSelector","start":11040,"end":11336},{"type":"TextQuoteSelector","exact":"Further reductions can only beachieved through process modifications, such as reducingthè inherent variability <j2a, reducing thè deadtime, incor-porating feedforward control, eliminating thè source of dis-turbances or possibly finding another manipulated variableto control thè process variable.","prefix":"hthè existing control strategy. ","suffix":"U , = -G C ( Z ~' )Y, (11)(10)Su"}]}]}
 >```
 >%%
->*%%PREFIX%%ear filter driven bywhite noise:%%HIGHLIGHT%% ==D, = d ( z ~ l )a, / [ <t> ( z ~' ) v d ) ]== %%POSTFIX%%(3)[ a t ] is a sequence of ind*
->%%LINK%%[[#^5liwav3nkou|show annotation]]
+>*%%PREFIX%%hthè existing control strategy.%%HIGHLIGHT%% ==Further reductions can only beachieved through process modifications, such as reducingthè inherent variability <j2a, reducing thè deadtime, incor-porating feedforward control, eliminating thè source of dis-turbances or possibly finding another manipulated variableto control thè process variable.== %%POSTFIX%%U , = -G C ( Z ~' )Y, (11)(10)Su*
+>%%LINK%%[[#^i93oz2f8tt|show annotation]]
 >%%COMMENT%%
->Esse é o modelo ARIMA da perturbação. É uma equação de diferenças estocástica. Ela diz que a perturbação D_t é gerada por ruído branco a_t, filtrado por uma dinâmica ARIMA.
+>É um jeito tão tangível de identificar se a malha está no seu máximo de controle que pode-se usar para avaliar que ela precisa de outra intervenção, é como se fosse um controle estatístico mesmo — na verdade é exatamente isso.
 >
->Harris quer separar três coisas:
->- O que vem de ação de controle U_r;
->- O que vem da perturbação D_t;
->- O que é inevitável porque o processo tem atraso; 
+>O k8s poderia classificar o problema em:
+>- sintonia
+>- atraso
+>- estrutura de controle
+>- perturbação
+>- saturação
+>- variável controlada
 >
->Com essa separação, é possível perguntar: qual é a menor variância possível de Y_t, dado que o controlador só consegue reagir depois do atraso?
+>Eu penso no k8s fazendo consultas em camadas:
+>1. A malha está degradada? 
+>→ PI / Predictability Index / métrica de qualidade
 >
->## Ligação possível com TCC:
+>2. A degradação parece corrigível por feedback?
+>→ Harris Benchmark / Minimum Variance Benchmark
 >
->- Y_t → uma XMEAS controlada, por exemplo pressão do reator
->- U_t → uma XMV, por exemplo vazão de água de resfriamento
->- D_t → efeito das IDVs e perturbações não medidas
->- T → passo de controle / amostragem
->- b → atraso discreto efetivo da malha
+>3. Se for corrigível, é sintonia, oscilação, saturação ou agressividade?
+>→ autocorrelação, variância de XMV, saturação, modo da malha
 >
->Isso é importante porque tua planta dinâmica original pode ser não linear e contínua, mas a avaliação de desempenho da malha pode ser feita em cima dos dados amostrados, como série temporal discreta.
->%%TAGS%%
->#semantica/MECANISMO-SISTEMAS_DINAMICOS-POSITIVO
-^5liwav3nkou
-
-
->%%
->```annotation-json
->{"created":"2026-06-12T08:23:05.247Z","text":"# NOTA CENTRAL\n\nPara Harris, controle é escolher a variável manipulada $U_t$ a partir da informação disponível até o instante $t$, para reduzir a variância da variável controlada $Y_t$​ em torno do setpoint.\n\nMais especificamente, é um problema de previsão e compensação da perturbação: usar $U_t$ para cancelar a parte previsível de $D_t$, deixando só o erro inevitável.\n\nEsse erro inevitável não se corrige com feedback; ele vira o piso de desempenho da malha. Então você faz três coisas com ele:\n\n1. aceita como limite se a variância real já está próxima dele;\n2. usa como benchmark para saber se o PID ainda tem espaço de melhoria;\n3. se ele ainda for alto demais, você muda a estrutura do problema: reduz atraso, melhora medição, adiciona feedforward, troca variável manipulada ou ataca a fonte da perturbação.\n\nEm termos do Harris: o erro inevitável é o que sobra mesmo no controle de variância mínima; portanto, ele não é “falha de sintonia”, é limite imposto por atraso + perturbação + informação disponível.","updated":"2026-06-12T08:23:05.247Z","document":{"title":"Assessment of control loop performance","link":[{"href":"urn:x-pdf:74e243065d2ababf171208423d1f4f1b"},{"href":"vault:/notes/articles/art9_Assessment-of-Control-Loop-Performance_Harris.pdf"}],"documentFingerprint":"74e243065d2ababf171208423d1f4f1b"},"uri":"vault:/notes/articles/art9_Assessment-of-Control-Loop-Performance_Harris.pdf","target":[{"source":"vault:/notes/articles/art9_Assessment-of-Control-Loop-Performance_Harris.pdf","selector":[{"type":"TextPositionSelector","start":0,"end":38},{"type":"TextQuoteSelector","exact":"Assessment of Control Loop Performance","prefix":"0%50%75%100%125%150%200%300%400%","suffix":"THOMAS /. HARRISDepartment of Ch"}]}]}
+>4. Se não for corrigível por feedback, é problema estrutural?
+>→ atraso, feedforward ausente, variável manipulada ruim, perturbação forte, sensor ruim
+>
+>---
+>
+>###  "A malha está saudável"
+>```yaml
+>PI: acceptable
+>harris_ratio: close_to_1
+>autocorrelation_after_delay: low
+>xmv_saturation: false
 >```
->%%
->*%%PREFIX%%0%50%75%100%125%150%200%300%400%%%HIGHLIGHT%% ==Assessment of Control Loop Performance== %%POSTFIX%%THOMAS /. HARRISDepartment of Ch*
->%%LINK%%[[#^f4fp2z5k0th|show annotation]]
->%%COMMENT%%
-># NOTA CENTRAL
+>**Conclusão**: a variável controlada não apresenta padrão previsível relevante sobrando, e a variância observada está perto do limite estimado.
+>**Ação**: não retunar. Apenas continuar monitorando.
 >
->Para Harris, controle é escolher a variável manipulada $U_t$ a partir da informação disponível até o instante $t$, para reduzir a variância da variável controlada $Y_t$​ em torno do setpoint.
 >
->Mais especificamente, é um problema de previsão e compensação da perturbação: usar $U_t$ para cancelar a parte previsível de $D_t$, deixando só o erro inevitável.
+>### “A malha está degradada e há espaço para melhorar por controle”
+>```yaml
+>PI: poor
+>harris_ratio: high
+>autocorrelation_after_delay: high
+>```
+>**Conclusão**: a saída ainda contém estrutura previsível além do atraso. Isso sugere que o controlador não está extraindo todo o desempenho possível.
+>Ação: abrir diagnóstico de sintonia PID, revisão de parâmetros, oscilação ou estratégia de controle.
 >
->Esse erro inevitável não se corrige com feedback; ele vira o piso de desempenho da malha. Então você faz três coisas com ele:
+>Aqui sim o Harris ajuda a dizer: talvez seja controle/sintonia.
 >
->1. aceita como limite se a variância real já está próxima dele;
->2. usa como benchmark para saber se o PID ainda tem espaço de melhoria;
->3. se ele ainda for alto demais, você muda a estrutura do problema: reduz atraso, melhora medição, adiciona feedforward, troca variável manipulada ou ataca a fonte da perturbação.
+>### “A malha está ruim, mas não parece ser problema de sintonia”
 >
->Em termos do Harris: o erro inevitável é o que sobra mesmo no controle de variância mínima; portanto, ele não é “falha de sintonia”, é limite imposto por atraso + perturbação + informação disponível.
+>```yaml
+>PI: poor
+>harris_ratio: close_to_1
+>minimum_variance: high
+>```
+>
+>**Conclusão**: a malha está perto do melhor desempenho possível para aquela estrutura, mas esse “melhor possível” ainda é ruim.
+>**Ação**: não insistir em retuning. Investigar redução de atraso, feedforward, troca de variável manipulada, sensor, pareamento ou fonte da perturbação.`
+>
+>### “O controlador tenta corrigir, mas o atuador está no limite”
+>```yaml
+>PI: poor
+>harris_ratio: high
+>xmv_saturation: true
+>xmv_variability: high
+>```
+>
+>**Conclusão**: existe desempenho perdido, mas o controlador pode estar limitado por saturação, restrição de válvula ou falta de autoridade da variável manipulada.
+>**Ação**: não só retunar. Verificar limites de XMV, capacidade do atuador e restrições operacionais.
+>
+>No TEP: válvula de água de resfriamento próxima de 100% enquanto a temperatura do reator continua fora do alvo.
+>
+>### “A malha está oscilando”
+>```yaml
+>PI: poor
+>autocorrelation_pattern: oscillatory
+>spectrum_peak: present
+>harris_ratio: high
+>```
+>
+>**Conclusão**: a saída tem padrão periódico previsível. Isso pode indicar sintonia agressiva, interação com outra malha ou perturbação periódica.
+>**Ação**: classificar como oscilação; depois investigar PID, acoplamento entre malhas ou perturbação externa.
+>
+>
+>### “O problema é atraso”
+>```yaml
+>PI: poor
+>harris_ratio: close_to_1
+>deadtime_fraction: high
+>minimum_variance: high
+>```
+>
+>**Conclusão**: o feedback chega tarde demais. Mesmo um controlador bom não consegue remover a variabilidade antes que o atraso passe.
+>**Ação**: reduzir atraso de medição/analisador, mudar ponto de medição, usar inferência, ou adicionar feedforward.
+>
+>No TEP isso é muito plausível para analisadores de composição, porque há atraso de amostragem/medição.
+>
+>### “O problema é perturbação não medida”
+>```yaml
+>PI: poor
+>harris_ratio: close_to_1
+>disturbance_activity: high
+>feedforward: absent
+>```
+>
+>**Conclusão**: a malha responde depois que a perturbação já afetou a saída. O feedback sozinho está fazendo o possível.
+>**Ação**: criar caminho feedforward ou medir a perturbação antes que ela afete a variável controlada.
+>
+>## Conclusão aqui
+>
+>O supervisor tipo Kubernetes não deveria ter uma regra simplista: `if loop_degraded -> retune PID`
+>
+>tem que ser algo:
+>
+>```
+>if loop_degraded:
+>    estimate_minimum_variance()
+>    classify_degradation_cause()
+>    choose_authorized_action()
+>``` 
 >%%TAGS%%
->#semantica/LIMITE-BENCHMARKING-POSITIVO
-^f4fp2z5k0th
+>
+^i93oz2f8tt

@@ -119,3 +119,84 @@ tema: politica_supervisao/tecnica
 >%%TAGS%%
 >
 ^4mle14mqi6m
+
+
+>%%
+>```annotation-json
+>{"created":"2026-06-19T10:04:02.138Z","text":"Essa é uma outra abordagem, uma outra estratégia. Identificar clusters de sensores a partir de suas atribuições também indica anomalias da operação. \n\nA camada diagnóstica pode criar objetos de alto nível baseados em relações: grupos de sensores, malhas, unidades de processo, atuadores correlacionados. O supervisor observa essas entidades, não cada tag crua separadamente.\n\n## Exemplo\n\n```yaml\nkind: SignalRelationship\nmetadata:\n  name: reactor-temperature-control-relation\nspec:\n  inputs:\n    - XMV_10   # reactor cooling water flow\n  outputs:\n    - XMEAS_9  # reactor temperature\n  relationType: LogicalControlRelation\nstatus:\n  coherent: false\n  reason: OutputNotRespondingAsExpected\n```","updated":"2026-06-19T10:04:02.138Z","document":{"title":"Model Learning Algorithms for Anomaly Detection in CERN Control SystemsModel Learning Algorithms for Anomaly Detection in CERN Control Systems","link":[{"href":"urn:x-pdf:82924ab786d8a7dc9e12e085f805a8bd"},{"href":"vault:/articles/art8_Model-Learning-Algorithms-for-Anomaly-Detection-in-CERN-Control-Systems_Tilaro_Bradu_Berges_Varela_Roshchin.pdf"}],"documentFingerprint":"82924ab786d8a7dc9e12e085f805a8bd"},"uri":"vault:/articles/art8_Model-Learning-Algorithms-for-Anomaly-Detection-in-CERN-Control-Systems_Tilaro_Bradu_Berges_Varela_Roshchin.pdf","target":[{"source":"vault:/articles/art8_Model-Learning-Algorithms-for-Anomaly-Detection-in-CERN-Control-Systems_Tilaro_Bradu_Berges_Varela_Roshchin.pdf","selector":[{"type":"TextPositionSelector","start":7524,"end":8026},{"type":"TextQuoteSelector","exact":"The analysis exploits the well-defined control system structure to discover possible sys-tematic relationships among different signals; these rela-tionships can be classified in 2 main categories: •  Physical  relationships:  two  or  more  sensors  de-ployed in the same sector or even in the same cell should not differ much in value (like to temperature sensors in contiguous cells). •  Logical  relationship:  the  control  loops  regulate some output signals as a function of some input sig-nals. ","prefix":" the complexity of the problem. ","suffix":" Both classes of these relations"}]}]}
+>```
+>%%
+>*%%PREFIX%%the complexity of the problem.%%HIGHLIGHT%% ==The analysis exploits the well-defined control system structure to discover possible sys-tematic relationships among different signals; these rela-tionships can be classified in 2 main categories: •  Physical  relationships:  two  or  more  sensors  de-ployed in the same sector or even in the same cell should not differ much in value (like to temperature sensors in contiguous cells). •  Logical  relationship:  the  control  loops  regulate some output signals as a function of some input sig-nals.== %%POSTFIX%%Both classes of these relations*
+>%%LINK%%[[#^y22ya4l7xwl|show annotation]]
+>%%COMMENT%%
+>Essa é uma outra abordagem, uma outra estratégia. Identificar clusters de sensores a partir de suas atribuições também indica anomalias da operação. 
+>
+>A camada diagnóstica pode criar objetos de alto nível baseados em relações: grupos de sensores, malhas, unidades de processo, atuadores correlacionados. O supervisor observa essas entidades, não cada tag crua separadamente.
+>
+>## Exemplo
+>
+>```yaml
+>kind: SignalRelationship
+>metadata:
+>  name: reactor-temperature-control-relation
+>spec:
+>  inputs:
+>    - XMV_10   # reactor cooling water flow
+>  outputs:
+>    - XMEAS_9  # reactor temperature
+>  relationType: LogicalControlRelation
+>status:
+>  coherent: false
+>  reason: OutputNotRespondingAsExpected
+>```
+>%%TAGS%%
+>
+^y22ya4l7xwl
+
+
+>%%
+>```annotation-json
+>{"created":"2026-06-19T10:31:02.200Z","text":"Na mesma lógica de usar cluster, pode-se montar um modelo 'nominal' de operação, uma operação normal e detectar anomalias a partir disso. \n\nEsse modelo aprendido pode alimentar o status dos objetos: a política declarada diz o que deveria ser verdadeiro; o diagnóstico diz se o observado ainda está coerente.\n\n```yaml\nkind: PlantPolicy\nmetadata:\n  name: tep-mode-1-policy\nspec:\n  mode: Mode1\n  require:\n    reactorTemperatureLoop: Stable\n    productQuality: WithinSpec\n    pressureConstraint: Safe\nstatus:\n  observed:\n    reactorTemperatureLoop: Oscillatory\n    productQuality: WithinSpec\n    pressureConstraint: Safe\n  reconciliationNeeded: true\n```","updated":"2026-06-19T10:31:02.200Z","document":{"title":"Model Learning Algorithms for Anomaly Detection in CERN Control SystemsModel Learning Algorithms for Anomaly Detection in CERN Control Systems","link":[{"href":"urn:x-pdf:82924ab786d8a7dc9e12e085f805a8bd"},{"href":"vault:/articles/art8_Model-Learning-Algorithms-for-Anomaly-Detection-in-CERN-Control-Systems_Tilaro_Bradu_Berges_Varela_Roshchin.pdf"}],"documentFingerprint":"82924ab786d8a7dc9e12e085f805a8bd"},"uri":"vault:/articles/art8_Model-Learning-Algorithms-for-Anomaly-Detection-in-CERN-Control-Systems_Tilaro_Bradu_Berges_Varela_Roshchin.pdf","target":[{"source":"vault:/articles/art8_Model-Learning-Algorithms-for-Anomaly-Detection-in-CERN-Control-Systems_Tilaro_Bradu_Berges_Varela_Roshchin.pdf","selector":[{"type":"TextPositionSelector","start":8121,"end":8245},{"type":"TextQuoteSelector","exact":" make a model of the system. The latter can be then used to detect change points that are distance from the reference state.","prefix":"in the controls data in order to","suffix":" It is worth noting that the cry"}]}]}
+>```
+>%%
+>*%%PREFIX%%in the controls data in order to%%HIGHLIGHT%% ==make a model of the system. The latter can be then used to detect change points that are distance from the reference state.== %%POSTFIX%%It is worth noting that the cry*
+>%%LINK%%[[#^3tokhqnpst2|show annotation]]
+>%%COMMENT%%
+>Na mesma lógica de usar cluster, pode-se montar um modelo 'nominal' de operação, uma operação normal e detectar anomalias a partir disso. 
+>
+>Esse modelo aprendido pode alimentar o status dos objetos: a política declarada diz o que deveria ser verdadeiro; o diagnóstico diz se o observado ainda está coerente.
+>
+>```yaml
+>kind: PlantPolicy
+>metadata:
+>  name: tep-mode-1-policy
+>spec:
+>  mode: Mode1
+>  require:
+>    reactorTemperatureLoop: Stable
+>    productQuality: WithinSpec
+>    pressureConstraint: Safe
+>status:
+>  observed:
+>    reactorTemperatureLoop: Oscillatory
+>    productQuality: WithinSpec
+>    pressureConstraint: Safe
+>  reconciliationNeeded: true
+>```
+>%%TAGS%%
+>
+^3tokhqnpst2
+
+
+>%%
+>```annotation-json
+>{"created":"2026-06-19T10:32:49.859Z","text":"Esse trecho sustenta a existência de uma interface entre análise e supervisão industrial. A sua contribuição pode ser propor que, em vez de apenas mostrar no SCADA, esses resultados virem estado observado formal, consumido por um supervisor declarativo que só executa ações autorizadas.","updated":"2026-06-19T10:32:49.859Z","document":{"title":"Model Learning Algorithms for Anomaly Detection in CERN Control SystemsModel Learning Algorithms for Anomaly Detection in CERN Control Systems","link":[{"href":"urn:x-pdf:82924ab786d8a7dc9e12e085f805a8bd"},{"href":"vault:/articles/art8_Model-Learning-Algorithms-for-Anomaly-Detection-in-CERN-Control-Systems_Tilaro_Bradu_Berges_Varela_Roshchin.pdf"}],"documentFingerprint":"82924ab786d8a7dc9e12e085f805a8bd"},"uri":"vault:/articles/art8_Model-Learning-Algorithms-for-Anomaly-Detection-in-CERN-Control-Systems_Tilaro_Bradu_Berges_Varela_Roshchin.pdf","target":[{"source":"vault:/articles/art8_Model-Learning-Algorithms-for-Anomaly-Detection-in-CERN-Control-Systems_Tilaro_Bradu_Berges_Varela_Roshchin.pdf","selector":[{"type":"TextPositionSelector","start":28045,"end":28253},{"type":"TextQuoteSelector","exact":"Furthermore a specialized reporting tool has been designed and implemented in order to show the analytical results directly into the SCADA (Supervisory Control and Data Acquisition) applications at CERN [17].","prefix":"ers and oper-ators can consult. ","suffix":" The detection of these anomalie"}]}]}
+>```
+>%%
+>*%%PREFIX%%ers and oper-ators can consult.%%HIGHLIGHT%% ==Furthermore a specialized reporting tool has been designed and implemented in order to show the analytical results directly into the SCADA (Supervisory Control and Data Acquisition) applications at CERN [17].== %%POSTFIX%%The detection of these anomalie*
+>%%LINK%%[[#^52awfrids38|show annotation]]
+>%%COMMENT%%
+>Esse trecho sustenta a existência de uma interface entre análise e supervisão industrial. A sua contribuição pode ser propor que, em vez de apenas mostrar no SCADA, esses resultados virem estado observado formal, consumido por um supervisor declarativo que só executa ações autorizadas.
+>%%TAGS%%
+>
+^52awfrids38

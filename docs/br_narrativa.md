@@ -44,7 +44,7 @@ Ao ler:
 Eu tive muitos insights sobre como o k8s poderia ser implementado. Eu percebi que ele seria um ente que iria consultar várias coisas para entender se uma política estaria sendo aplicada na planta, uma política de alto nível. E ele encontraria muitos subsídios para tal. O método da definição da política é perfeito porque ele parte do exato objetivo de alto nível do controle, a função de custo. E os diversos métodos de qualidade do controle são perfeitos porque eles dão ao k8s o poder de concluir se a planta está na política e o que pode ser feito para levar ela até a política.
 
 
-Em `art2` eu sei se uma malha está "controlada". Em `art9` eu sei se o controle dela pode ser aprimorado ou não. Em `art7` comportamento anômalo observável, como oscilação. 
+Em `art2` eu sei se uma malha está "controlada". Em `art9` eu sei se o controle dela pode ser aprimorado ou não. Em `art7` comportamento anômalo observável, como oscilação. Em `art8` começamos a agrupar sensores em clusters a partir de atribuições compartilhas e também temos a idea de um serviço de avaliação de telemetria. Isso me lembrou da minha iniciação científica em que estudei métodos de avaliar avarias em mancais de rolamento usando análise de sinais e transformada wavelet. Me lembrou porque é uma espécie de telemetria online. Eu trouxe o artigo também.
 
 
 ---

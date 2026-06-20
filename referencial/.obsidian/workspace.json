@@ -4,19 +4,17 @@
     "type": "split",
     "children": [
       {
-        "id": "78cf4b7e926622f2",
+        "id": "a65136239c567477",
         "type": "tabs",
         "children": [
           {
-            "id": "77610265701d87a1",
+            "id": "da8289622919778e",
             "type": "leaf",
             "state": {
-              "type": "pdf-annotator",
-              "state": {
-                "file": "notes/ft_Condition-Monitoring-of-Bearing-Damage-in-Electromechanical-Drive.md"
-              },
+              "type": "empty",
+              "state": {},
               "icon": "lucide-file",
-              "title": "ft_Condition-Monitoring-of-Bearing-Damage-in-Electromechanical-Drive"
+              "title": "New tab"
             }
           }
         ]
@@ -189,11 +187,16 @@
       "bases:Create new base": false
     }
   },
-  "active": "77610265701d87a1",
+  "active": "da8289622919778e",
   "lastOpenFiles": [
+    "books/book1_Mechatronic-Futures.pdf",
+    "books/book1_DigitalTwin-Mechatronic-Futures_Hehenberger_Bradley.pdf",
+    "books/book2_Services-OPC-Unified-Architecture_Mahnke,_Leitner_Damm.pdf",
+    "books/book2_Introduction-OPC-Unified-Architecture_Mahnke,_Leitner_Damm.pdf",
+    "books/book2_System-Architecture-OPC-Unified-Architecture_Mahnke,_Leitner_Damm.pdf",
     "notes/ft_Condition-Monitoring-of-Bearing-Damage-in-Electromechanical-Drive.md",
-    "notes/ft_Condition-Monitoring-of-Bearing-Damage-in-Electromechanical-Drive.md.tmp.2952.91d832398801",
     "notes/ft_UNICOS-A-Framework-to-Build-Industry-Like-Control-Systems.md",
+    "notes/ft_Condition-Monitoring-of-Bearing-Damage-in-Electromechanical-Drive.md.tmp.2952.91d832398801",
     "notes/ft_Model-Learning-Algorithms-for-Anomaly-Detection-in-CERN-Control-Systems.md",
     "bibTex/art13_Condition-Monitoring-of-Bearing-Damage-in-Electromechanical-Drive_Lessmeier_et_al.bib",
     "articles/art13_Condition-Monitoring-of-Bearing-Damage-in-Electromechanical-Drive_Lessmeier_et_al.pdf",
@@ -204,10 +207,6 @@
     "bibTex/book2_System-Architecture-OPC-Unified-Architecture_Mahnke,_Leitner_Damm.bib",
     "bibTex/Não confirmado 964985.crdownload",
     "bibTex/book2_Services-OPC-Unified-Architecture_Mahnke,_Leitner_Damm.bib",
-    "bibTex/Não confirmado 817238.crdownload",
-    "bibTex/book2_Introduction-OPC-Unified-Architecture_Mahnke,_Leitner_Damm.bib",
-    "bibTex/Não confirmado 165986.crdownload",
-    "bibTex/book1_Mechatronic-Futures_Hehenberger_Bradley.bib",
     "notes/ft_Kubernetes-Orchestration-of-High-Availability_Johansson_et_al.md",
     "notes/ft_Design-of-an-IoT-PLC_Mellado_Nunez.md",
     "notes/ft_Cloud-Native-Computing-A-Survey-from-the-Perspective-of-Services_Shuiguang_et_al.md",
@@ -226,7 +225,6 @@
     "Mudei de ideia.md",
     "notes/ft_assessment-control-loop-performance.md",
     "notes/ft_model-learning-anomaly-detection-cern.md",
-    "notes/ft_expert-knowledge-online-detection.md",
     "notes/topicos_dispersos.canvas",
     "notes/monografia.canvas",
     "canvas/monografia.canvas",

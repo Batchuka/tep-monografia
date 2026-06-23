@@ -4,11 +4,11 @@
     "type": "split",
     "children": [
       {
-        "id": "56a9efb5bc5aba18",
+        "id": "0dc6f1aeab37409f",
         "type": "tabs",
         "children": [
           {
-            "id": "8238459c4f8ea800",
+            "id": "8e5c2007510d7f84",
             "type": "leaf",
             "state": {
               "type": "pdf-annotator",
@@ -42,7 +42,7 @@
                 "autoReveal": false
               },
               "icon": "lucide-folder-closed",
-              "title": "Files"
+              "title": "Explorador de arquivos"
             }
           },
           {
@@ -76,7 +76,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 371.5,
+    "width": 210.5,
     "collapsed": true
   },
   "right": {
@@ -181,17 +181,18 @@
   },
   "left-ribbon": {
     "hiddenItems": {
-      "switcher:Open quick switcher": false,
-      "graph:Open graph view": false,
-      "canvas:Create new canvas": false,
-      "daily-notes:Open today's daily note": false,
-      "templates:Insert template": false,
-      "command-palette:Open command palette": false,
-      "bases:Create new base": false
+      "switcher:Abrir a troca rápida": false,
+      "graph:Abrir visualização em gráfico": false,
+      "canvas:Criar novo canvas": false,
+      "daily-notes:Abrir a nota de hoje": false,
+      "templates:Inserir modelo": false,
+      "command-palette:Abrir paleta de comandos": false,
+      "bases:Criar nova base": false
     }
   },
-  "active": "8238459c4f8ea800",
+  "active": "8e5c2007510d7f84",
   "lastOpenFiles": [
+    "notes/ft_OPC-UA-Services_Mahnke_Leitner_Damm.md",
     "notes/ft_OPC-UA-Introduction_Mahnke_Leitner_Damm.md",
     "notes/ft_Mechatronic-to-CyberPhysical-Mechatronic-Futures_Hehenberger-et-al.md",
     "notes/ft_DigitalTwin-Mechatronic-Futures_Hehenberger_Bradley.md",
@@ -212,7 +213,6 @@
     "notes/ft_IEC_62541-8.md",
     "notes/ft_Kubernetes-Orchestration-of-High-Availability_Johansson_et_al.md",
     "notes/ft_Model-Learning-Algorithms-for-Anomaly-Detection-in-CERN-Control-Systems.md",
-    "notes/ft_OPC-UA-Services_Mahnke_Leitner_Damm.md",
     "notes/ft_OPC-UA-System-Architecture_Mahnke_Leitner_Damm.md",
     "notes/ft_Plantwide-Control-A-Review-and-a-new-Design-Procedure.md",
     "notes/ft_UNICOS-A-Framework-to-Build-Industry-Like-Control-Systems.md",

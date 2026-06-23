@@ -1,5 +1,4 @@
 Você está me ajudando a ler um artigo para meu TCC de Engenharia de Controle e Automação. 
-
 Meu projeto investiga a ideia de uma camada supervisória inspirada em Kubernetes aplicada a uma planta industrial simulada, especialmente o Tennessee Eastman Process. 
 
 A intuição central é: 

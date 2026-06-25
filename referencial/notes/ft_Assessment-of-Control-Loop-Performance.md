@@ -4,41 +4,8 @@ titulo: Assessment of control loop performance
 autor: Burns, W.L.
 ano: 2016
 fonte:
-tema: politica_supervisao/tecnica
+papel: tecnica_diagnostico
 ---
-
-## O que diz
-
-
-## O que me interessa
-
-
-## Conexões
-
-- [[]]
-
-## Citação ABNT
-
-```bibtex
-@article{BURNS2016,
-  author  = {Burns, W. L.},
-  title   = {Assessment of control loop performance},
-  journal = {},
-  year    = {2016},
-}
-```
-
-
-
-
-
-
-
-
-
-
-
-
 
 >%%
 >```annotation-json

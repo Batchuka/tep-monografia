@@ -4,30 +4,8 @@ titulo: OPC Unified Architecture — System Architecture
 autor: Mahnke, W.; Leitner, S.-H.; Damm, M.
 ano: 2009
 fonte: Springer
-tema:
+papel: integracao_formal
 ---
-
-## O que diz
-
-
-## O que me interessa
-
-
-## Conexões
-
-- [[]]
-
-## Citação ABNT
-
-```bibtex
-@book{Mahnke2009,
-  author    = {Mahnke, Wolfgang and Leitner, Stefan-Helmut and Damm, Matthias},
-  title     = {{OPC} Unified Architecture},
-  publisher = {Springer},
-  year      = {2009},
-}
-```
-
 
 >%%
 >```annotation-json

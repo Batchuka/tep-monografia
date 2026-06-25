@@ -4,22 +4,65 @@
     "type": "split",
     "children": [
       {
-        "id": "ec9007a54dd39524",
+        "id": "ce2cf10068508233",
         "type": "tabs",
         "children": [
           {
-            "id": "54493eac104653d0",
+            "id": "e08651393814545a",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "notes/ft_Condition-Monitoring-of-Bearing-Damage-in-Electromechanical-Drive.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "ft_Condition-Monitoring-of-Bearing-Damage-in-Electromechanical-Drive"
+            }
+          },
+          {
+            "id": "23419050f8e005bd",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "notes/ft_Design-of-an-IoT-PLC_Mellado_Nunez.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "ft_Design-of-an-IoT-PLC_Mellado_Nunez"
+            }
+          },
+          {
+            "id": "b9f4e76d4646e75c",
             "type": "leaf",
             "state": {
               "type": "pdf-annotator",
               "state": {
-                "file": "notes/ft_IEC_62541-8.md"
+                "file": "notes/ft_Design-of-an-IoT-PLC_Mellado_Nunez.md"
               },
               "icon": "lucide-file",
-              "title": "ft_IEC_62541-8"
+              "title": "ft_Design-of-an-IoT-PLC_Mellado_Nunez"
+            }
+          },
+          {
+            "id": "ace19458d2b62881",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "notes/ft_Design-of-an-IoT-PLC_Mellado_Nunez.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "ft_Design-of-an-IoT-PLC_Mellado_Nunez"
             }
           }
-        ]
+        ],
+        "currentTab": 2
       }
     ],
     "direction": "vertical"
@@ -189,35 +232,35 @@
       "bases:Criar nova base": false
     }
   },
-  "active": "54493eac104653d0",
+  "active": "b9f4e76d4646e75c",
   "lastOpenFiles": [
-    "notes/ft_IEC_62541-3.md",
-    "notes/ft_IEC_62541-1.md",
-    "notes/ft_IEC_62264-1.md",
+    "notes/ft_DigitalTwin-Mechatronic-Futures_Hehenberger_Bradley.md",
+    "notes/ft_Design-of-an-IoT-PLC_Mellado_Nunez.md",
+    "notes/ft_IEC_62541-8.md",
+    "notes/ft_OPC-UA-Services_Mahnke_Leitner_Damm.md",
+    "notes/ft_OPC-UA-System-Architecture_Mahnke_Leitner_Damm.md",
+    "notes/ft_Plantwide-Control-A-Review-and-a-new-Design-Procedure.md",
+    "notes/ft_UNICOS-A-Framework-to-Build-Industry-Like-Control-Systems.md",
+    "notes/ft_Borg-Omega-and-Kubernetes.md",
+    "notes/ft_Automatic-PID-Performance-Monitoring-Applied-to-LHC-Cryogenics.md",
+    "notes/ft_Assessment-of-Control-Loop-Performance.md",
+    "notes/ft_An-Expert-Knowledge-Based-Methodology-for-Online-Detection-of-Signal-Oscillations.md",
     "notes/ft_A-Plantwide-Industrial-Process-Control-Problem.md",
+    "notes/ft_Condition-Monitoring-of-Bearing-Damage-in-Electromechanical-Drive.md",
+    "notes/ft_Control-Structure-Desing-for-Complete-Chemical-Plants.md",
+    "notes/ft_IEC_62264-1.md",
+    "notes/ft_OPC-UA-Introduction_Mahnke_Leitner_Damm.md",
+    "notes/ft_Cloud-Native-Computing-A-Survey-from-the-Perspective-of-Services_Shuiguang_et_al.md",
+    "notes/ft_IEC_62541-1.md",
+    "notes/ft_IEC_62541-3.md",
     "ft_An-Expert-Knowledge-Based-Methodology-for-Online-Detection-of-Signal-Oscillations.md",
     "ft_A-Plantwide-Industrial-Process-Control-Problem.md",
     "ft_OPC-UA-Introduction_Mahnke_Leitner_Damm.md",
-    "notes/ft_OPC-UA-System-Architecture_Mahnke_Leitner_Damm.md",
-    "notes/ft_OPC-UA-Services_Mahnke_Leitner_Damm.md",
-    "notes/ft_OPC-UA-Introduction_Mahnke_Leitner_Damm.md",
     "notes/ft_Mechatronic-to-CyberPhysical-Mechatronic-Futures_Hehenberger-et-al.md",
-    "notes/ft_DigitalTwin-Mechatronic-Futures_Hehenberger_Bradley.md",
     "books/book1_Mechatronic-to-CyberPhysical-Mechatronic-Futures_Hehenberger-et-al.pdf",
     "books/book1_Mechatronic-to-CyberPhysical-Mechatronic-Futures_Hehenberger_Bradley.pdf",
-    "notes/ft_Design-of-an-IoT-PLC_Mellado_Nunez.md",
-    "notes/ft_An-Expert-Knowledge-Based-Methodology-for-Online-Detection-of-Signal-Oscillations.md",
-    "notes/ft_Assessment-of-Control-Loop-Performance.md",
-    "notes/ft_Automatic-PID-Performance-Monitoring-Applied-to-LHC-Cryogenics.md",
-    "notes/ft_Borg-Omega-and-Kubernetes.md",
-    "notes/ft_Cloud-Native-Computing-A-Survey-from-the-Perspective-of-Services_Shuiguang_et_al.md",
-    "notes/ft_Condition-Monitoring-of-Bearing-Damage-in-Electromechanical-Drive.md",
-    "notes/ft_Control-Structure-Desing-for-Complete-Chemical-Plants.md",
-    "notes/ft_IEC_62541-8.md",
     "notes/ft_Kubernetes-Orchestration-of-High-Availability_Johansson_et_al.md",
     "notes/ft_Model-Learning-Algorithms-for-Anomaly-Detection-in-CERN-Control-Systems.md",
-    "notes/ft_Plantwide-Control-A-Review-and-a-new-Design-Procedure.md",
-    "notes/ft_UNICOS-A-Framework-to-Build-Industry-Like-Control-Systems.md",
     "notes/ft_OPC-Unified-Architecture_Mahnke_Leitner_Damm.md",
     "bibTex/IEC_62541-8.bib",
     "bibTex/IEC_62541-3.bib",

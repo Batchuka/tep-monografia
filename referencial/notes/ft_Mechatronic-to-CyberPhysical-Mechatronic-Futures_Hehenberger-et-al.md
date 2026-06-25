@@ -4,32 +4,8 @@ titulo: From Mechatronics to Cyber-Physical Systems — cap. in Mechatronic Futu
 autor: Hehenberger, P. et al.
 ano: 2016
 fonte: Springer (eds. Hehenberger, P.; Bradley, D.)
-tema:
+papel: conceito_cps
 ---
-
-## O que diz
-
-
-## O que me interessa
-
-
-## Conexões
-
-- [[]]
-
-## Citação ABNT
-
-```bibtex
-@inbook{Hehenberger2016,
-  author    = {Hehenberger, Peter and others},
-  title     = {From Mechatronics to Cyber-Physical Systems},
-  booktitle = {Mechatronic Futures: Challenges and Solutions for Mechatronic Systems and their Designers},
-  editor    = {Hehenberger, Peter and Bradley, David},
-  publisher = {Springer},
-  year      = {2016},
-}
-```
-
 
 >%%
 >```annotation-json

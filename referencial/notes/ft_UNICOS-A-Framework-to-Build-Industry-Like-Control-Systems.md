@@ -4,48 +4,8 @@ titulo: UNICOS — A Framework to Build Industry-Like Control Systems
 autor:
 ano:
 fonte: CERN
-tema: politica_supervisao/tecnica
+papel: plataforma_abstracao
 ---
-
-## O que diz
-
-
-## O que me interessa
-
-
-## Conexões
-
-- [[]]
-
-## Citação ABNT
-
-```bibtex
-@techreport{CERN_UNICOS,
-  author      = {},
-  title       = {{UNICOS}: A Framework to Build Industry-Like Control Systems},
-  institution = {CERN},
-  year        = {},
-}
-```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 >%%
 >```annotation-json

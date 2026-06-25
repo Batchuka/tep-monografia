@@ -4,40 +4,8 @@ titulo: Control structure design for complete chemical plants
 autor: Skogestad, S.
 ano:
 fonte:
-tema: politica_supervisao/espirito
+papel: espirito_politica
 ---
-
-## O que diz
-
-
-## O que me interessa
-
-
-## Conexões
-
-- [[]]
-
-## Citação ABNT
-
-```bibtex
-@article{SKOGESTAD_CONTROL_STRUCTURE,
-  author  = {Skogestad, S.},
-  title   = {Control structure design for complete chemical plants},
-  journal = {},
-  year    = {},
-}
-```
-
-
-
-
-
-
-
-
-
-
-
 
 >%%
 >```annotation-json

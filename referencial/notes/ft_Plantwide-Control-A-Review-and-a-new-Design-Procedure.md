@@ -4,35 +4,8 @@ titulo: Plantwide control — A review and a new design procedure
 autor:
 ano:
 fonte:
-tema: politica_supervisao/espirito
+papel: espirito_politica
 ---
-
-## O que diz
-
-
-## O que me interessa
-
-
-## Conexões
-
-- [[]]
-
-## Citação ABNT
-
-```bibtex
-@article{PLANTWIDE_REVIEW,
-  author  = {},
-  title   = {Plantwide control --- A review and a new design procedure},
-  journal = {},
-  year    = {},
-}
-```
-
-
-
-
-
-
 
 >%%
 >```annotation-json

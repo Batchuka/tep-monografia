@@ -4,45 +4,8 @@ titulo: Borg, Omega, and Kubernetes
 autor: Verma, A. et al. (Google)
 ano: 2015
 fonte: ACM Queue, v.13, n.5
-tema: runtime_supervisao/espirito
+papel: analogia_fundante
 ---
-
-## O que diz
-
-
-## O que me interessa
-
-
-## Conexões
-
-- [[]]
-
-## Citação ABNT
-
-```bibtex
-@article{VERMA2015,
-  author  = {Verma, Abhishek and others},
-  title   = {Large-scale cluster management at {Google} with {Borg}},
-  journal = {ACM Queue},
-  volume  = {13},
-  number  = {5},
-  year    = {2015},
-}
-```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 >%%
 >```annotation-json

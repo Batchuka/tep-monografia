@@ -4,47 +4,8 @@ titulo: Automatic Assessment of PID Controllers Applied to the LHC Cryogenic Sys
 autor: Blanco Viñuela; Fernández Adiego; Gayet; Goddet
 ano: "2013"
 fonte: ICALEPCS 2013 — Proceedings
-tema: politica_supervisao/tecnica
+papel: tecnica_diagnostico
 ---
-
-
-## O que diz
-> *Os autores expõe uma técnica não baseada em métodos clássicos de avaliação — que segundo eles, produziam muitos dados e tornavam impossível a gestão dos loops. Eles implementaram um método numérico e estatístico que é mais objetivo. Esse método é o 'Predictability Index'*
-
-
-## O que me interessa
-> *Filtre o que é relevante para o TCC. Citações diretas com número de página.*
-
-
-## Conexões
-> *Links para outras notas, capítulos da monografia ou conceitos relacionados.*
-
-- [[]]
-
-## Citação ABNT
-> *Cole aqui a referência formatada para usar no references.bib*
-
-```bibtex
-@inproceedings{CERN_WEAPL02,
-  author    = {Blanco Viñuela, E. and Fernández Adiego, B. and Gayet, P. and Goddet, M.},
-  title     = {Automatic Assessment of PID Controllers Applied to the {LHC} Cryogenic System},
-  booktitle = {Proceedings of ICALEPCS 2013},
-  year      = {2013},
-  pages     = {WEAPL02},
-  note      = {Disponível em:\url{https://cds.cern.ch/record/2305967/files/weapl02.pdf}}
-}
-```
-
-
-
-
-
-
-
-
-
-
-
 
 >%%
 >```annotation-json

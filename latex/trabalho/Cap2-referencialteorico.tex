@@ -1,10 +1,10 @@
 \chapter[REFERENCIAL TEÓRICO]{REFERENCIAL TEÓRICO}
 \label{cha:referencial}
 
-Este capítulo apresenta os fundamentos teóricos que embasam o desenvolvimento deste trabalho. São abordados o Processo Tennessee Eastman como benchmark industrial, o padrão IEC~61499 para controle distribuído, o padrão de Operators do Kubernetes como mecanismo de orquestração, o protocolo gRPC como canal de comunicação, a integração numérica por Runge-Kutta de 4ª ordem como método de simulação, e o conceito de gêmeo digital como paradigma que unifica os demais.
+Este capítulo apresenta os fundamentos teóricos que embasam o desenvolvimento deste trabalho. São abordados, em ordem narrativa: o Processo Tennessee Eastman como problema de referência; os princípios de controle plant-wide como teoria da supervisão; o diagnóstico de qualidade de malhas como o olho do supervisor; a analogia cloud-native e seus precedentes industriais; o padrão IEC~61499 e os Operators do Kubernetes como mecanismo de orquestração; o gêmeo digital como paradigma de implementação; o protocolo gRPC como canal de comunicação; o OPC UA e a família IEC~62541 como padrões de integração; e o método de integração numérica RK4 como fundamento do simulador.
 
 % -------------------------------------------------------------------------
-\section{Processo Tennessee Eastman (TEP)}
+\section{Processo Tennessee Eastman}
 \label{sec:tep}
 
 O Processo Tennessee Eastman (\textit{Tennessee Eastman Process} — TEP) é um \textit{benchmark} amplamente utilizado na comunidade de controle de processos para avaliação de estratégias de controle, detecção de falhas e otimização de operações industriais. Proposto originalmente por Downs e Vogel em 1993, o TEP descreve uma planta química realista com dinâmica não-linear complexa, laços de reciclo e múltiplas perturbações programadas, sendo deliberadamente desafiador do ponto de vista de controle \cite{DOWNS1993}.
@@ -19,7 +19,7 @@ A planta consiste em cinco unidades de processo interconectadas: um reator, um c
 
 O componente B é inerte e não participa das reações. Os produtos G e H são os produtos desejados; F é um subproduto indesejado. As reações são exotérmicas, e a temperatura do reator é controlada indiretamente pela água de resfriamento (\textit{cooling water} — CW).
 
-O modelo matemático é descrito por um sistema de 50 equações diferenciais ordinárias (EDO), representando os holdups de massa e energia de cada vaso de processo. O vetor de estado $\mathbf{y} \in \mathbb{R}^{50}$ inclui os inventários de cada componente nos reatores, separadores e no espaço de vapor, bem como as energias internas de cada subsistema. O modelo completo foi originalmente implementado em FORTRAN e posteriormente portado para diversas linguagens, mantendo a estrutura matemática original.
+O modelo matemático é descrito por um sistema de 50 equações diferenciais ordinárias (EDO), representando os holdups de massa e energia de cada vaso de processo. O vetor de estado $\mathbf{y} \in \mathbb{R}^{50}$ inclui os inventários de cada componente nos reatores, separadores e no espaço de vapor, bem como as energias internas de cada subsistema. O modelo original foi implementado em FORTRAN e posteriormente portado para diversas linguagens, mantendo a estrutura matemática intacta.
 
 O modelo expõe 41 variáveis medidas (XMEAS$_1$ a XMEAS$_{41}$) e 12 variáveis manipuladas (XMV$_1$ a XMV$_{12}$). As variáveis medidas incluem vazões, composições, temperaturas, pressões e níveis dos principais subsistemas; as variáveis manipuladas correspondem a posições de válvulas e setpoints de controladores de baixo nível. O ponto de operação nominal (Modo 1) é caracterizado por pressão do reator de 2705~kPa, temperatura do reator de 120,4~°C e frações molares de produto (razão G/H) específicas \cite{DOWNS1993}.
 
@@ -28,23 +28,101 @@ O modelo inclui 20 distúrbios programados (IDV$_1$ a IDV$_{20}$) que simulam ev
 A relevância do TEP como \textit{benchmark} decorre de sua riqueza dinâmica: o modelo combina não-linearidades, acoplamentos entre malhas de controle, laços de reciclo com elevada constante de tempo e perturbações com mecanismos físicos distintos. Essas características tornam o TEP um ambiente adequado para avaliar arquiteturas de controle supervisório — em especial aquelas que dependem de comunicação distribuída e coordenação entre componentes heterogêneos, como a arquitetura proposta neste trabalho.
 
 % -------------------------------------------------------------------------
-\section{Controle Proporcional e Avaliação de Qualidade de Malhas}
-\label{sec:controle}
+\section{Controle Plant-Wide}
+\label{sec:plantwide}
 
-O controle realimentado é o paradigma central de qualquer sistema de automação industrial. Na sua forma mais simples, um \textbf{controlador proporcional} (P) calcula a variável manipulada $u(t)$ como função linear do erro $e(t) = \text{SP} - \text{PV}(t)$:
+Plantas de processo contínuo não podem ser operadas exclusivamente por malhas de controle locais. Cada controlador PID regula uma variável de seu subsistema imediato, mas é incapaz de perceber os efeitos que suas ações propagam ao longo da planta através de reciclos, transferências de massa e acoplamentos termodinâmicos. A consequência é que perturbações de grande amplitude podem atravessar toda a cadeia de processo e produzir instabilidade em pontos distantes da origem, sem que nenhum controlador local tenha autoridade para reagir \cite{Larsson2000}.
+
+\citeonline{Larsson2000} revisamm a literatura de controle plant-wide e identificam quatro problemas centrais que qualquer estratégia de supervisão deve endereçar: (i) seleção de variáveis controladas (quais saídas manter no setpoint); (ii) seleção de variáveis manipuladas (quais entradas usar para cada objetivo); (iii) estrutura de controle (como parear variáveis); e (iv) sequenciamento de implementação (bottom-up ou top-down). A ausência de uma resposta sistemática a essas perguntas é, segundo os autores, a principal causa de estratégias de controle que funcionam individualmente mas falham quando integradas.
+
+\citeonline{Skogestad2004} propõe uma metodologia sistemática para o projeto de estruturas de controle em plantas completas, organizada em uma hierarquia de três camadas:
+
+\begin{enumerate}
+  \item \textbf{Controle regulatório}: malhas PID locais que estabilizam variáveis de processo em torno de um ponto de operação. Esse nível opera em escala de segundos a minutos e não possui visão global da planta.
+  \item \textbf{Controle supervisório}: coordenação das malhas regulatórias via ajuste de setpoints e ativação/desativação de malhas, operando em escala de minutos a horas. Esse é o nível que reage a perturbações que transcendem os limites de uma única malha local.
+  \item \textbf{Otimização em tempo real}: reconfiguração de objetivos operacionais baseada em condições econômicas e restrições de processo, operando em escala de horas a dias.
+\end{enumerate}
+
+Um conceito central da metodologia de Skogestad é o de \textbf{variáveis de controle self-optimizing}: variáveis que, quando mantidas em setpoint fixo, aproximam naturalmente o ponto ótimo de operação sem necessidade de otimização explícita. A identificação dessas variáveis reduz a complexidade do supervisor, pois transforma o problema de otimização em um problema de regulação \cite{Skogestad2004}.
+
+No contexto deste trabalho, a hierarquia de Skogestad fundamenta a separação de responsabilidades entre o \texttt{ControllerBank} (controle regulatório), o Operator Kubernetes (controle supervisório) e as extensões futuras de otimização. O TEP, com seus 41~XMEAS e 12~XMV, é um caso de estudo adequado para avaliar como um supervisor declarativo pode coordenar um conjunto de controladores regulatórios sem necessidade de reconfiguração manual.
+
+% -------------------------------------------------------------------------
+\section{Diagnóstico de Qualidade de Malhas}
+\label{sec:diagnostico}
+
+A qualidade de uma malha de controle não é binária: um controlador pode estar operando, mas de forma subótima. Malhas com ganho excessivo oscilam; malhas com ganho insuficiente respondem lentamente e permitem que distúrbios se propaguem; malhas com setpoint desatualizado operam em ponto de trabalho inadequado. Em instalações industriais com centenas ou milhares de malhas, identificar automaticamente quais controladores estão mal sintonizados é um problema relevante e de difícil solução manual \cite{Bradu2018}.
+
+\subsection{Índice de Harris e o Benchmark de Variância Mínima}
+
+O trabalho seminal de \citeonline{Harris1989} estabeleceu o primeiro índice quantitativo para avaliação automática de desempenho de malhas fechadas. A ideia central é que, para qualquer processo linear com distúrbios estocásticos, existe um limite inferior para a variância da variável de processo: a variância do controlador de variância mínima. Esse limite pode ser estimado diretamente dos dados de operação rotineira, sem necessidade de identificação explícita do modelo do processo.
+
+O índice de Harris $\eta \in [0, 1]$ compara a variância observada $\sigma^2_y$ com o limite de variância mínima $\sigma^2_{\text{mv}}$:
 
 \begin{equation}
-  u(t) = K_p \cdot e(t) + u_{\text{bias}}
-  \label{eq:p_controller}
+  \eta = \frac{\sigma^2_{\text{mv}}}{\sigma^2_y}
+  \label{eq:harris_index}
 \end{equation}
 
-\noindent onde $K_p$ é o ganho proporcional, SP é o setpoint e $u_{\text{bias}}$ é o ponto de operação nominal da variável manipulada. O controlador P apresenta erro estacionário não nulo para perturbações de carga, limitação mitigada pelo controlador PID com adição das ações integral e derivativa. Neste trabalho, três malhas P são implementadas para estabilização da planta TEP: controle de pressão do reator, nível do separador e nível do \textit{stripper}.
+Valores próximos de 1 indicam operação próxima ao ótimo estocástico; valores baixos indicam desempenho degradado. A estimativa de $\sigma^2_{\text{mv}}$ é obtida ajustando-se um modelo autorregressivo de ordem $d$ (atraso puro do processo) aos dados de operação, sem necessidade de experimentos de identificação \cite{Harris1989}. O índice tornou-se referência na literatura de \textit{control loop performance monitoring} (CLPM) e motivou uma geração de índices derivados, incluindo o Índice de Preditividade descrito a seguir.
 
-A qualidade de uma malha de controle não é binária — um controlador pode estar operando, mas de forma subótima. Malhas com ganho excessivo oscilam; malhas com ganho insuficiente respondem lentamente e permitem que distúrbios se propaguem; malhas com setpoint desatualizado operam em ponto de trabalho inadequado. Em instalações industriais com centenas ou milhares de malhas, identificar automaticamente quais controladores estão mal sintonizados é um problema relevante e de difícil solução manual \cite{CERN_WEAPL02}.
+\subsection{Índice de Preditividade e a Abordagem do CERN}
 
-Um indicador quantitativo para esse problema é o \textbf{Índice de Preditividade} (\textit{Predictability Index} — PI), proposto para avaliação automática de malhas PID no sistema criogênico do LHC \cite{CERN_WEAPL02}. O PI mede a capacidade do modelo autorregressivo de prever o comportamento futuro da variável de processo: malhas bem reguladas são previsíveis (PI alto), enquanto malhas oscilantes ou instáveis são imprevisíveis (PI baixo). Os parâmetros do índice incluem o horizonte de predição $b$, a ordem de regressão $m$ e o número de amostras $n$ analisadas. Esse índice é calculado em \textit{post-processing} sobre as séries temporais das variáveis medidas — exatamente o tipo de dado que o gêmeo digital deste trabalho é capaz de gerar em escala e com controle total sobre as condições de operação.
+O sistema criogênico do LHC opera aproximadamente 5.000 malhas PID para manter os imãs supercondutores a 1,9~K. Nessa escala, qualquer abordagem de diagnóstico baseada em inspeção humana é inviável: a revisão manual de 5.000 malhas levaria centenas de horas de trabalho especializado por ciclo de operação \cite{Bradu2018}.
 
-A combinação entre gêmeo digital e métricas de qualidade de malha como o PI representa a motivação de longo prazo desta infraestrutura: gerar dados controlados de operação degradada, calcular o índice sobre esses dados, e eventualmente incorporar a lógica de avaliação ao Operator Kubernetes para supervisão autônoma de qualidade.
+\citeonline{Bradu2018} propõem o \textbf{Índice de Preditividade} (\textit{Predictability Index} — PI) como métrica automática para triagem de malhas. O PI mede a capacidade de um modelo autorregressivo de prever o comportamento futuro da variável de processo: malhas bem reguladas são inerentemente previsíveis (pequenos resíduos de predição), enquanto malhas oscilantes ou instáveis apresentam comportamento imprevisível (resíduos elevados). Formalmente, o PI é calculado como:
+
+\begin{equation}
+  \text{PI} = 1 - \frac{\text{RMSE}(\hat{y}, y)}{\sigma_y}
+  \label{eq:pi_index}
+\end{equation}
+
+\noindent onde $\hat{y}$ é a predição do modelo autorregressivo de ordem $m$ com horizonte $b$, $y$ é o valor real e $\sigma_y$ é o desvio padrão da série. O PI varia de 0 (completamente imprevisível) a 1 (perfeitamente previsível); um limiar prático para diagnóstico é tipicamente fixado em PI $< 0{,}7$ para sinalizar malhas problemáticas \cite{Bradu2018}.
+
+Trabalhos complementares do mesmo grupo investigam a detecção de oscilações via métodos baseados em conhecimento especializado \cite{Tilaro2017} e o aprendizado de modelos para detecção de anomalias em sistemas de controle do CERN \cite{Tilaro2018}. Em conjunto, esses trabalhos estabelecem que o diagnóstico automático de malhas em larga escala é viável com técnicas baseadas em análise de séries temporais, sem necessidade de modelos físicos explícitos.
+
+\subsection{Relevância para este Trabalho}
+
+O gêmeo digital desenvolvido neste trabalho é capaz de gerar, de forma controlada e reprodutível, séries temporais das 41~XMEAS sob qualquer condição de operação — com controladores bem sintonizados, degradados, e sob distúrbios IDV específicos. Essa capacidade de experimentação controlada é o que torna o laboratório TEP uma plataforma natural para cálculo do Índice de Preditividade: os históricos sintéticos podem ser usados para calibrar os parâmetros $(m, b, n)$ do PI, identificar os limiares adequados para cada variável, e validar a lógica de diagnóstico antes de aplicá-la a dados de plantas reais.
+
+% -------------------------------------------------------------------------
+\section{Cloud-Native como Paradigma de Orquestração Industrial}
+\label{sec:cloudnative}
+
+O termo \textit{cloud-native} designa uma abordagem de desenvolvimento de sistemas que explora as capacidades da computação em nuvem para construir e executar aplicações escaláveis, resilientes e gerenciáveis. Os princípios fundamentais — conteinerização, microsserviços, orquestração declarativa e entrega contínua — foram consolidados a partir da experiência acumulada por empresas de tecnologia de grande porte ao gerenciar infraestruturas de escala global \cite{Shuiguang2023}.
+
+\citeonline{Shuiguang2023} apresentam uma revisão abrangente da computação cloud-native sob a perspectiva de serviços, identificando que a essência do paradigma é a separação entre a definição do que um sistema deve fazer (declaração de estado desejado) e a mecânica de como esse estado é alcançado e mantido (infraestrutura de orquestração). Essa separação é análoga ao problema central do controle supervisório: o operador declara uma política de operação, e a infraestrutura de controle trabalha para manter a planta dentro dessa política.
+
+\citeonline{Burns2016} documentam a evolução dos sistemas de orquestração do Google — Borg, Omega e Kubernetes — e identificam que o salto qualitativo de Borg para Kubernetes foi exatamente a adoção de uma API declarativa baseada em estado desejado, em contraste com as APIs imperativas anteriores. Esse princípio, que o Google consolidou ao longo de mais de uma década operando clusters com dezenas de milhares de máquinas, é o mesmo que fundamenta a proposta de usar o Kubernetes como plataforma supervisória neste trabalho.
+
+\subsection{Precedentes Industriais}
+
+A aplicação de princípios cloud-native a sistemas de controle industrial não é apenas uma analogia: trabalhos recentes demonstram implementações concretas.
+
+\citeonline{Johansson2022} demonstram a viabilidade de usar o Kubernetes para orquestrar sistemas de controle distribuído de alta disponibilidade (\textit{High Availability Distributed Control Systems}). Os autores constroem um sistema em que os componentes de controle são implantados como pods Kubernetes e o plano de controle nativo gerencia failover, reinicialização e distribuição de carga — funções que em sistemas de controle industriais tradicionais exigem hardware redundante dedicado. Os resultados demonstram que o Kubernetes pode fornecer os mesmos níveis de disponibilidade com infraestrutura de propósito geral.
+
+\citeonline{Mellado2022} propõem o \textbf{IoT-PLC}, um CLP conteinerizado para a Indústria~4.0 em que cada funcionalidade — controle regulatório, armazenamento de dados de campo, interfaces sem fio — é encapsulada em um contêiner separado. O IoT-PLC usa um \textit{modelo de dispositivo virtual} que abstrai a interface com camadas superiores, permitindo que aplicações na nuvem interajam com o controlador físico de forma transparente. Esse modelo de abstração é precursor direto do CRD \texttt{PLCMachine} proposto neste trabalho.
+
+A convergência desses trabalhos sugere que a integração entre infraestrutura cloud-native e sistemas de controle industrial não é uma extrapolação especulativa, mas uma direção ativa de pesquisa com resultados publicados e reproduzíveis.
+
+% -------------------------------------------------------------------------
+\section{IEC~61499 e Controle Distribuído por Blocos de Função}
+\label{sec:iec61499}
+
+A norma \textbf{IEC~61499} \cite{IEC61499} define uma arquitetura para sistemas de controle distribuído baseada em \textbf{Blocos de Função} (\textit{Function Blocks} — FBs). Proposta como evolução da IEC~61131-3 (que standardiza a programação de CLPs individuais), a IEC~61499 endereça o problema da distribuição: como decompor uma aplicação de controle em unidades modulares que possam ser implantadas em dispositivos distintos e comunicar-se entre si via redes industriais.
+
+Um Bloco de Função na IEC~61499 encapsula tanto dados (variáveis de entrada/saída) quanto comportamento (algoritmos e máquinas de estados de eventos). Os FBs se comunicam por \textbf{eventos} (que disparam execução) e \textbf{dados} (que carregam valores de processo). Essa separação entre fluxo de controle (eventos) e fluxo de dados é análoga à separação entre plano de controle e plano de dados em redes de computadores — o que facilita a distribuição dos componentes por múltiplos dispositivos físicos.
+
+A norma define dois níveis de abstração:
+
+\begin{enumerate}
+  \item \textbf{Modelo de aplicação}: a lógica de controle descrita como um grafo de FBs interconectados, independente de hardware.
+  \item \textbf{Modelo de sistema}: a distribuição dos FBs por dispositivos físicos e os recursos (\textit{resources}) dentro de cada dispositivo que executam os FBs.
+\end{enumerate}
+
+A distinção entre modelo de aplicação e modelo de sistema é o elemento da IEC~61499 mais relevante para este trabalho: o Operator Kubernetes realiza exatamente a função de um \textit{deployment manager} da IEC~61499 — mapeia a aplicação (lógica supervisória declarada no CRD) para o sistema (componentes em execução no cluster). A \textit{spec} do CRD corresponde ao modelo de aplicação; o \textit{status} corresponde ao estado observado do sistema; o \textit{controller loop} realiza a reconciliação.
+
+No Capítulo~5, a correspondência entre o padrão de Operator e os princípios da IEC~61499 é analisada em detalhes, concluindo que o Kubernetes pode servir como infraestrutura de runtime para aplicações modeladas segundo a norma, desde que a lógica de cada FB seja encapsulada em contêineres com interface gRPC.
 
 % -------------------------------------------------------------------------
 \section{Kubernetes e o Padrão de Operators}
@@ -54,7 +132,7 @@ O Kubernetes é uma plataforma de orquestração de contêineres de código aber
 
 A arquitetura do Kubernetes divide-se em plano de controle (\textit{control plane}) e nós de trabalho (\textit{worker nodes}). O plano de controle inclui o \textit{API Server} (único ponto de entrada para todas as operações), o \textit{etcd} (banco de dados distribuído de chave-valor que armazena o estado do cluster), o \textit{Scheduler} (alocador de cargas de trabalho) e o \textit{Controller Manager} (gerenciador dos controladores nativos). Os nós de trabalho executam os contêineres via \textit{kubelet} e \textit{container runtime}.
 
-O Kubernetes permite estender seu modelo de recursos por meio das \textbf{Definições de Recursos Customizados} (\textit{Custom Resource Definitions} — CRDs). Um CRD declara um novo tipo de recurso no API Server, com seu próprio esquema (\textit{spec} e \textit{status}), tornando-o disponível para criação, listagem e edição com as mesmas ferramentas (kubectl, YAML) usadas para recursos nativos. A separação entre \textit{spec} (intenção declarada pelo usuário) e \textit{status} (estado observado pelo sistema) segue o mesmo princípio dos recursos nativos e é fundamental para o padrão de Operator \cite{Burns2016}.
+O Kubernetes permite estender seu modelo de recursos por meio das \textbf{Definições de Recursos Customizados} (\textit{Custom Resource Definitions} — CRDs). Um CRD declara um novo tipo de recurso no API Server, com seu próprio esquema (\textit{spec} e \textit{status}), tornando-o disponível para criação, listagem e edição com as mesmas ferramentas (kubectl, YAML) usadas para recursos nativos. A separação entre \textit{spec} (intenção declarada pelo usuário) e \textit{status} (estado observado pelo sistema) é fundamental para o padrão de Operator \cite{Burns2016}.
 
 O \textbf{padrão de Operator} (\textit{Operator Pattern}) é um método de extensão do Kubernetes que codifica o conhecimento operacional de uma aplicação específica em um controlador customizado \cite{Burns2016}. Um Operator combina um ou mais CRDs com um \textit{controller loop} que observa instâncias desses recursos e age para reconciliar o estado real com o estado desejado — substituindo a intervenção humana pela automação do domínio de conhecimento específico da aplicação.
 
@@ -65,21 +143,52 @@ O \textit{loop} de reconciliação de um Operator segue o padrão \textbf{Observ
   \item \textbf{Agir}: se houver divergência, o controller toma ações corretivas — no caso deste trabalho, chamadas gRPC à planta para ajustar parâmetros de controle.
 \end{enumerate}
 
-O framework \textbf{Kubebuilder} é a ferramenta oficial da CNCF para construção de Operators em Go. Ele provê scaffolding de projeto, integração com o \textit{controller-runtime} (biblioteca Go para interação com o API Server), geração de CRDs a partir de structs Go anotadas, e utilitários para testes. A anotação dos campos do struct com marcadores como \texttt{+kubebuilder:validation} permite validação automática de manifests, e \texttt{+kubebuilder:subresource:status} habilita o subrecurso de \textit{status} separado da \textit{spec}.
+O framework \textbf{Kubebuilder} é a ferramenta oficial da CNCF para construção de Operators em Go. Ele provê scaffolding de projeto, integração com o \textit{controller-runtime} (biblioteca Go para interação com o API Server), geração de CRDs a partir de structs Go anotadas, e utilitários para testes.
 
 Para operações industriais, o padrão de Operator oferece vantagens relevantes: a lógica supervisória é codificada uma vez e executada de forma autônoma; a política de operação é declarativa e auditável em repositórios de versionamento; e o Kubernetes garante alta disponibilidade do próprio operator via restarts automáticos \cite{Burns2016}.
+
+% -------------------------------------------------------------------------
+\section{Gêmeo Digital Industrial}
+\label{sec:twin}
+
+\subsection{Conceito Fundador e Origem}
+
+O conceito de \textbf{gêmeo digital} (\textit{digital twin}) origina-se do programa Apollo da NASA, onde gêmeos idênticos de naves espaciais eram mantidos na Terra para espelhar as condições das naves em órbita, permitindo que engenheiros simulassem alternativas e assistissem os astronautas em situações críticas \cite{Boschert2016}. A ideia foi posteriormente adaptada para sistemas terrestres: na indústria aeroespacial, o conceito do \textit{Iron Bird} — uma integração física de sistemas elétricos, hidráulicos e controles de voo com layouts correspondentes aos aviões reais — representa um análogo físico-digital que permite otimização e validação de falhas em estágios iniciais de desenvolvimento \cite{Boschert2016}.
+
+Com o avanço das tecnologias de simulação e integração de dados, o conceito evoluiu para modelos totalmente digitais que acompanham o ativo físico ao longo de todo seu ciclo de vida. O \textbf{gêmeo digital industrial} moderno refere-se a uma \textit{representação digital compreensiva e funcional de um componente, produto ou sistema que inclui informações úteis em todas as fases do ciclo de vida} \cite{Boschert2016}.
+
+\subsection{Gêmeo Digital e Sistemas Cyber-Físicos}
+
+O conceito de \textbf{Sistema Cyber-Físico} (\textit{Cyber-Physical System} — CPS) designa sistemas em que componentes computacionais e físicos estão profundamente integrados, comunicando-se continuamente para que o mundo digital possa influenciar o mundo físico e vice-versa \cite{Hehenberger2016}. O CPS representa o substrato conceitual sobre o qual o gêmeo digital opera: enquanto o gêmeo digital é a representação, o CPS é a arquitetura que mantém a sincronização entre representação e realidade.
+
+\citeonline{Hehenberger2016} discutem a evolução dos sistemas mecatrônicos em direção a CPSs, identificando que o salto qualitativo não é apenas de complexidade, mas de paradigma: em um CPS, a fronteira entre o artefato físico e seu modelo digital é deliberadamente porosa, e a lógica de controle pode residir em qualquer lado dessa fronteira. Essa perspectiva é relevante para este trabalho: o laboratório TEP é um CPS prototípico em que a planta física (simulada em Rust) e o supervisor (Operator Kubernetes) coexistem em camadas distintas mas comunicantes via gRPC.
+
+\subsection{Níveis de Fidelidade}
+
+Uma taxonomia comum classifica os gêmeos digitais em três níveis de fidelidade \cite{Boschert2016}:
+\begin{enumerate}
+  \item \textbf{Modelo digital}: representação estática ou off-line, sem sincronização em tempo real com o ativo.
+  \item \textbf{\textit{Digital shadow}}: representação que recebe dados do ativo físico mas não envia comandos de volta; usada para monitoramento e diagnóstico.
+  \item \textbf{Gêmeo digital completo}: integração bidirecional — recebe dados do ativo e pode enviar atuações e comandos, formando um \textit{cyber-physical loop} que fecha sobre operação e controle.
+\end{enumerate}
+
+O laboratório desenvolvido neste trabalho implementa um gêmeo digital do tipo \textit{shadow} em transição para \textit{completo}: a planta simulada em Rust replica a dinâmica do TEP via modelo matemático de 50 EDOs, e o Operator Kubernetes atua sobre ela em um laço de controle supervisório. Embora não haja uma planta física correspondente no presente trabalho, a arquitetura é deliberadamente construída segundo o paradigma de gêmeo digital: a substituição da planta simulada por dados reais requeriria apenas a troca do endereço gRPC de destino, preservando toda a lógica supervisória.
+
+\subsection{Limite Honesto da Implementação}
+
+É importante delimitar o que foi entregue neste trabalho em relação ao espectro completo de um gêmeo digital. O laboratório TEP implementa o modelo matemático original com fidelidade, mas não inclui: modelos de degradação de equipamentos, estimação de estado baseada em dados reais, ou sincronização com um ativo físico. O sistema é mais precisamente classificado como um \textbf{simulador com interface supervisória} — um passo necessário antes de um gêmeo digital operacional, mas não equivalente a ele \cite{Boschert2016}.
 
 % -------------------------------------------------------------------------
 \section{gRPC como Protocolo de Comunicação}
 \label{sec:grpc}
 
-O gRPC é um \textit{framework} de chamada de procedimento remoto (\textit{Remote Procedure Call} — RPC) de alto desempenho desenvolvido pelo Google, baseado no protocolo HTTP/2 e no sistema de serialização \textit{Protocol Buffers} (protobuf) \cite{GRPC2024}. Diferentemente de alternativas baseadas em REST/JSON, o gRPC utiliza serialização binária tipada, o que reduz o tamanho das mensagens e o tempo de serialização — vantagem relevante para aplicações de automação que transmitem dados de sensores em alta frequência.
+O gRPC é um \textit{framework} de chamada de procedimento remoto (\textit{Remote Procedure Call} — RPC) de alto desempenho desenvolvido pelo Google, baseado no protocolo HTTP/2 e no sistema de serialização \textit{Protocol Buffers} (protobuf) \cite{GRPC}. Diferentemente de alternativas baseadas em REST/JSON, o gRPC utiliza serialização binária tipada, o que reduz o tamanho das mensagens e o tempo de serialização — vantagem relevante para aplicações de automação que transmitem dados de sensores em alta frequência.
 
-A definição de um serviço gRPC é feita em um arquivo \texttt{.proto}, que especifica os métodos RPC e os tipos de mensagem de forma agnóstica à linguagem. A partir desse arquivo, o compilador \texttt{protoc} gera \textit{stubs} de cliente e servidor para as linguagens desejadas — no caso deste trabalho, Rust (biblioteca \textit{tonic}) para a planta, Go (biblioteca \textit{google.golang.org/grpc}) para o operator, e Python (biblioteca \textit{grpcio}) para a IHM. A consistência do contrato é garantida pelo arquivo \texttt{.proto} canônico, mantido no repositório \texttt{tep-plant}.
+A definição de um serviço gRPC é feita em um arquivo \texttt{.proto}, que especifica os métodos RPC e os tipos de mensagem de forma agnóstica à linguagem. A partir desse arquivo, o compilador \texttt{protoc} gera \textit{stubs} de cliente e servidor para as linguagens desejadas — no caso deste trabalho, Rust (biblioteca \textit{tonic}) para a planta, Go (\textit{google.golang.org/grpc}) para o operator, e Python (\textit{grpcio}) para a IHM.
 
 O gRPC suporta quatro modalidades de comunicação:
 \begin{enumerate}
-  \item \textbf{Unário}: uma requisição e uma resposta — usado para comandos pontuais (e.g., \texttt{GetPlantStatus}, \texttt{UpdateController}).
+  \item \textbf{Unário}: uma requisição e uma resposta — usado para comandos pontuais (\texttt{GetPlantStatus}, \texttt{UpdateController}).
   \item \textbf{\textit{Server streaming}}: uma requisição e um fluxo contínuo de respostas — usado para streaming de métricas (\texttt{StreamMetrics}).
   \item \textbf{\textit{Client streaming}}: fluxo de requisições e uma resposta.
   \item \textbf{Bidirecional}: fluxos simultâneos em ambas as direções.
@@ -87,74 +196,70 @@ O gRPC suporta quatro modalidades de comunicação:
 
 No contexto industrial, o \textit{server streaming} é particularmente adequado para a transmissão contínua de dados de processo: a IHM abre um único fluxo gRPC e recebe atualizações das 41~XMEAS e 12~XMV a cada passo de simulação, sem \textit{polling} periódico. O protocolo HTTP/2 subjacente permite múltiplos fluxos simultâneos em uma única conexão TCP, reduzindo overhead de estabelecimento de conexão.
 
-A escolha do gRPC como protocolo de comunicação neste trabalho é motivada por três fatores: (a) suporte nativo a \textit{streaming} de alta frequência com baixa latência; (b) contrato fortemente tipado que detecta incompatibilidades entre componentes em tempo de compilação; e (c) suporte multiplataforma (Rust, Go, Python) sem adaptadores intermediários, permitindo uma arquitetura poliglota coesa.
-
 % -------------------------------------------------------------------------
 \section{OPC UA e a Família de Normas IEC~62541}
 \label{sec:opcua}
 
 \subsection{Contexto e Motivação}
 
-Antes do OPC UA, a comunicação entre sistemas de automação industrial era dominada por protocolos proprietários e incompatíveis: cada fabricante de CLP, SCADA ou sistema de controle de processos expunha seus dados em formatos distintos, forçando integradores a desenvolver adaptadores específicos para cada par de sistemas. O OPC clássico (OPC DA, OPC AE, OPC HDA), lançado em 1996, foi a primeira tentativa de padronização — mas era baseado em COM/DCOM da Microsoft, o que o restringia a Windows e criava barreiras de segurança e escalabilidade.
+Antes do OPC UA, a comunicação entre sistemas de automação industrial era dominada por protocolos proprietários e incompatíveis. O OPC clássico (OPC DA, OPC AE, OPC HDA), lançado em 1996, foi a primeira tentativa de padronização — mas era baseado em COM/DCOM da Microsoft, o que o restringia a Windows e criava barreiras de segurança e escalabilidade.
 
-O \textbf{OPC UA} (\textit{OPC Unified Architecture}), desenvolvido pela OPC Foundation a partir de 2006 e formalizado como família de normas internacionais \textbf{IEC~62541} a partir de 2009, representa uma ruptura com esse modelo: é independente de plataforma e sistema operacional, orientado a serviços, com modelo de segurança nativo baseado em criptografia de chave pública (X.509) e transportável sobre qualquer rede IP \cite{OPCUA2017}. A norma unifica os padrões clássicos — acesso a dados em tempo real (DA), alarmes e eventos (AE) e acesso histórico (HDA) — em uma arquitetura coesa e extensível.
+O \textbf{OPC UA} (\textit{OPC Unified Architecture}), desenvolvido pela OPC Foundation a partir de 2006 e formalizado como família de normas internacionais \textbf{IEC~62541} \cite{IEC62541_1}, representa uma ruptura com esse modelo: é independente de plataforma e sistema operacional, orientado a serviços, com modelo de segurança nativo baseado em criptografia de chave pública (X.509) e transportável sobre qualquer rede IP \cite{Mahnke2009intro}. A norma unifica os padrões clássicos — acesso a dados em tempo real (DA), alarmes e eventos (AE) e acesso histórico (HDA) — em uma arquitetura coesa e extensível.
 
 \subsection{Arquitetura}
 
-A arquitetura do OPC UA é centrada no conceito de \textbf{espaço de endereçamento} (\textit{Address Space}): um grafo de nós (\textit{Nodes}) interconectados por referências tipadas (\textit{References}), que representa de forma uniforme todos os dados, metadados, métodos e eventos expostos por um servidor. Cada nó possui uma classe (\textit{NodeClass}) que define seu papel:
+A arquitetura do OPC UA é centrada no conceito de \textbf{espaço de endereçamento} (\textit{Address Space}): um grafo de nós (\textit{Nodes}) interconectados por referências tipadas (\textit{References}), que representa de forma uniforme todos os dados, metadados, métodos e eventos expostos por um servidor \cite{Mahnke2009arch}. Cada nó possui uma classe (\textit{NodeClass}) que define seu papel:
 
 \begin{itemize}
   \item \textbf{Object}: representa entidades do mundo real (e.g., um reator, um sensor).
   \item \textbf{Variable}: armazena um valor escalar ou estruturado com timestamp, qualidade e tipo de dado.
   \item \textbf{Method}: define uma operação executável (e.g., ligar uma bomba).
-  \item \textbf{ObjectType / VariableType}: tipos reutilizáveis que definem modelos de informação — análogos a classes em orientação a objetos.
+  \item \textbf{ObjectType / VariableType}: tipos reutilizáveis que definem modelos de informação.
 \end{itemize}
 
-Um cliente OPC UA navega o espaço de endereçamento usando o serviço \texttt{Browse}, lê e escreve valores com \texttt{Read}/\texttt{Write}, e recebe notificações de mudança via \texttt{Subscription}/\texttt{MonitoredItem} — o mecanismo equivalente ao \textit{server streaming} do gRPC, mas padronizado. O servidor publica atualizações periodicamente (\textit{Publishing Interval}) apenas quando o valor monitorado muda além de um limiar configurável (\textit{DeadBand}), reduzindo tráfego de rede desnecessário.
-
-O modelo de segurança opera em três camadas: autenticação do usuário (por certificado, usuário/senha ou anônimo), segurança de canal (\textit{SecureChannel} com criptografia TLS e assinatura de mensagens) e autorização por papel (\textit{Role-Based Access Control} — RBAC). Os modos de segurança são: \texttt{None} (sem segurança), \texttt{Sign} (apenas integridade) e \texttt{Sign\&Encrypt} (integridade e confidencialidade).
+Um cliente OPC UA navega o espaço de endereçamento usando o serviço \texttt{Browse}, lê e escreve valores com \texttt{Read}/\texttt{Write}, e recebe notificações de mudança via \texttt{Subscription}/\texttt{MonitoredItem} \cite{Mahnke2009services}. O servidor publica atualizações periodicamente apenas quando o valor monitorado muda além de um limiar configurável (\textit{DeadBand}), reduzindo tráfego de rede desnecessário.
 
 \subsection{Família de Normas IEC~62541}
 
-A IEC~62541 é composta por 14 partes publicadas entre 2009 e 2026, cada uma cobrindo um aspecto distinto da especificação. A Tabela~\ref{tab:iec62541} apresenta as partes mais relevantes para este trabalho.
+A IEC~62541 é composta por 14 partes, cada uma cobrindo um aspecto distinto da especificação. A Tabela~\ref{tab:iec62541} apresenta as partes mais relevantes para este trabalho.
 
 \begin{table}[ht!]
 \centering
 \caption{Partes selecionadas da família IEC~62541 e sua relevância para o projeto TEP}
 \label{tab:iec62541}
-\begin{tabular}{|c|l|p{5.5cm}|p{3cm}|}
+\begin{tabular}{|c|l|p{5cm}|p{3.2cm}|}
 \hline
-\textbf{Parte} & \textbf{Título} & \textbf{Versa sobre} & \textbf{Edições (anos)} \\
+\textbf{Parte} & \textbf{Título} & \textbf{Versa sobre} & \textbf{Edições} \\
 \hline
-3 & Modelo de Espaço de End. & Nós, referências, navegação — base de todo modelo de informação & 2010, 2015, 2020 \\
+1 & Visão Geral e Conceitos & Fundamentos, terminologia e motivação do padrão & 2009, 2025 \\
 \hline
-4 & Serviços & API completa do servidor: Read, Write, Browse, Subscribe, Call & 2010, 2015, 2020 \\
+3 & Modelo do Espaço de End. & Nós, referências, navegação — base de todo modelo de informação \cite{IEC62541_3} & 2010, 2020, 2025 \\
 \hline
-6 & Mapeamentos & Protocolos concretos: UA Binary (TCP), UA XML, UA JSON & 2010, 2015, 2020 \\
+4 & Serviços & API completa do servidor: Read, Write, Browse, Subscribe, Call & 2010, 2020 \\
 \hline
-8 & Acesso a Dados & Variáveis analógicas e discretas com unidade de engenharia, faixa e qualidade — expor XMEAS/XMV & 2011, 2015, 2020 \\
+8 & Acesso a Dados & Variáveis analógicas com unidade de engenharia, faixa e qualidade — expor XMEAS/XMV \cite{IEC62541_8} & 2011, 2020, 2025 \\
 \hline
-9 & Alarmes e Condições & Modelo de alarmes: estados, reconhecimento, supressão — mapeável aos ISDs do TEP & 2012, 2015, 2020 \\
+9 & Alarmes e Condições & Modelo de alarmes: estados, reconhecimento, supressão — mapeável aos ISDs do TEP & 2012, 2020 \\
 \hline
-11 & Acesso Histórico & Séries temporais: leitura, inserção e agregação de dados históricos — mapeável aos CSVs de experimentos & 2015, 2020 \\
+11 & Acesso Histórico & Séries temporais: leitura e agregação de dados históricos & 2015, 2020 \\
 \hline
-14 & PubSub & Publish-subscribe sobre MQTT/AMQP/UDP — complemento ao cliente-servidor para IIoT & 2020, 2026 \\
+14 & PubSub & Publish-subscribe sobre MQTT/AMQP/UDP — complemento IIoT & 2020, 2026 \\
 \hline
 \end{tabular}
-\fonte{Elaborado pelo autor com base em \citeonline{OPCUA2017}.}
+\fonte{Elaborado pelo autor com base em \citeonline{IEC62541_1} e \citeonline{Mahnke2009intro}.}
 \end{table}
 
-A \textbf{Parte 6 (Mapeamentos)} é o ponto de entrada para qualquer implementação: define como serializar as mensagens OPC UA sobre a rede. O mapeamento \textit{UA Binary} usa um formato binário compacto sobre TCP (porta 4840), equivalente ao protobuf do gRPC em termos de eficiência, e é o mais utilizado em campo. O mapeamento \textit{UA JSON} (adicionado na 3ª edição, 2020) permite integração com APIs REST e ambientes de nuvem, tornando o OPC UA compatível com arquiteturas modernas.
+A \textbf{Parte~8 (Acesso a Dados)} \cite{IEC62541_8} é a mais relevante para expor variáveis de processo: o tipo \texttt{AnalogItemType} encapsula um valor numérico com sua unidade de engenharia, faixa operacional e faixa instrumental — metadados que as XMEAS do TEP possuem intrinsecamente (XMEAS$_7$, por exemplo, é pressão em kPa com faixa operacional definida). A qualidade (\textit{Bad}/\textit{Uncertain}/\textit{Good}) associada a cada leitura permite que clientes OPC UA tomem decisões com base na confiabilidade dos dados.
 
-A \textbf{Parte 8 (Acesso a Dados)} é a mais relevante para expor variáveis de processo: o tipo \texttt{AnalogItemType} encapsula um valor numérico com sua unidade de engenharia (\texttt{EngineeringUnits}), faixa operacional (\texttt{EURange}) e faixa instrumental (\texttt{InstrumentRange}) — metadados que as XMEAS do TEP possuem intrinsecamente (por exemplo, XMEAS$_7$ é pressão em kPa com faixa operacional definida). A qualidade (\textit{Bad}/\textit{Uncertain}/\textit{Good}) associada a cada leitura permite que clientes OPC UA tomem decisões com base na confiabilidade dos dados — algo inexistente no contrato gRPC atual.
+\subsection{Integração Empresarial e o Modelo Purdue — IEC~62264}
 
-A \textbf{Parte 11 (Acesso Histórico)} define como um servidor OPC UA pode armazenar e disponibilizar séries temporais via serviço \texttt{HistoryRead}. Um cliente pode consultar os valores de uma variável entre dois instantes de tempo sem precisar de uma API separada, usando os mesmos mecanismos de navegação e segurança do servidor. Isso tornaria os CSVs gerados pela IHM diretamente acessíveis como dados históricos padronizados, consultáveis por qualquer ferramenta compatível com OPC UA — incluindo sistemas SCADA, ferramentas de análise de dados e clientes de terceiros.
+A norma \textbf{IEC~62264} \cite{IEC62264} (\textit{Enterprise-Control System Integration}) define modelos e terminologia para integração entre sistemas de gestão empresarial (Nível~4 — ERP) e sistemas de controle de manufatura (Níveis~0 a~3). O modelo de referência hierárquico da IEC~62264 — derivado do Modelo Purdue — organiza as funções de controle em camadas com responsabilidades e horizontes temporais distintos, alinhando-se à hierarquia de Skogestad descrita na Seção~\ref{sec:plantwide}.
 
 \subsection{OPC UA no Contexto deste Trabalho}
 
-A comunicação interna entre os componentes do laboratório foi implementada com gRPC por suas vantagens de desempenho e integração nativa com Rust, Go e Python. No entanto, o gRPC é um protocolo interno ao ecossistema do laboratório — não é reconhecido por sistemas de supervisão industriais, CLPs ou ferramentas SCADA de terceiros. O OPC UA, por sua vez, é o protocolo de interoperabilidade industrial adotado por praticamente todos os fabricantes relevantes e normalizado pela IEC~62541.
+A comunicação interna do laboratório foi implementada com gRPC por suas vantagens de desempenho e integração nativa com Rust, Go e Python. No entanto, o gRPC é um protocolo interno — não é reconhecido por sistemas SCADA, CLPs ou ferramentas de terceiros. O OPC UA, por sua vez, é o protocolo de interoperabilidade industrial adotado por praticamente todos os fabricantes relevantes e normalizado pela IEC~62541.
 
-A integração futura prevista para este laboratório envolve expor a planta TEP como um servidor OPC UA, mapeando as 41~XMEAS como variáveis \texttt{AnalogItemType} (Parte~8) e os distúrbios IDV como métodos invocáveis (Parte~4). Isso permitiria: (a) conectar controladores reais ao gêmeo digital via OPC UA, substituindo o \texttt{ControllerBank} interno por controladores externos de qualquer fabricante; (b) integrar ferramentas de diagnóstico de malhas baseadas em OPC UA para cálculo do Índice de Preditividade; e (c) arquivar os dados de experimentos como séries históricas acessíveis via Parte~11, eliminando a dependência dos CSVs proprietários. Essa arquitetura tornaria o laboratório uma plataforma de integração e teste compatível com o ecossistema industrial real, não apenas um simulador isolado.
+A integração futura prevista envolve expor a planta TEP como um servidor OPC UA, mapeando as 41~XMEAS como variáveis \texttt{AnalogItemType} (Parte~8) e os distúrbios IDV como métodos invocáveis (Parte~4). Isso permitiria: (a) conectar controladores reais ao gêmeo digital via OPC UA, substituindo o \texttt{ControllerBank} interno; (b) integrar ferramentas de diagnóstico baseadas em OPC UA para cálculo do Índice de Preditividade; e (c) arquivar os dados de experimentos como séries históricas acessíveis via Parte~11.
 
 % -------------------------------------------------------------------------
 \section{Integração Numérica por Runge-Kutta de 4ª Ordem}
@@ -169,7 +274,7 @@ A simulação dinâmica do TEP requer a integração numérica de um sistema de 
 
 \noindent onde $\mathbf{y} \in \mathbb{R}^{50}$ é o vetor de estado, $\mathbf{u} \in \mathbb{R}^{12}$ é o vetor de variáveis manipuladas e $f$ é a função de dinâmica da planta — altamente não-linear, com acoplamentos termodinâmicos e de transferência de massa.
 
-O método de \textbf{Runge-Kutta de 4ª ordem} (RK4) é o integrador clássico para EDOs de valores iniciais com dinâmica suave. Para um passo de tempo $h$, a atualização do estado é dada por:
+O método de \textbf{Runge-Kutta de 4ª ordem} (RK4) é o integrador clássico para EDOs de valores iniciais com dinâmica suave. Para um passo de tempo $h$, a atualização do estado é:
 
 \begin{align}
   k_1 &= h \cdot f(\mathbf{y}_n, t_n) \nonumber \\
@@ -180,51 +285,12 @@ O método de \textbf{Runge-Kutta de 4ª ordem} (RK4) é o integrador clássico p
   \label{eq:rk4}
 \end{align}
 
-O RK4 possui erro local de truncamento de ordem $\mathcal{O}(h^5)$ e erro global de ordem $\mathcal{O}(h^4)$, o que o torna preciso o suficiente para simulação de processos industriais com passo de tempo adequado. Para o TEP, o modelo original de Downs e Vogel especifica $dt = 0{,}001$~h como passo de integração padrão, valor que garante estabilidade numérica para a dinâmica mais rápida do sistema (tipicamente associada ao espaço de vapor do compressor) \cite{DOWNS1993}.
+O RK4 possui erro local de truncamento de ordem $\mathcal{O}(h^5)$ e erro global de ordem $\mathcal{O}(h^4)$. Para o TEP, o modelo original especifica $dt = 0{,}001$~h como passo de integração padrão, valor que garante estabilidade numérica para a dinâmica mais rápida do sistema \cite{DOWNS1993}.
 
-A norma dos derivativos $\|\mathbf{f}(\mathbf{y}, t)\|_\infty$ — denominada \texttt{deriv\_norm} na implementação deste trabalho — serve como indicador de saúde numérica da simulação: valores excessivamente altos indicam instabilidade iminente ou condições iniciais inconsistentes; valores estabilizados em patamar baixo indicam operação próxima ao estado estacionário. Esse indicador revelou-se útil para detectar o impacto de distúrbios antes que as variáveis medidas apresentassem desvios visíveis.
-
-% -------------------------------------------------------------------------
-\section{Gêmeo Digital Industrial}
-\label{sec:twin}
-
-\subsection{Conceito Fundador e Origem}
-
-O conceito de \textbf{gêmeo digital} (\textit{digital twin}) origina-se do programa Apollo da NASA, onde gêmeos idênticos de naves espaciais eram mantidos na Terra para espelhar as condições das naves em órbita, permitindo que engenheiros simulassem alternativas e assistissem os astronautas em situações críticas \cite{Boschert2016}. A ideia foi posteriormente adaptada para sistemas terrestres: na indústria aeroespacial, o conceito do \textit{Iron Bird} — uma integração física de sistemas elétricos, hidráulicos e controles de voo com layouts correspondentes aos aviões reais — representa um análogo físico-digital que permite otimização e validação de falhas em estágios iniciais de desenvolvimento \cite{Boschert2016}.
-
-Com o avanço das tecnologias de simulação e integração de dados, o conceito evoluiu para modelos totalmente digitais que acompanham o ativo físico ao longo de todo seu ciclo de vida. O \textbf{gêmeo digital industrial} moderno refere-se a uma \textit{representação digital compreensiva e funcional de um componente, produto ou sistema que inclui informações úteis em todas as fases do ciclo de vida} — desde o design até operação e manutenção \cite{Boschert2016}.
-
-\subsection{Características Principais}
-
-As características fundamentais de um gêmeo digital são \cite{Boschert2016}:
-
-\begin{enumerate}
-  \item \textbf{Coleção ligada de artefatos digitais}: o gêmeo integra dados de engenharia, dados operacionais e descrições de comportamento via múltiplos modelos de simulação, cada um com fidelidade apropriada ao problema a ser resolvido.
-  \item \textbf{Evolução com o sistema real}: o gêmeo acompanha as mudanças no ativo físico ao longo de todas as fases do ciclo de vida, mantendo consistência entre projeto, execução e operação.
-  \item \textbf{Suporte a decisões operacionais}: o gêmeo não apenas descreve comportamento, mas fornece funcionalidades para sistemas de assistência que otimizam operação e manutenção, estendendo o paradigma de engenharia baseada em modelos (MBSE) das fases de desenvolvimento para operação e serviço.
-\end{enumerate}
-
-\subsection{Níveis de Fidelidade e Ciclo de Vida}
-
-Uma taxonomia comum classifica os gêmeos digitais em três níveis de fidelidade \cite{Boschert2016}:
-\begin{enumerate}
-  \item \textbf{Modelo digital}: representação estática ou off-line, sem sincronização em tempo real com o ativo.
-  \item \textbf{\textit{Digital shadow}}: representação que recebe dados do ativo físico mas não envia comandos de volta; tipicamente usada para monitoramento e diagnóstico.
-  \item \textbf{Gêmeo digital completo}: integração bidirecional — recebe dados do ativo e pode enviar atuações e comandos, formando um \textit{cyber-physical loop} que fecha sobre operação e controle.
-\end{enumerate}
-
-O gêmeo digital cresce em complexidade e volume de dados ao longo do ciclo de vida \cite{Boschert2016}: durante o \textbf{design}, modelos de requisitos e funcionais estabelecem a estrutura; no \textbf{engineering}, modelos de múltiplos domínios (mecânico, elétrico, de controle, térmico) são integrados e validados virtualmente, eliminando o desenvolvimento iterativo em hardware; durante a \textbf{operação}, dados em tempo real atualizam continuamente o modelo, permitindo monitoramento de condição via \textit{soft sensors} — extensões virtuais das medições reais que inferem variáveis inacessíveis por medição direta; na \textbf{manutenção e serviço}, dados históricos e modelos de degradação informam planejamento de manutenção preditiva e cálculo de vida útil remanescente.
-
-\subsection{Aplicação a Avaliação de Qualidade de Malhas}
-
-Uma aplicação particular relevante para este trabalho é o uso do gêmeo digital como gerador controlado de dados para métricas de qualidade de malha. O Índice de Preditividade descrito na Seção~\ref{sec:controle} requer históricos de operação em múltiplas condições — com controladores bem sintonizados e degradados, sob perturbações variadas. Um gêmeo digital permite sintetizar esses históricos de forma reprodutível: o simulador gera séries temporais das XMEAS sob condições especificadas, e algoritmos de avaliação de malha processam esses dados como se fossem originários de um ativo real. Essa capacidade de experimentação controlada é impraticável com plantas físicas, onde perturbações e degradações deliberadas arriscam segurança ou causam danos.
-
-\subsection{Implementação no Laboratório TEP}
-
-O laboratório desenvolvido neste trabalho implementa um gêmeo digital do tipo \textit{shadow} em transição para \textit{completo}: a planta simulada em Rust replica a dinâmica do TEP com alta fidelidade via modelo matemático de 50 EDOs (Seção~\ref{sec:tep}), e o Operator Kubernetes atua sobre ela em um laço de controle supervisório — análogo ao que seria feito com um ativo físico real. Embora não haja uma planta física correspondente no presente trabalho, a arquitetura é deliberadamente construída segundo o paradigma de gêmeo digital: a substituição da planta simulada por dados reais requeriria apenas a troca do endereço gRPC de destino, preservando toda a lógica supervisória, seguindo os princípios de separação entre comportamento do ativo e política de controle descritos por Boschert e Rosen.
+A norma dos derivativos $\|\mathbf{f}(\mathbf{y}, t)\|_\infty$ — denominada \texttt{deriv\_norm} na implementação — serve como indicador de saúde numérica da simulação: valores excessivamente altos indicam instabilidade iminente; valores estabilizados em patamar baixo indicam operação próxima ao estado estacionário.
 
 % -------------------------------------------------------------------------
 \section{Considerações Finais}
 \label{sec:ref_conclusao}
 
-A revisão apresentada fundamenta as escolhas tecnológicas do trabalho: o TEP provê o modelo de processo com complexidade industrial; o IEC~61499 fornece o referencial conceitual para controle distribuído baseado em eventos; o padrão de Operator do Kubernetes realiza esse controle na prática como um controlador declarativo e autônomo; o gRPC garante comunicação eficiente e fortemente tipada entre os componentes; o RK4 integra as EDOs do modelo com precisão adequada; e o paradigma de gêmeo digital enquadra o sistema como uma arquitetura válida para investigação de orquestração industrial. Os capítulos seguintes descrevem como esses elementos foram combinados na prova de conceito.
+A revisão apresentada fundamenta as escolhas tecnológicas do trabalho segundo a cadeia argumentativa do Big Picture: o TEP provê o problema que força a pergunta sobre supervisão; o controle plant-wide (Skogestad, Larsson) fornece a teoria da resposta; o diagnóstico de malhas (Harris, Bradu) define o que o supervisor deve observar; a analogia cloud-native (Shuiguang, Burns) e os precedentes industriais (Johansson, Mellado) mostram que a abordagem é viável; o IEC~61499 formaliza o modelo de dispositivo sobre o qual o Operator opera; o gêmeo digital enquadra o laboratório como arquitetura válida para investigação de orquestração industrial; e o gRPC e o OPC UA (IEC~62541) formalizam as interfaces entre os subsistemas. Os capítulos seguintes descrevem como esses elementos foram combinados na prova de conceito.

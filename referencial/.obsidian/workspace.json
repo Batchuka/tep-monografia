@@ -13,10 +13,10 @@
             "state": {
               "type": "pdf-annotator",
               "state": {
-                "file": "notes/ft_IEC_62541-3.md"
+                "file": "notes/ft_IEC_62541-8.md"
               },
               "icon": "lucide-file",
-              "title": "ft_IEC_62541-3"
+              "title": "ft_IEC_62541-8"
             }
           }
         ]
@@ -191,6 +191,7 @@
   },
   "active": "54493eac104653d0",
   "lastOpenFiles": [
+    "notes/ft_IEC_62541-3.md",
     "notes/ft_IEC_62541-1.md",
     "notes/ft_IEC_62264-1.md",
     "notes/ft_A-Plantwide-Industrial-Process-Control-Problem.md",
@@ -212,7 +213,6 @@
     "notes/ft_Cloud-Native-Computing-A-Survey-from-the-Perspective-of-Services_Shuiguang_et_al.md",
     "notes/ft_Condition-Monitoring-of-Bearing-Damage-in-Electromechanical-Drive.md",
     "notes/ft_Control-Structure-Desing-for-Complete-Chemical-Plants.md",
-    "notes/ft_IEC_62541-3.md",
     "notes/ft_IEC_62541-8.md",
     "notes/ft_Kubernetes-Orchestration-of-High-Availability_Johansson_et_al.md",
     "notes/ft_Model-Learning-Algorithms-for-Anomaly-Detection-in-CERN-Control-Systems.md",

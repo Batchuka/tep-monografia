@@ -1,0 +1,68 @@
+<mxfile host="Electron">
+  <diagram name="Página-1" id="bO0YJutP_LunMTEwr4w9">
+    <mxGraphModel dx="1178" dy="729" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="8Ibo_TmPAQYlRRFqP5gS-4" parent="1" style="swimlane;whiteSpace=wrap;html=1;" value="&lt;div style=&quot;text-align: start;&quot;&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;container: &lt;i&gt;kind:0.27&lt;/i&gt;&lt;/span&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="200" width="200" x="575" y="500" as="geometry" />
+        </mxCell>
+        <mxCell id="8Ibo_TmPAQYlRRFqP5gS-3" parent="8Ibo_TmPAQYlRRFqP5gS-4" style="rounded=0;whiteSpace=wrap;html=1;" value="&lt;font style=&quot;font-size: 20px;&quot;&gt;&lt;b&gt;Kind+CRD &#39;PLCMachine&#39;&lt;/b&gt;&lt;/font&gt;&lt;br&gt;(Go)" vertex="1">
+          <mxGeometry height="97" width="167" x="16.5" y="59" as="geometry" />
+        </mxCell>
+        <mxCell id="8Ibo_TmPAQYlRRFqP5gS-7" parent="1" style="swimlane;whiteSpace=wrap;html=1;" value="Docker Local" vertex="1">
+          <mxGeometry height="618" width="824" x="280" y="141" as="geometry" />
+        </mxCell>
+        <mxCell id="8Ibo_TmPAQYlRRFqP5gS-6" parent="8Ibo_TmPAQYlRRFqP5gS-7" style="swimlane;whiteSpace=wrap;html=1;" value="container:&amp;nbsp;&lt;i&gt;rust:latest&lt;/i&gt;" vertex="1">
+          <mxGeometry height="200" width="200" x="558" y="103" as="geometry" />
+        </mxCell>
+        <mxCell id="8Ibo_TmPAQYlRRFqP5gS-2" parent="8Ibo_TmPAQYlRRFqP5gS-6" style="rounded=0;whiteSpace=wrap;html=1;" value="&lt;font style=&quot;font-size: 20px;&quot;&gt;&lt;b&gt;TEP Service&lt;/b&gt;&lt;/font&gt;&lt;br&gt;(planta em Rust)" vertex="1">
+          <mxGeometry height="70" width="147" x="26.5" y="77" as="geometry" />
+        </mxCell>
+        <mxCell id="8Ibo_TmPAQYlRRFqP5gS-5" parent="8Ibo_TmPAQYlRRFqP5gS-7" style="swimlane;whiteSpace=wrap;html=1;" value="container:&lt;i&gt;&amp;nbsp;python:3.12-slim&lt;/i&gt;" vertex="1">
+          <mxGeometry height="200" width="271" x="73" y="103" as="geometry" />
+        </mxCell>
+        <mxCell id="8Ibo_TmPAQYlRRFqP5gS-1" parent="8Ibo_TmPAQYlRRFqP5gS-5" style="rounded=0;whiteSpace=wrap;html=1;" value="&lt;font style=&quot;font-size: 20px;&quot;&gt;&lt;b&gt;IHM&lt;/b&gt;&lt;/font&gt;&lt;br&gt;(Python+JS+HTML+CSS)" vertex="1">
+          <mxGeometry height="93.75" width="161" x="37" y="59" as="geometry" />
+        </mxCell>
+        <mxCell id="8Ibo_TmPAQYlRRFqP5gS-13" edge="1" parent="8Ibo_TmPAQYlRRFqP5gS-5" source="8Ibo_TmPAQYlRRFqP5gS-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=0.998;entryY=0.163;entryDx=0;entryDy=0;entryPerimeter=0;dashed=1;dashPattern=8 8;" target="8Ibo_TmPAQYlRRFqP5gS-1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="240" y="129" />
+              <mxPoint x="240" y="74" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="8Ibo_TmPAQYlRRFqP5gS-14" connectable="0" parent="8Ibo_TmPAQYlRRFqP5gS-13" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="HTTP" vertex="1">
+          <mxGeometry relative="1" x="0.1169" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="8Ibo_TmPAQYlRRFqP5gS-8" edge="1" parent="8Ibo_TmPAQYlRRFqP5gS-7" source="8Ibo_TmPAQYlRRFqP5gS-1" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=0;entryY=0.75;entryDx=0;entryDy=0;dashed=1;dashPattern=8 8;" target="8Ibo_TmPAQYlRRFqP5gS-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="8Ibo_TmPAQYlRRFqP5gS-9" connectable="0" parent="8Ibo_TmPAQYlRRFqP5gS-8" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="gRPC" vertex="1">
+          <mxGeometry relative="1" x="-0.0302" y="2" as="geometry">
+            <mxPoint x="-2" y="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="8Ibo_TmPAQYlRRFqP5gS-15" edge="1" parent="1" source="8Ibo_TmPAQYlRRFqP5gS-3" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;dashed=1;dashPattern=8 8;" target="8Ibo_TmPAQYlRRFqP5gS-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="8Ibo_TmPAQYlRRFqP5gS-16" connectable="0" parent="8Ibo_TmPAQYlRRFqP5gS-15" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="gRPC" vertex="1">
+          <mxGeometry relative="1" x="-0.0826" y="3" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="8Ibo_TmPAQYlRRFqP5gS-17" edge="1" parent="1" source="8Ibo_TmPAQYlRRFqP5gS-3" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;dashPattern=8 8;" target="8Ibo_TmPAQYlRRFqP5gS-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="8Ibo_TmPAQYlRRFqP5gS-18" connectable="0" parent="8Ibo_TmPAQYlRRFqP5gS-17" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="gRPC" vertex="1">
+          <mxGeometry relative="1" x="0.1688" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

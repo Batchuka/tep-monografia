@@ -4,7 +4,7 @@ titulo: A plant-wide industrial process control problem
 autor: Downs, J.J.; Vogel, E.F.
 ano: 1993
 fonte: Computers & Chemical Engineering, v.17, n.3
-papel: problema_supervisao
+tags: problema_supervisao
 ---
 
 >%%
@@ -16,9 +16,6 @@ papel: problema_supervisao
 >%%LINK%%[[#^8jla28mbzqn|show annotation]]
 >%%COMMENT%%
 >Aqui o artigo define o TEP como benchmark industrial, não como uma planta real aberta nem como um simples exemplo acadêmico.
->
->%%TAGS%%
->
 ^8jla28mbzqn
 
 

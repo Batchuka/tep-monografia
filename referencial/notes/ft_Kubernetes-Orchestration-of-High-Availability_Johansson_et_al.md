@@ -4,7 +4,7 @@ titulo: Kubernetes Orchestration of High Availability Distributed Control System
 autor: Bjarne Johansson, Mats Rågebrergi, Thomas Nolte, Alessandro V. Papadopoulos
 ano:
 fonte: ABB, Västerås, Sweden; Mälardalen University
-papel: precedente_ousado
+tags: precedente_ousado
 ---
 
 >%%

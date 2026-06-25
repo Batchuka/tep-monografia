@@ -4,7 +4,7 @@ titulo: Automatic Assessment of PID Controllers Applied to the LHC Cryogenic Sys
 autor: Blanco Viñuela; Fernández Adiego; Gayet; Goddet
 ano: "2013"
 fonte: ICALEPCS 2013 — Proceedings
-papel: tecnica_diagnostico
+tags: tecnica_diagnostico
 ---
 
 >%%

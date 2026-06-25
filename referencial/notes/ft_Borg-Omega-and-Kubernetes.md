@@ -4,7 +4,7 @@ titulo: Borg, Omega, and Kubernetes
 autor: Verma, A. et al. (Google)
 ano: 2015
 fonte: ACM Queue, v.13, n.5
-papel: analogia_fundante
+tags: analogia_fundante
 ---
 
 >%%

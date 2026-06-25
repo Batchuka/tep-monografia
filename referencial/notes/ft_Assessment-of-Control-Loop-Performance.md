@@ -4,7 +4,7 @@ titulo: Assessment of control loop performance
 autor: Burns, W.L.
 ano: 2016
 fonte:
-papel: tecnica_diagnostico
+tags: tecnica_diagnostico
 ---
 
 >%%

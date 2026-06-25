@@ -4,7 +4,7 @@ titulo: Cloud-Native Computing — A Survey from the Perspective of Services
 autor: Shuiguang Deng et al.
 ano: 2023
 fonte: arXiv
-papel: analogia_fundante
+tags: analogia_fundante
 ---
 
 >%%

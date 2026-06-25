@@ -4,7 +4,7 @@ titulo: Model Learning Algorithms for Anomaly Detection in CERN Control Systems
 autor: Tilaro, F.; Bradu, B.; Berges, A.; Varela, C.; Roshchin, M.
 ano:
 fonte:
-papel: tecnica_diagnostico
+tags: tecnica_diagnostico
 ---
 
 >%%

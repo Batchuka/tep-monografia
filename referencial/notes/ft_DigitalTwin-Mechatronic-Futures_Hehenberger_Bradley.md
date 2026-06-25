@@ -4,7 +4,7 @@ titulo:   Digital Twin Cap - Mechatronic Futures - Challenges and Solutions for 
 autor: Boschert, S.; Rosen, R.
 ano: 2016
 fonte: Springer (eds. Hehenberger, P.; Bradley, D.)
-papel: limite_honesto
+tags: limite_honesto
 ---
 
 >%%

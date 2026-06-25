@@ -4,7 +4,7 @@ titulo: Control structure design for complete chemical plants
 autor: Skogestad, S.
 ano:
 fonte:
-papel: espirito_politica
+tags: espirito_politica
 ---
 
 >%%

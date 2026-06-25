@@ -4,7 +4,7 @@ titulo: Plantwide control — A review and a new design procedure
 autor:
 ano:
 fonte:
-papel: espirito_politica
+tags: espirito_politica
 ---
 
 >%%

@@ -4,7 +4,7 @@ titulo: Design of an IoT-PLC - A containerized programmeble logical controller f
 autor: Jacob Mellado, Felipe Núñez
 ano: 2021
 fonte: Journal of Industrial Information Integration
-papel: precedente_ousado
+tags: precedente_ousado
 ---
 
 >%%

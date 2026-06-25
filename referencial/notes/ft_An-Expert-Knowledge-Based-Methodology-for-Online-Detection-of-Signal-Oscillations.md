@@ -4,7 +4,7 @@ titulo: An Expert Knowledge Based Methodology for Online Detection of Signal Osc
 autor: Tilaro, F.; Bradu, B.; Berges, A.; Roshchin, M.
 ano:
 fonte:
-papel: tecnica_diagnostico
+tags: tecnica_diagnostico
 ---
 
 >%%

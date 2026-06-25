@@ -4,7 +4,7 @@ titulo: OPC Unified Architecture — Services
 autor: Mahnke, W.; Leitner, S.-H.; Damm, M.
 ano: 2009
 fonte: Springer
-papel: integracao_formal
+tags: integracao_formal
 ---
 
 >%%

@@ -4,7 +4,7 @@ titulo: From Mechatronics to Cyber-Physical Systems — cap. in Mechatronic Futu
 autor: Hehenberger, P. et al.
 ano: 2016
 fonte: Springer (eds. Hehenberger, P.; Bradley, D.)
-papel: conceito_cps
+tags: conceito_cps
 ---
 
 >%%

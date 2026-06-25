@@ -4,7 +4,7 @@ titulo: Condition Monitoring of Bearing Damage in Electromechanical Drive System
 autor: Lessmeier, C.; Kimotho, J.K.; Zimmer, D.; Sextro, W.
 ano: 2016
 fonte: PHM Europe — European Conference of the Prognostics and Health Management Society
-papel: tecnica_diagnostico
+tags: tecnica_diagnostico
 ---
 
 >%%

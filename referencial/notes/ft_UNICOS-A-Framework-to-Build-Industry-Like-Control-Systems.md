@@ -4,7 +4,7 @@ titulo: UNICOS — A Framework to Build Industry-Like Control Systems
 autor:
 ano:
 fonte: CERN
-papel: plataforma_abstracao
+tags: plataforma_abstracao
 ---
 
 >%%

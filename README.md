@@ -2,7 +2,9 @@
 
 ## Big Picture
 
-[![Big picture da monografia TEP](referencial/big_picture_tcc_tep.svg)](referencial/big_picture_tcc_tep.svg)
+<a href="referencial/big_picture_tcc_tep.svg">
+  <img src="referencial/big_picture_tcc_tep.svg" alt="Big picture da monografia TEP">
+</a>
 
 > Clique na imagem para abrir a versão interativa — cada card navega para a nota correspondente.
 

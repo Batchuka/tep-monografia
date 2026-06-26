@@ -82,7 +82,7 @@ O Experimento 12 validou a integração completa da stack: planta Rust + Operato
 
 Um segundo obstáculo foi incompatibilidade de versão dos stubs protobuf gerados. Após regeneração dos arquivos \texttt{.pb.go} no repositório \texttt{tep-operator}, o operator conectou-se com sucesso e passou para a fase \texttt{Stable}. Os logs do operator confirmaram:
 
-\begin{lstlisting}[caption={Log do operator após conectividade estabelecida}]
+\begin{lstlisting}[float=htbp, label={lst:operator_log}, caption={Log do \texttt{tep-operator} após conectividade estabelecida (Experimento 12)}]
 INFO observation cycle complete
   plantTime: 28019.85 h
   xmeas_count: 41
@@ -152,7 +152,12 @@ XMV$_6$ (Purge valve \%)       & $\approx$39\%       & $\uparrow$ 62\% — insuf
 
 O mecanismo identificado: IDV(1) desacelerou as reações que convertem gás em líquido ($A + C + D \to G$, $A + C + E \to H$), causando acúmulo de inventário gasoso no reator com curva de pressão monotonicamente crescente. O controlador P de pressão abriu a purge de 39 para 62\%, mas a taxa de remoção não acompanhou o acúmulo. Notavelmente, a temperatura permaneceu absolutamente flat — uma \textbf{armadilha diagnóstica}: sem sinal térmico, o operador não tem aviso precoce, e a pressão já está em trajetória de colapso quando se torna observável.
 
-\todo[inline]{Inserir figura: gráfico do Experimento 15 — XMEAS7 (pressão) e XMV6 (purge) ao longo do tempo, com marcação do ISD.}
+\begin{figure}[htbp]
+\centering
+\missingfigure[figwidth=0.92\textwidth]{Gráfico do Experimento 15 (IDV(1)): eixo X = tempo simulado (0 a 2{,}5~h); eixo Y esquerdo = XMEAS$_7$ pressão do reator (kPa), subindo monotonicamente de $\approx$2700~kPa até o limite ISD em $\approx$2960~kPa; eixo Y direito = XMV$_6$ purge valve (\%), subindo de $\approx$39\% para $\approx$62\% sem conseguir conter o acúmulo. Marcar com linha vertical tracejada o instante de ISD em $t \approx 2{,}5$~h. Destaque visual: XMEAS$_9$ (temperatura) mantida absolutamente flat como evidência da armadilha diagnóstica.}
+\caption{Experimento 15 --- IDV(1): pressão do reator (XMEAS$_7$) e abertura da purge (XMV$_6$) com marcação do evento ISD em $t \approx 2{,}5$~h.}
+\label{fig:exp15_pressure}
+\end{figure}
 
 \subsection{Experimento 16 — IDV(2): Composição de B no Feed}
 \label{sec:exp16}
@@ -185,7 +190,12 @@ XMV$_6$ (Purge \%)             & $\approx$42       & $\uparrow$ 67\%+ — insufi
 \fonte{Elaborado pelo autor a partir dos dados do Experimento 16.}
 \end{table}
 
-\todo[inline]{Inserir figura: gráfico do Experimento 16 — XMEAS7 e XMV6, destacando os dois regimes (transiente rápido e deriva lenta).}
+\begin{figure}[htbp]
+\centering
+\missingfigure[figwidth=0.92\textwidth]{Gráfico do Experimento 16 (IDV(2)): eixo X = tempo simulado (0 a $\approx$31~h); eixo Y esquerdo = XMEAS$_7$ pressão do reator (kPa); eixo Y direito = XMV$_6$ purge valve (\%). Evidenciar dois regimes com anotação ou fundo diferenciado: \textbf{Regime 1 — transiente rápido} ($t < 10$~h): pressão sobe $\approx$110~kPa em degrau e aparenta estabilizar em $\approx$2840~kPa, XMV$_6$ abre de 42 para 53\%; \textbf{Regime 2 — deriva lenta} ($t > 10$~h): pressão continua subindo monotonicamente a $\approx$4--5~kPa/h, XMV$_6$ segue abrindo até $>$67\%; marcação do ISD em $t \approx 31$~h. Comparar visualmente com a curva do Experimento 15 para evidenciar diferença de escala temporal.}
+\caption{Experimento 16 --- IDV(2): dois regimes de resposta --- transiente rápido aparente e deriva lenta com colapso em $t \approx 31$~h.}
+\label{fig:exp16_pressure}
+\end{figure}
 
 O contraste com o Experimento 15 é revelador: IDV(1) colapsa em $\approx$2,5~h por mecanismo cinético (menos A → menos consumo de gás); IDV(2) colapsa em dezenas de horas por acúmulo lento de inerte. O ritmo é diferente; o destino é o mesmo. Para o supervisor, IDV(2) representa o caso de \textit{distúrbio mensurável → resposta insuficiente → colapso lento} — a lógica supervisória precisa detectar a deriva de pressão antes que o erro acumulado se torne irrecuperável.
 

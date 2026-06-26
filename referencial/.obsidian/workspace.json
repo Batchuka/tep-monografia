@@ -11,10 +11,12 @@
             "id": "e2e76487c7cc7adc",
             "type": "leaf",
             "state": {
-              "type": "graph",
-              "state": {},
-              "icon": "lucide-git-fork",
-              "title": "Visualização em gráfico"
+              "type": "pdf-annotator",
+              "state": {
+                "file": "notes/ft_Cloud-Native-Computing-A-Survey-from-the-Perspective-of-Services_Shuiguang_et_al.md"
+              },
+              "icon": "lucide-file",
+              "title": "ft_Cloud-Native-Computing-A-Survey-from-the-Perspective-of-Services_Shuiguang_et_al"
             }
           }
         ]
@@ -74,7 +76,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 210.5
+    "width": 418.5
   },
   "right": {
     "id": "2b1e6e84b0c00a82",
@@ -189,6 +191,8 @@
   },
   "active": "e2e76487c7cc7adc",
   "lastOpenFiles": [
+    "bibTex/IEC_63303.bib",
+    "bibTex/IEC_62541-8 copy.bib",
     "big_picture_tcc_tep.svg.tmp.38132.f3d4e9520e74",
     "big_picture_tcc_tep.svg",
     "big_picture_tcc_tep_v2.svg",
@@ -225,8 +229,6 @@
     "bibTex/IEC_62541-1 copy.bib",
     "bibTex/IEC_62541-1.bib",
     "bibTex/ft_IEC_62541-1.bib",
-    "bibTex/IEC_62264-1.bib",
-    "bibTex/temp.bib",
     "notes/topicos_dispersos.canvas",
     "notes/monografia.canvas",
     "canvas/monografia.canvas",

@@ -1,7 +1,7 @@
 \chapter[REFERENCIAL TEÓRICO]{REFERENCIAL TEÓRICO}
 \label{cha:referencial}
 
-Este capítulo apresenta os fundamentos teóricos que embasam o desenvolvimento deste trabalho. São abordados, em ordem narrativa: o Processo Tennessee Eastman como problema de referência; os princípios de controle plant-wide como teoria da supervisão; o diagnóstico de qualidade de malhas como o olho do supervisor; a analogia cloud-native e seus precedentes industriais; o padrão IEC~61499 e os Operators do Kubernetes como mecanismo de orquestração; o gêmeo digital como paradigma de implementação; o protocolo gRPC como canal de comunicação; o OPC UA e a família IEC~62541 como padrões de integração; e o método de integração numérica RK4 como fundamento do simulador.
+Este capítulo apresenta os fundamentos teóricos que embasam o desenvolvimento deste trabalho. São abordados, em ordem narrativa: o Processo Tennessee Eastman como problema de referência; os princípios de controle plant-wide como teoria da supervisão; a analogia cloud-native e seus precedentes industriais; o padrão IEC~61499 e os Operators do Kubernetes como mecanismo de orquestração; o diagnóstico de qualidade de malhas como o olho do supervisor;  o OPC UA e a família IEC~62541 como padrões de integração.
 
 % -------------------------------------------------------------------------
 \section{Processo Tennessee Eastman}
@@ -19,7 +19,7 @@ A planta consiste em cinco unidades de processo interconectadas: um reator, um c
 
 O componente B é inerte e não participa das reações. Os produtos G e H são os produtos desejados; F é um subproduto indesejado. As reações são exotérmicas, e a temperatura do reator é controlada indiretamente pela água de resfriamento (\textit{cooling water} — CW).
 
-O modelo matemático é descrito por um sistema de 50 equações diferenciais ordinárias (EDO), representando os holdups de massa e energia de cada vaso de processo. O vetor de estado $\mathbf{y} \in \mathbb{R}^{50}$ inclui os inventários de cada componente nos reatores, separadores e no espaço de vapor, bem como as energias internas de cada subsistema. O modelo original foi implementado em FORTRAN e posteriormente portado para diversas linguagens, mantendo a estrutura matemática intacta.
+O modelo matemático é descrito por um sistema de 50 equações diferenciais ordinárias (EDO), representando os holdups de massa e energia de cada vaso de processo. O vetor de estado $\mathbf{y} \in \mathbb{R}^{50}$ inclui os inventários de cada componente nos reatores, separadores e no espaço de vapor, bem como as energias internas de cada subsistema. O modelo original foi implementado em FORTRAN.
 
 O modelo expõe 41 variáveis medidas (XMEAS$_1$ a XMEAS$_{41}$) e 12 variáveis manipuladas (XMV$_1$ a XMV$_{12}$). As variáveis medidas incluem vazões, composições, temperaturas, pressões e níveis dos principais subsistemas; as variáveis manipuladas correspondem a posições de válvulas e setpoints de controladores de baixo nível. O ponto de operação nominal (Modo 1) é caracterizado por pressão do reator de 2705~kPa, temperatura do reator de 120,4~°C e frações molares de produto (razão G/H) específicas \cite{DOWNS1993}.
 
@@ -27,201 +27,293 @@ O modelo inclui 20 distúrbios programados (IDV$_1$ a IDV$_{20}$) que simulam ev
 
 A relevância do TEP como \textit{benchmark} decorre de sua riqueza dinâmica: o modelo combina não-linearidades, acoplamentos entre malhas de controle, laços de reciclo com elevada constante de tempo e perturbações com mecanismos físicos distintos. Essas características tornam o TEP um ambiente adequado para avaliar arquiteturas de controle supervisório — em especial aquelas que dependem de comunicação distribuída e coordenação entre componentes heterogêneos, como a arquitetura proposta neste trabalho.
 
+\begin{figure}[htbp]
+\centering
+\missingfigure[figwidth=0.92\textwidth]{Diagrama de processo do TEP: cinco unidades interconectadas (reator, condensador, separador flash, compressor, coluna de stripping) com indicação das correntes de alimentação (A, B, C, D/E), produtos (G, H) e subproduto (F), pontos de medição XMEAS e variáveis manipuladas XMV, e agua de resfriamento do reator. Baseado na Figura~1 de \citeauthor{DOWNS1993} (\citeyear{DOWNS1993}).}
+\caption{Fluxograma esquemático do Processo Tennessee Eastman.}
+\label{fig:tep_flowsheet}
+\end{figure}
+
 % -------------------------------------------------------------------------
+
 \section{Controle Plant-Wide}
 \label{sec:plantwide}
 
-Plantas de processo contínuo não podem ser operadas exclusivamente por malhas de controle locais. Cada controlador PID regula uma variável de seu subsistema imediato, mas é incapaz de perceber os efeitos que suas ações propagam ao longo da planta através de reciclos, transferências de massa e acoplamentos termodinâmicos. A consequência é que perturbações de grande amplitude podem atravessar toda a cadeia de processo e produzir instabilidade em pontos distantes da origem, sem que nenhum controlador local tenha autoridade para reagir \cite{Larsson2000}.
+O TEP descreve com precisão \textit{o quê} uma planta complexa expõe: 41 variáveis medidas, 12 variáveis manipuladas, laços de reciclo acoplados e 20 perturbações programadas. O que o modelo não responde é \textit{como} estruturar o controle para lidar com essa complexidade — quais variáveis controlar, quais manipular, como parear entradas e saídas, e como coordenar os objetivos de operação em escala de planta. Essa é uma questão de projeto, não de sintonia.
 
-\citeonline{Larsson2000} revisamm a literatura de controle plant-wide e identificam quatro problemas centrais que qualquer estratégia de supervisão deve endereçar: (i) seleção de variáveis controladas (quais saídas manter no setpoint); (ii) seleção de variáveis manipuladas (quais entradas usar para cada objetivo); (iii) estrutura de controle (como parear variáveis); e (iv) sequenciamento de implementação (bottom-up ou top-down). A ausência de uma resposta sistemática a essas perguntas é, segundo os autores, a principal causa de estratégias de controle que funcionam individualmente mas falham quando integradas.
+Em plantas de processo contínuo, malhas de controle locais são necessárias, mas insuficientes para garantir desempenho econômico e coordenação global. Cada controlador PID regula uma variável de seu subsistema imediato, mas é incapaz de perceber os efeitos que suas ações propagam ao longo da planta por meio de reciclos, transferências de massa e acoplamentos termodinâmicos. A consequência é que perturbações de grande amplitude podem atravessar toda a cadeia de processo e provocar perda econômica, saturação de variáveis, oscilações sustentadas ou degradação de qualidade em pontos distantes da origem, sem que nenhum controlador local tenha autoridade para reagir \cite{Larsson2000}.
 
-\citeonline{Skogestad2004} propõe uma metodologia sistemática para o projeto de estruturas de controle em plantas completas, organizada em uma hierarquia de três camadas:
+O problema não é de sintonia: cada PID pode estar corretamente ajustado para seu subsistema imediato e, ainda assim, o conjunto falhar como sistema integrado. \citeonline{Larsson2000} revisam a literatura e identificam cinco tarefas estruturais que qualquer estratégia de supervisão deve endereçar: (i)~seleção de variáveis controladas (quais saídas manter no setpoint); (ii)~seleção de variáveis manipuladas (quais entradas usar para cada objetivo); (iii)~seleção de medições (quais variáveis medir para fechar as malhas); (iv)~seleção da configuração de controle (como parear variáveis controladas e manipuladas); e (v)~seleção do tipo de controlador (estrutura e grau de descentralização). A ausência de uma resposta sistemática a essas perguntas é, segundo os autores, a principal causa de estratégias de controle que funcionam individualmente mas falham quando integradas.
+
+\subsection{Função de custo como ponto de partida}
+
+Antes de responder a qualquer uma dessas cinco perguntas, \citeonline{Skogestad2004} estabelece um
+pré-requisito frequentemente negligenciado: a definição explícita dos objetivos operacionais. Sem um
+critério de desempenho claro, a escolha entre controlar temperatura do reator, vazão de reciclo ou
+composição na purga torna-se arbitrária — uma questão de opinião ou convenção, não de análise.
+Idealmente, esses objetivos devem ser combinados em uma função de custo escalar $J$ a ser minimizada:
+
+\begin{quote}
+\textit{``The operational objectives must be clearly defined before attempting to design a control
+system. Although this seems obvious, this step is frequently overlooked. Preferably, the operational
+objectives should be combined into a scalar cost function J to be minimized. In many cases, J may be
+simply selected as the operational cost.''} \cite{Skogestad2004}
+\end{quote}
+
+O artigo original de \citeonline{DOWNS1993} fornece exatamente essa função de custo para o TEP,
+expressa em termos de custos operacionais com coeficientes numéricos específicos (Tabela~9 do artigo
+original). De forma conceitual, a lógica econômica dessa função pode ser entendida como a soma
+ponderada de cinco componentes de perda: (a)~perda de reagentes não convertidos na corrente de
+purga; (b)~perda de matérias-primas na corrente de produto; (c)~formação do subproduto F, que
+representa reagentes consumidos sem retorno econômico; (d)~trabalho do compressor; e (e)~consumo de
+vapor. A representação abaixo sintetiza essa estrutura — mas não deve ser entendida como transcrição
+literal dos termos da Tabela~9:
+
+\begin{equation}
+  J = c_{\mathrm{purga}} \cdot \dot{m}_{\mathrm{purga}}
+    + c_{\mathrm{prod}} \cdot \dot{m}_{\mathrm{MP,prod}}
+    + c_F \cdot \dot{m}_F
+    + c_{\mathrm{comp}} \cdot W_{\mathrm{comp}}
+    + c_{\mathrm{vapor}} \cdot \dot{Q}_{\mathrm{vapor}}
+  \label{eq:tep_cost}
+\end{equation}
+
+\noindent onde cada termo representa, respectivamente: custo das matérias-primas perdidas na purga,
+custo das matérias-primas que saem com o produto, custo econômico atribuído à formação de F, custo
+do trabalho de compressão e custo do vapor. O sinal de $J$ está formulado como custo (negativo de
+lucro), de modo que minimizar $J$ corresponde a maximizar a eficiência operacional \cite{DOWNS1993}.
+
+A existência dessa função de custo transforma as cinco tarefas de Larsson em perguntas técnicas
+respondíveis: a melhor seleção de variáveis controladas é aquela que, sob incerteza de perturbações
+e ruído, mantém $J$ mais próximo do seu valor ótimo $J^*$.
+
+\subsection{Hierarquia de controle e escala de tempo}
+
+\citeonline{Skogestad2004} propõe organizar a resposta a essas perguntas em uma hierarquia de
+camadas separadas por escala de tempo:
 
 \begin{enumerate}
-  \item \textbf{Controle regulatório}: malhas PID locais que estabilizam variáveis de processo em torno de um ponto de operação. Esse nível opera em escala de segundos a minutos e não possui visão global da planta.
-  \item \textbf{Controle supervisório}: coordenação das malhas regulatórias via ajuste de setpoints e ativação/desativação de malhas, operando em escala de minutos a horas. Esse é o nível que reage a perturbações que transcendem os limites de uma única malha local.
-  \item \textbf{Otimização em tempo real}: reconfiguração de objetivos operacionais baseada em condições econômicas e restrições de processo, operando em escala de horas a dias.
+  \item \textbf{Controle regulatório}: malhas PID locais que estabilizam variáveis de processo em
+        torno de um ponto de operação. Esse nível opera em escala de segundos a minutos e não possui
+        visão global da planta.
+  \item \textbf{Controle supervisório}: coordenação das malhas regulatórias via ajuste de setpoints
+        e ativação/desativação de malhas, operando em escala de minutos a horas. Esse é o nível que
+        reage a perturbações que transcendem os limites de uma única malha local.
+  \item \textbf{Otimização em tempo real} (\textit{Real-Time Optimization} --- RTO): recálculo dos
+        setpoints ótimos das variáveis primárias com base nas condições econômicas vigentes e nas
+        restrições ativas, operando em escala de horas a dias.
 \end{enumerate}
 
-Um conceito central da metodologia de Skogestad é o de \textbf{variáveis de controle self-optimizing}: variáveis que, quando mantidas em setpoint fixo, aproximam naturalmente o ponto ótimo de operação sem necessidade de otimização explícita. A identificação dessas variáveis reduz a complexidade do supervisor, pois transforma o problema de otimização em um problema de regulação \cite{Skogestad2004}.
+A separação em camadas é justificada não apenas pela diferença de escala de tempo, mas pela
+diferença de informação disponível em cada nível. A camada regulatória opera com medições locais e
+sem modelo da planta inteira. A camada supervisória opera sobre os setpoints das malhas regulatórias,
+sem necessidade de acessar diretamente as válvulas. A RTO, por sua vez, resolve um problema de
+otimização estacionária para determinar os setpoints ótimos que a camada supervisória deve perseguir
+\cite{Skogestad2004}.
 
-No contexto deste trabalho, a hierarquia de Skogestad fundamenta a separação de responsabilidades entre o \texttt{ControllerBank} (controle regulatório), o Operator Kubernetes (controle supervisório) e as extensões futuras de otimização. O TEP, com seus 41~XMEAS e 12~XMV, é um caso de estudo adequado para avaliar como um supervisor declarativo pode coordenar um conjunto de controladores regulatórios sem necessidade de reconfiguração manual.
+\begin{figure}[htbp]
+\centering
+\missingfigure[figwidth=0.80\textwidth]{Hierarquia de controle plant-wide de Skogestad (3 camadas verticais): base = controle regulatório (malhas PID, escala de segundos a minutos); meio = controle supervisório (ajuste de setpoints e modos, escala de minutos a horas); topo = otimização em tempo real --- RTO (recálculo de setpoints ótimos via minimização de $J$, escala de horas a dias). Setas descendentes indicam setpoints; setas ascendentes indicam estados e medições. Adaptado de \citeauthor{Skogestad2004} (\citeyear{Skogestad2004}).}
+\caption{Hierarquia de controle plant-wide: regulatório, supervisório e otimização em tempo real.}
+\label{fig:plantwide_hierarchy}
+\end{figure}
+
+\subsection{Controle self-optimizing e a perda econômica}
+
+O conceito central que conecta a função de custo $J$ à estrutura de controle é o de
+\textbf{controle self-optimizing}: escolher variáveis controladas $c$ tais que, mantidas em setpoint
+fixo, levem automaticamente aos ajustes ótimos das variáveis manipuladas quando ocorrem perturbações
+--- sem necessidade de reotimização explícita \cite{Skogestad2004}. Para quantificar quando uma
+escolha de $c$ é suficientemente boa, define-se a \textbf{perda econômica} $L$:
+
+\begin{equation}
+  L = J(u, d) - J^*(d)
+  \label{eq:loss}
+\end{equation}
+
+\noindent onde $J(u,d)$ é o valor real da função de custo quando a política de setpoint fixo é
+aplicada sob perturbação $d$, e $J^*(d)$ é o valor ótimo que seria atingido com reotimização
+completa. O controle self-optimizing é alcançado quando existe uma política de setpoint constante
+que resulta em perda $L$ aceitável para o espectro esperado de perturbações \cite{Skogestad2004}.
+
+A implicação prática é significativa: se as variáveis controladas forem bem escolhidas, o supervisor
+não precisa resolver um problema de otimização a cada perturbação --- basta regular $c$ no setpoint.
+A escolha errada das variáveis controladas, por outro lado, pode resultar em perda econômica elevada
+mesmo que todas as malhas estejam corretamente sintonizadas.
+
+\subsection{Aplicação ao TEP: análise de graus de liberdade}
+
+\citeonline{Larsson2000} aplicam essa metodologia diretamente ao TEP. Uma análise de graus de
+liberdade no estado estacionário revela que o processo possui 8 graus de liberdade manipuláveis.
+No Modo~1 de operação, 5 desses graus estão consumidos por restrições economicamente ativas ---
+variáveis que operam em seu limite operacional ótimo e, portanto, devem ser mantidas nesses limites
+como restrições, não como alvos de setpoint livre. Restam 3 graus de liberdade não restringidos,
+para os quais é necessário escolher variáveis self-optimizing \cite{Larsson2000}.
+
+Avaliando sistematicamente as alternativas pela perda $L$ calculada com a função de custo de
+\citeonline{DOWNS1993}, os autores concluem que boas escolhas self-optimizing incluem: temperatura
+do reator (XMEAS$_9$), vazão de reciclo ou trabalho do compressor (XMEAS$_5$ ou XMEAS$_{20}$), e
+composição de A na purga ou na alimentação do reator. Notavelmente, a fração molar do inerte B ---
+frequentemente indicada por outros autores --- é identificada como uma má escolha nesse contexto:
+controlá-la em setpoint fixo resulta em perda econômica mais elevada do que as alternativas acima
+\cite{Larsson2000}.
+
+Essa análise revela a função concreta que uma camada supervisória deve exercer no TEP: não apenas
+estabilizar a planta, mas garantir que as variáveis primárias $c$ --- aquelas identificadas como
+self-optimizing --- permaneçam próximas de seus setpoints ótimos frente às perturbações IDV.
+Qualquer arquitetura supervisória proposta pode ser avaliada, em última instância, pelo valor de $L$
+que produz em simulação.
+
+A hierarquia de Skogestad fornece o enquadramento teórico para a separação de responsabilidades na
+arquitetura proposta neste trabalho: a camada regulatória é implementada pelo conjunto de
+controladores PID do \texttt{ControllerBank}; a camada supervisória é o objeto de investigação
+central deste trabalho --- responsável por coordenar setpoints, modos e condições observadas das
+malhas regulatórias frente a perturbações e transições operacionais. A camada de otimização em tempo
+real, que determinaria os setpoints ótimos de $c$ via minimização de $J$, fica fora do escopo deste
+trabalho e constitui extensão natural. O TEP, com sua função de custo explícita e seus 41~XMEAS e
+12~XMV, é um ambiente adequado para avaliar se um supervisor consegue manter a planta próxima do
+ótimo operacional sem requerer reotimização a cada perturbação.
 
 % -------------------------------------------------------------------------
+
+\section{Cloud-Native como Paradigma de Orquestração Industrial}
+\label{sec:cloudnative}
+
+A hierarquia de controle plant-wide estabelece a existência e a função de uma camada supervisória: ela deve observar o estado de múltiplos controladores distribuídos pela planta, propagar decisões de coordenação --- setpoints, modos, políticas --- e reagir a perturbações sem executar diretamente as malhas regulatórias. Isso coloca uma questão de implementação que o referencial de controle de processos não responde: qual paradigma tecnológico suporta construir um sistema distribuído capaz de observar componentes heterogêneos, manter um estado operacional desejado e tomar ações corretivas de forma contínua e autônoma? É a esse problema que o paradigma cloud-native se dirige.
+
+O termo \textit{cloud-native} designa uma abordagem de desenvolvimento e operação de sistemas distribuídos que explora recursos típicos da computação em nuvem --- conteinerização, microsserviços, orquestração automática de containers, DevOps e pipelines de entrega contínua \cite{Shuiguang2023}. Conforme \citeonline{Shuiguang2023}, uma aplicação cloud-native pode ser entendida como um sistema distribuído, elástico e escalável horizontalmente, composto por microsserviços inter-relacionados empacotados em containers leves e orquestrados sobre múltiplos servidores. Nesse paradigma, a orquestração é descrita pelos autores como a configuração, o gerenciamento e a coordenação automatizados do ciclo de vida dos containers --- provisionamento, implantação, agendamento, escalonamento, configuração de rede e balanceamento de carga --- de modo a manter as funcionalidades da aplicação elásticas e disponíveis. O Kubernetes, originado do gerenciador de clusters Borg do Google, é descrito pelos mesmos autores como o software open-source de orquestração de containers mais popular e como um padrão de fato amplamente adotado pela indústria.
+
+\citeonline{Burns2016} documentam a evolução dos sistemas de orquestração do Google --- Borg, Omega e Kubernetes --- e mostram que a força do Kubernetes está na combinação de uma API uniforme, objetos extensíveis e separação explícita entre estado desejado e estado observado. Cada recurso Kubernetes é representado como um objeto com dois campos centrais: \textit{Spec}, que descreve o estado desejado, e \textit{Status}, que registra o estado observado em tempo de execução. Sobre essa estrutura operam controladores de reconciliação (\textit{reconciliation controller loops}) que comparam continuamente o estado desejado ao estado observado e executam ações para convergir o segundo em direção ao primeiro \cite{Burns2016}. Os autores destacam ainda que a conteinerização muda o paradigma operacional dos data centers --- de uma perspectiva orientada a máquinas para uma perspectiva orientada a aplicações, na qual gerenciar containers significa gerenciar aplicações, não servidores. Essa combinação de API uniforme, objetos Spec/Status, controladores de reconciliação e extensibilidade torna o Kubernetes uma plataforma de operação declarativa para sistemas distribuídos complexos. No ecossistema Kubernetes, essa lógica declarativa pode ser estendida pelo \textit{Operator Pattern}, no qual controladores específicos de domínio observam recursos customizados e executam ações de reconciliação sobre aplicações ou sistemas externos ao cluster.
+
+\begin{figure}[htbp]
+\centering
+\missingfigure[figwidth=0.85\textwidth]{Loop de reconciliação do Kubernetes: (1) objeto com \textit{Spec} (estado desejado declarado pelo operador) e \textit{Status} (estado observado em tempo real); (2) controlador de reconciliação compara Spec e Status; (3) se divergentes, aciona ação corretiva (e.g., reiniciar pod, ajustar réplicas, atualizar rota); (4) sistema converge e Status se aproxima de Spec. Pode incluir exemplo industrial análogo: \textit{Spec} = modo operacional desejado da planta; \textit{Status} = condição observada das malhas; ação = ajuste de setpoint ou reconfiguração. Baseado em \citeauthor{Burns2016} (\citeyear{Burns2016}).}
+\caption{Loop de reconciliação Spec/Status do Kubernetes e sua analogia com supervisão industrial.}
+\label{fig:k8s_reconciliation}
+\end{figure}
+
+A relevância desse paradigma para sistemas industriais não está em substituir controladores regulatórios ou malhas de tempo real, mas em oferecer uma forma de organizar camadas superiores de operação: implantação e ciclo de vida de serviços, supervisão de componentes distribuídos, observabilidade, tolerância a falhas, aplicação de políticas e coordenação de estados operacionais. Nesse enquadramento, cloud-native e Kubernetes são considerados como referências para a camada supervisória e informacional do sistema, preservando a distinção entre controle regulatório da planta e orquestração da infraestrutura de software.
+
+\subsection{Precedentes Industriais}
+
+Trabalhos recentes indicam que essa aproximação entre infraestrutura cloud-native e automação industrial já é objeto de pesquisa. \citeonline{Johansson2022} investigam o uso de Kubernetes para orquestrar nós controladores distribuídos virtualizados (\textit{Virtual Distributed Control Nodes}, VDCNs) em cenários de alta disponibilidade. A lógica de controle permanece no interior dos VDCNs; o Kubernetes atua como camada de orquestração, executando o agendamento situacional dos containers, gerenciando os laços de reconciliação que empurram o estado atual em direção ao estado desejado, e atualizando as rotas de comunicação conforme o estado da aplicação --- determinando qual instância VDCN recebe comandos OPC~UA e, portanto, qual controlador participa ativamente da operação. Diante de falhas de nó, o Kubernetes detecta o evento, reimplanta o VDCN afetado e, no caso redundante, promove o backup a primário enquanto cria uma nova instância de backup \cite{Johansson2022}. Esse resultado é relevante porque mostra um precedente em que o Kubernetes é usado não apenas como infraestrutura genérica, mas como camada responsável por recompor componentes de controle industrial diante de falhas, com efeito direto sobre a continuidade operacional do sistema.
+
+\citeonline{Mellado2022} propõem o \textbf{IoT-PLC}, uma arquitetura baseada em containers para CLPs orientados à Indústria~4.0, na qual cada funcionalidade --- controle regulatório, armazenamento de dados de campo, interfaces sem fio --- é encapsulada em um container separado. O IoT-PLC é posicionado como nó de fog computing, mantendo a execução próxima à planta enquanto permite gerenciamento direto a partir da nuvem, reconfiguração a quente de malhas de controle e ajuste de recursos computacionais por container sem interromper o processo. O artigo utiliza também um \textit{modelo de dispositivo virtual} que abstrai a interface do controlador para camadas superiores. Embora não constitua uma implementação baseada em Kubernetes, o IoT-PLC é relevante como antecedente conceitual: ele mostra que a literatura industrial já considera plausível decompor funções de CLP em componentes conteinerizados, reconfiguráveis e gerenciáveis externamente, e representar entidades físicas por abstrações digitais acessíveis a camadas superiores --- uma preocupação compatível com a lógica de recursos declarativos usada em arquiteturas cloud-native.
+
+Em conjunto, esses trabalhos indicam uma convergência entre práticas cloud-native e sistemas industriais, mas também delimitam seu escopo. Uma limitação importante é que o Kubernetes não foi projetado para controle determinístico de tempo real: seus mecanismos de agendamento, reinicialização e redistribuição de cargas são adequados para disponibilidade e operação de aplicações distribuídas, mas não garantem, por si só, tempos de resposta compatíveis com malhas regulatórias industriais. A contribuição mais defensável dos princípios cloud-native está na camada supervisória --- observação de componentes distribuídos, manutenção de configurações desejadas, recomposição de serviços após falhas e disponibilização de abstrações operacionais para camadas superiores ---, sem substituir a execução determinística de controladores de baixo nível. A integração com ativos industriais pressupõe ainda uma camada de comunicação capaz de representar medições, comandos e estados de equipamentos de forma estruturada; protocolos como OPC~UA são relevantes nesse ponto, funcionando como possível interface entre a camada de orquestração e os dispositivos de automação.
+
+% -------------------------------------------------------------------------
+
 \section{Diagnóstico de Qualidade de Malhas}
 \label{sec:diagnostico}
 
-A qualidade de uma malha de controle não é binária: um controlador pode estar operando, mas de forma subótima. Malhas com ganho excessivo oscilam; malhas com ganho insuficiente respondem lentamente e permitem que distúrbios se propaguem; malhas com setpoint desatualizado operam em ponto de trabalho inadequado. Em instalações industriais com centenas ou milhares de malhas, identificar automaticamente quais controladores estão mal sintonizados é um problema relevante e de difícil solução manual \cite{Bradu2018}.
+O paradigma cloud-native oferece a infraestrutura para observar componentes distribuídos, manter estados desejados e acionar ações corretivas. O problema é que o Kubernetes --- ou qualquer camada supervisória de software --- opera sobre abstrações que nada têm a ver com o vocabulário da planta: ele conhece pods, serviços, configurações e rotas, não variáveis de processo, setpoints ou oscilações em malhas PID. Para que um orquestrador possa tomar decisões sobre o estado operacional de uma planta, é necessário um passo anterior: sair dos sinais brutos gerados pelos controladores e produzir estados reconhecíveis em nível de supervisão. Isso exige uma camada analítica que saiba interpretar séries temporais de processo e traduzi-las em condições que o supervisor possa consumir --- malha saudável, malha degradada, atuador saturado, comportamento oscilatório. É dessa tradução que trata o diagnóstico de qualidade de malhas.
 
-\subsection{Índice de Harris e o Benchmark de Variância Mínima}
+A qualidade de uma malha de controle não é binária: um controlador pode estar em modo automático e ainda assim apresentar desempenho degradado. Malhas excessivamente agressivas podem induzir oscilações e desgaste de atuadores; malhas conservadoras demais respondem lentamente e permitem a propagação de distúrbios; e restrições de atuador, ruído de medição ou perturbações externas podem comprometer o comportamento da malha sem necessariamente acionar alarmes discretos. Em plantas com centenas ou milhares de controladores, a identificação manual de condições degradadas torna-se impraticável, motivando técnicas de \textit{control loop performance monitoring} (CLPM). O objetivo do CLPM não é controlar melhor diretamente, mas transformar históricos de sinais da malha --- setpoint, variável medida e saída do controlador --- em indicadores de desempenho que permitam priorizar quais malhas exigem análise especializada \cite{Bradu2018}.
 
-O trabalho seminal de \citeonline{Harris1989} estabeleceu o primeiro índice quantitativo para avaliação automática de desempenho de malhas fechadas. A ideia central é que, para qualquer processo linear com distúrbios estocásticos, existe um limite inferior para a variância da variável de processo: a variância do controlador de variância mínima. Esse limite pode ser estimado diretamente dos dados de operação rotineira, sem necessidade de identificação explícita do modelo do processo.
+\subsection{Benchmark de Variância Mínima e o Índice de Harris}
 
-O índice de Harris $\eta \in [0, 1]$ compara a variância observada $\sigma^2_y$ com o limite de variância mínima $\sigma^2_{\text{mv}}$:
+O trabalho de \citeonline{Harris1989} tornou-se um marco clássico na avaliação quantitativa de desempenho de malhas fechadas ao propor um benchmark baseado em controle de variância mínima. A ideia central é que, para processos representáveis por funções de transferência lineares sujeitos a perturbações aditivas, existe um limite inferior teórico para a variância da variável controlada: a variância que seria obtida por um controlador de variância mínima (MVC), dado o atraso discreto inerente ao processo. A principal contribuição de Harris é que esse limite pode ser estimado a partir de dados rotineiros de operação em malha fechada --- sem experimentos de identificação ou conhecimento completo do modelo --- bastando conhecer o atraso discreto efetivo $f$ (número de períodos de amostragem entre a ação de controle e seu efeito mensurável na saída).
+
+A estimativa de $\sigma^2_{\text{mv}}$ é obtida ajustando-se um modelo univariado de séries temporais à variável controlada em malha fechada e extraindo a variância do erro de previsão $f+1$ passos à frente. Essa variância corresponde à parcela da saída que não pode ser removida por \textit{feedback} antes que o efeito do atraso se manifeste, e está associada aos primeiros coeficientes da representação de médias móveis da dinâmica de perturbação \cite{Harris1989}. Uma propriedade diagnóstica importante decorre diretamente da teoria: sob controle de variância mínima, a autocorrelação da variável controlada é nula além do lag $f$. Portanto, autocorrelação significativa para lags maiores que $f$ indica que o controlador não está extraindo todo o desempenho possível com a estrutura de controle vigente.
+
+Em formulações de CLPM posteriores ao trabalho original, o desempenho é expresso como:
 
 \begin{equation}
   \eta = \frac{\sigma^2_{\text{mv}}}{\sigma^2_y}
   \label{eq:harris_index}
 \end{equation}
 
-Valores próximos de 1 indicam operação próxima ao ótimo estocástico; valores baixos indicam desempenho degradado. A estimativa de $\sigma^2_{\text{mv}}$ é obtida ajustando-se um modelo autorregressivo de ordem $d$ (atraso puro do processo) aos dados de operação, sem necessidade de experimentos de identificação \cite{Harris1989}. O índice tornou-se referência na literatura de \textit{control loop performance monitoring} (CLPM) e motivou uma geração de índices derivados, incluindo o Índice de Preditividade descrito a seguir.
+\noindent Valores próximos de 1 indicam operação próxima ao benchmark de variância mínima; valores baixos indicam variância observada substancialmente maior do que o limite alcançável. Deve-se observar que o índice não identifica a causa da degradação: um baixo $\eta$ pode decorrer de má sintonia, mas também de atraso excessivo, saturação de atuador, ruído de medição, ausência de ação feedforward ou perturbação não medida. Quando $\eta$ está próximo de 1, mas a variância absoluta ainda é elevada, a causa é estrutural --- e reduções adicionais de variância só são alcançáveis por modificações no processo, como redução de atraso, troca de variável manipulada ou adição de feedforward \cite{Harris1989}.
 
 \subsection{Índice de Preditividade e a Abordagem do CERN}
 
-O sistema criogênico do LHC opera aproximadamente 5.000 malhas PID para manter os imãs supercondutores a 1,9~K. Nessa escala, qualquer abordagem de diagnóstico baseada em inspeção humana é inviável: a revisão manual de 5.000 malhas levaria centenas de horas de trabalho especializado por ciclo de operação \cite{Bradu2018}.
+Embora o benchmark de Harris forneça uma referência teórica robusta, sua aplicação pressupõe hipóteses de linearidade e requer o conhecimento de $f$. Abordagens posteriores de CLPM buscaram métricas mais simples de implantar em larga escala, operando diretamente sobre históricos de malhas sem modelo físico da planta. É nesse contexto que se insere o \textit{Predictability Index} (PI) aplicado por \citeonline{Bradu2018} ao sistema criogênico do LHC, que opera milhares de malhas PID distribuídas ao longo do acelerador. Nessa escala, a inspeção manual é inviável, e o PI funciona como métrica automática de triagem.
 
-\citeonline{Bradu2018} propõem o \textbf{Índice de Preditividade} (\textit{Predictability Index} — PI) como métrica automática para triagem de malhas. O PI mede a capacidade de um modelo autorregressivo de prever o comportamento futuro da variável de processo: malhas bem reguladas são inerentemente previsíveis (pequenos resíduos de predição), enquanto malhas oscilantes ou instáveis apresentam comportamento imprevisível (resíduos elevados). Formalmente, o PI é calculado como:
+O método prediz o erro futuro da malha a partir de seus valores passados. Para um horizonte de predição $b$ e uma ordem de modelo $m$, o erro previsto é:
 
 \begin{equation}
-  \text{PI} = 1 - \frac{\text{RMSE}(\hat{y}, y)}{\sigma_y}
+  \hat{e}(t+b) = a_0 + a_1\,e(t) + a_2\,e(t-1) + \cdots + a_m\,e(t-m-1)
+  \label{eq:pi_pred}
+\end{equation}
+
+A partir do resíduo de predição, calcula-se:
+
+\begin{equation}
+  \text{PI} = \frac{\sigma^2_r}{\text{mse}}
   \label{eq:pi_index}
 \end{equation}
 
-\noindent onde $\hat{y}$ é a predição do modelo autorregressivo de ordem $m$ com horizonte $b$, $y$ é o valor real e $\sigma_y$ é o desvio padrão da série. O PI varia de 0 (completamente imprevisível) a 1 (perfeitamente previsível); um limiar prático para diagnóstico é tipicamente fixado em PI $< 0{,}7$ para sinalizar malhas problemáticas \cite{Bradu2018}.
+\noindent onde $\sigma^2_r$ é a variância do resíduo entre o erro medido e o erro previsto e
+$\text{mse}$ é o erro quadrático médio da malha. Operacionalmente, PI baixo indica comportamento
+errático ou imprevisível; PI alto indica comportamento regular compatível com o modelo adotado
+\cite{Bradu2018}.
 
-Trabalhos complementares do mesmo grupo investigam a detecção de oscilações via métodos baseados em conhecimento especializado \cite{Tilaro2017} e o aprendizado de modelos para detecção de anomalias em sistemas de controle do CERN \cite{Tilaro2018}. Em conjunto, esses trabalhos estabelecem que o diagnóstico automático de malhas em larga escala é viável com técnicas baseadas em análise de séries temporais, sem necessidade de modelos físicos explícitos.
+Os parâmetros do método são derivados de grandezas operacionais: intervalo de amostragem $t_s$, janela de análise $T_W$ e constante de tempo característica da malha $T$. A partir dessas grandezas, calculam-se o número de amostras da janela $n = \lceil T_W/t_s \rceil$, o horizonte de predição $b = \lceil T/t_s \rceil$ e a ordem do modelo $m = 2b$. Essa estrutura permite configurar o método por grupos de malhas, sem ajuste individual para cada controlador.
 
-\subsection{Relevância para este Trabalho}
+A classificação de uma malha como problemática não depende apenas do valor bruto do PI. Os autores adicionam duas condições operacionais para reduzir falsos positivos: (i)~a saída do controlador deve apresentar variação significativa ($\sigma_y > \bar{\sigma}_y$), evitando classificar como degradadas malhas saturadas, inativas ou em modo manual; e (ii)~a condição PI~$< PI_L$ deve persistir em mais de $N$ janelas dentro de um período de 24 horas, evitando que transientes breves sejam interpretados como degradação estrutural. O limiar $PI_L$ não é uma constante universal: no artigo do CERN, ele é definido empiricamente por grupos de controladores --- temperatura, pressão, vazão e nível --- com valores distintos conforme a dinâmica e os objetivos operacionais de cada grupo \cite{Bradu2018}.
 
-O gêmeo digital desenvolvido neste trabalho é capaz de gerar, de forma controlada e reprodutível, séries temporais das 41~XMEAS sob qualquer condição de operação — com controladores bem sintonizados, degradados, e sob distúrbios IDV específicos. Essa capacidade de experimentação controlada é o que torna o laboratório TEP uma plataforma natural para cálculo do Índice de Preditividade: os históricos sintéticos podem ser usados para calibrar os parâmetros $(m, b, n)$ do PI, identificar os limiares adequados para cada variável, e validar a lógica de diagnóstico antes de aplicá-la a dados de plantas reais.
+Quando uma malha é declarada problemática pelo PI, o artigo classifica a causa em quatro categorias: (i)~\textit{tuning} --- o controlador precisa ser resintonizado; (ii)~\textit{process} --- o controlador não lida adequadamente com os distúrbios, inclusive por restrições mecânicas; (iii)~\textit{noise} --- a variável medida apresenta ruído excessivo para uma regulagem eficaz; e (iv)~\textit{false positive} --- os parâmetros do PI estão inadequados para aquela malha específica. PI baixo, portanto, não implica diretamente em PID mal sintonizado; a causa exige diagnóstico complementar \cite{Bradu2018}.
 
-% -------------------------------------------------------------------------
-\section{Cloud-Native como Paradigma de Orquestração Industrial}
-\label{sec:cloudnative}
+\begin{figure}[htbp]
+\centering
+\missingfigure[figwidth=0.90\textwidth]{Pipeline do CLPM: da esquerda para a direita --- (1) série temporal bruta da malha (setpoint, variável medida, saída do controlador); (2) cálculo de índices: Harris $\eta = \sigma^2_{\text{mv}}/\sigma^2_y$ e Predictability Index $\text{PI} = \sigma^2_r/\text{mse}$; (3) estado diagnóstico resultante (malha saudável / degradada / oscilatória / ruidosa). Pode incluir exemplo de série temporal contrastando malha saudável ($\eta \approx 1$, PI alto) com malha degradada ($\eta \ll 1$, PI baixo). Baseado em \citeauthor{Harris1989} (\citeyear{Harris1989}) e \citeauthor{Bradu2018} (\citeyear{Bradu2018}).}
+\caption{Pipeline conceitual do diagnóstico de qualidade de malhas (CLPM): de sinais brutos a estados supervisionáveis.}
+\label{fig:clpm_pipeline}
+\end{figure}
 
-O termo \textit{cloud-native} designa uma abordagem de desenvolvimento de sistemas que explora as capacidades da computação em nuvem para construir e executar aplicações escaláveis, resilientes e gerenciáveis. Os princípios fundamentais — conteinerização, microsserviços, orquestração declarativa e entrega contínua — foram consolidados a partir da experiência acumulada por empresas de tecnologia de grande porte ao gerenciar infraestruturas de escala global \cite{Shuiguang2023}.
+\subsection{Detecção de Padrões Dinâmicos e Anomalias}
 
-\citeonline{Shuiguang2023} apresentam uma revisão abrangente da computação cloud-native sob a perspectiva de serviços, identificando que a essência do paradigma é a separação entre a definição do que um sistema deve fazer (declaração de estado desejado) e a mecânica de como esse estado é alcançado e mantido (infraestrutura de orquestração). Essa separação é análoga ao problema central do controle supervisório: o operador declara uma política de operação, e a infraestrutura de controle trabalha para manter a planta dentro dessa política.
+Além de índices globais de desempenho, trabalhos do mesmo grupo investigam a detecção de padrões específicos de comportamento anômalo. \citeonline{Tilaro2017} propõem um método de detecção online de oscilações em sensores e atuadores que combina análise espectral por transformada de Fourier discreta (DFT), filtro passa-faixa, detecção de cruzamentos por zero e verificação de regularidade temporal. Uma propriedade relevante do método é que oscilações podem ocorrer mesmo quando o sistema opera em estado nominal, sem acionar qualquer alarme discreto de limiar. O método formaliza o julgamento tácito do especialista --- que identificava visualmente padrões anômalos nas tendências de válvulas e medições --- em uma análise computável, produzindo condições interpretadas caracterizadas por frequência dominante, amplitude, período e índice de regularidade.
 
-\citeonline{Burns2016} documentam a evolução dos sistemas de orquestração do Google — Borg, Omega e Kubernetes — e identificam que o salto qualitativo de Borg para Kubernetes foi exatamente a adoção de uma API declarativa baseada em estado desejado, em contraste com as APIs imperativas anteriores. Esse princípio, que o Google consolidou ao longo de mais de uma década operando clusters com dezenas de milhares de máquinas, é o mesmo que fundamenta a proposta de usar o Kubernetes como plataforma supervisória neste trabalho.
+\citeonline{Tilaro2018} estendem essa direção com métodos de aprendizado de modelos sobre dados históricos de controle, explorando relações físicas e lógicas entre sinais para detectar desvios coerentes em relação ao comportamento histórico esperado. Desvios persistentes funcionam como sinais de aviso de possíveis anomalias futuras, ativando verificações por especialistas antes que falhas se manifestem.
 
-\subsection{Precedentes Industriais}
+A mesma lógica de transformar séries temporais em estados de saúde supervisionáveis estende-se ao monitoramento de condição de equipamentos. \citeonline{Lessmeier2016} demonstram que sinais de corrente elétrica de motores, disponíveis nos inversores de frequência já presentes na instalação sem necessidade de sensores adicionais, carregam informação sobre danos em mancais do sistema de acionamento. O estado relevante --- dano no mancal, sua localização e extensão --- não é medido diretamente: ele é um estado latente inferido a partir de assinaturas espectrais e estatísticas extraídas da série temporal de corrente. Esse trabalho é particularmente relevante no contexto de atuadores de processo, como bombas e compressores, cujos defeitos mecânicos incipientes podem se manifestar como degradação de desempenho de malhas de controle antes de qualquer alarme de processo --- ou seja, como uma das categorias \textit{process} do PI de \citeonline{Bradu2018}.
 
-A aplicação de princípios cloud-native a sistemas de controle industrial não é apenas uma analogia: trabalhos recentes demonstram implementações concretas.
+Em trabalho de iniciação científica desenvolvido pelo autor sob orientação do Prof.\ Dr.\ Luiz Alberto Pinto, a análise via transformada \textit{wavelet} foi investigada como extensão dessa abordagem. A decomposição \textit{wavelet} permite decompor o sinal de corrente em múltiplas escalas de frequência e tempo simultaneamente, capturando assinaturas transitórias de falha que métodos baseados exclusivamente em análise de Fourier podem deixar passar. Os resultados obtidos nessa investigação indicam ganho de cobertura diagnóstica sobre descritores puramente espectrais, especialmente em condições de operação variáveis e regimes não estacionários \cite{Lessmeier2016}.
 
-\citeonline{Johansson2022} demonstram a viabilidade de usar o Kubernetes para orquestrar sistemas de controle distribuído de alta disponibilidade (\textit{High Availability Distributed Control Systems}). Os autores constroem um sistema em que os componentes de controle são implantados como pods Kubernetes e o plano de controle nativo gerencia failover, reinicialização e distribuição de carga — funções que em sistemas de controle industriais tradicionais exigem hardware redundante dedicado. Os resultados demonstram que o Kubernetes pode fornecer os mesmos níveis de disponibilidade com infraestrutura de propósito geral.
+\subsection{Relevância para a Arquitetura Supervisória Proposta}
 
-\citeonline{Mellado2022} propõem o \textbf{IoT-PLC}, um CLP conteinerizado para a Indústria~4.0 em que cada funcionalidade — controle regulatório, armazenamento de dados de campo, interfaces sem fio — é encapsulada em um contêiner separado. O IoT-PLC usa um \textit{modelo de dispositivo virtual} que abstrai a interface com camadas superiores, permitindo que aplicações na nuvem interajam com o controlador físico de forma transparente. Esse modelo de abstração é precursor direto do CRD \texttt{PLCMachine} proposto neste trabalho.
+Esses trabalhos estabelecem a viabilidade de uma camada intermediária entre sinais crus da planta e decisões supervisórias. Índices como Harris e PI, métodos de detecção de oscilações e modelos de anomalia permitem transformar séries temporais de baixo nível em estados diagnósticos de maior abstração: malha saudável, malha degradada, comportamento oscilatório, variável ruidosa, relação sensor--atuador incoerente. Do ponto de vista arquitetural, esses estados são consumíveis por uma camada supervisória sem que ela precise atuar diretamente sobre os sinais crus do controlador.
 
-A convergência desses trabalhos sugere que a integração entre infraestrutura cloud-native e sistemas de controle industrial não é uma extrapolação especulativa, mas uma direção ativa de pesquisa com resultados publicados e reproduzíveis.
+Uma observação crítica que emerge dessa literatura é que PI baixo não implica em ``resintonizar o PID''. Ele implica em ``a malha apresenta comportamento não explicado pelo modelo de predição; é necessário investigar a causa''. Essa separação entre detecção de anomalia e ação corretiva é estruturalmente importante para a arquitetura proposta: o componente que observa o estado divergente e o componente que executa a ação corretiva são distintos, e a ação só ocorre quando autorizada pela política operacional vigente.
 
-% -------------------------------------------------------------------------
-\section{IEC~61499 e Controle Distribuído por Blocos de Função}
-\label{sec:iec61499}
-
-A norma \textbf{IEC~61499} \cite{IEC61499} define uma arquitetura para sistemas de controle distribuído baseada em \textbf{Blocos de Função} (\textit{Function Blocks} — FBs). Proposta como evolução da IEC~61131-3 (que standardiza a programação de CLPs individuais), a IEC~61499 endereça o problema da distribuição: como decompor uma aplicação de controle em unidades modulares que possam ser implantadas em dispositivos distintos e comunicar-se entre si via redes industriais.
-
-Um Bloco de Função na IEC~61499 encapsula tanto dados (variáveis de entrada/saída) quanto comportamento (algoritmos e máquinas de estados de eventos). Os FBs se comunicam por \textbf{eventos} (que disparam execução) e \textbf{dados} (que carregam valores de processo). Essa separação entre fluxo de controle (eventos) e fluxo de dados é análoga à separação entre plano de controle e plano de dados em redes de computadores — o que facilita a distribuição dos componentes por múltiplos dispositivos físicos.
-
-A norma define dois níveis de abstração:
-
-\begin{enumerate}
-  \item \textbf{Modelo de aplicação}: a lógica de controle descrita como um grafo de FBs interconectados, independente de hardware.
-  \item \textbf{Modelo de sistema}: a distribuição dos FBs por dispositivos físicos e os recursos (\textit{resources}) dentro de cada dispositivo que executam os FBs.
-\end{enumerate}
-
-A distinção entre modelo de aplicação e modelo de sistema é o elemento da IEC~61499 mais relevante para este trabalho: o Operator Kubernetes realiza exatamente a função de um \textit{deployment manager} da IEC~61499 — mapeia a aplicação (lógica supervisória declarada no CRD) para o sistema (componentes em execução no cluster). A \textit{spec} do CRD corresponde ao modelo de aplicação; o \textit{status} corresponde ao estado observado do sistema; o \textit{controller loop} realiza a reconciliação.
-
-No Capítulo~5, a correspondência entre o padrão de Operator e os princípios da IEC~61499 é analisada em detalhes, concluindo que o Kubernetes pode servir como infraestrutura de runtime para aplicações modeladas segundo a norma, desde que a lógica de cada FB seja encapsulada em contêineres com interface gRPC.
+No contexto deste trabalho, o TEP oferece um ambiente adequado para investigar essas métricas, pois disponibiliza múltiplas variáveis medidas e manipuladas sob condições de operação programáveis. A calibração dos parâmetros de diagnóstico para as variáveis XMEAS e XMV do TEP será tratada na metodologia experimental.
 
 % -------------------------------------------------------------------------
-\section{Kubernetes e o Padrão de Operators}
-\label{sec:kubernetes}
 
-O Kubernetes é uma plataforma de orquestração de contêineres de código aberto desenvolvida originalmente pelo Google e atualmente mantida pela \textit{Cloud Native Computing Foundation} (CNCF). Sua arquitetura é centrada no princípio da \textbf{reconciliação declarativa}: o usuário descreve o estado desejado do sistema em manifestos YAML, e o plano de controle do Kubernetes trabalha continuamente para fazer o estado real convergir ao estado desejado \cite{Burns2016}.
-
-A arquitetura do Kubernetes divide-se em plano de controle (\textit{control plane}) e nós de trabalho (\textit{worker nodes}). O plano de controle inclui o \textit{API Server} (único ponto de entrada para todas as operações), o \textit{etcd} (banco de dados distribuído de chave-valor que armazena o estado do cluster), o \textit{Scheduler} (alocador de cargas de trabalho) e o \textit{Controller Manager} (gerenciador dos controladores nativos). Os nós de trabalho executam os contêineres via \textit{kubelet} e \textit{container runtime}.
-
-O Kubernetes permite estender seu modelo de recursos por meio das \textbf{Definições de Recursos Customizados} (\textit{Custom Resource Definitions} — CRDs). Um CRD declara um novo tipo de recurso no API Server, com seu próprio esquema (\textit{spec} e \textit{status}), tornando-o disponível para criação, listagem e edição com as mesmas ferramentas (kubectl, YAML) usadas para recursos nativos. A separação entre \textit{spec} (intenção declarada pelo usuário) e \textit{status} (estado observado pelo sistema) é fundamental para o padrão de Operator \cite{Burns2016}.
-
-O \textbf{padrão de Operator} (\textit{Operator Pattern}) é um método de extensão do Kubernetes que codifica o conhecimento operacional de uma aplicação específica em um controlador customizado \cite{Burns2016}. Um Operator combina um ou mais CRDs com um \textit{controller loop} que observa instâncias desses recursos e age para reconciliar o estado real com o estado desejado — substituindo a intervenção humana pela automação do domínio de conhecimento específico da aplicação.
-
-O \textit{loop} de reconciliação de um Operator segue o padrão \textbf{Observar–Avaliar–Agir}:
-\begin{enumerate}
-  \item \textbf{Observar}: o controller recebe uma notificação de que um recurso customizado foi criado, modificado ou deletado (via \textit{watch} no API Server).
-  \item \textbf{Avaliar}: o controller lê o estado atual da aplicação (possivelmente via chamadas externas, como gRPC) e compara com o estado desejado descrito no \textit{spec} do CRD.
-  \item \textbf{Agir}: se houver divergência, o controller toma ações corretivas — no caso deste trabalho, chamadas gRPC à planta para ajustar parâmetros de controle.
-\end{enumerate}
-
-O framework \textbf{Kubebuilder} é a ferramenta oficial da CNCF para construção de Operators em Go. Ele provê scaffolding de projeto, integração com o \textit{controller-runtime} (biblioteca Go para interação com o API Server), geração de CRDs a partir de structs Go anotadas, e utilitários para testes.
-
-Para operações industriais, o padrão de Operator oferece vantagens relevantes: a lógica supervisória é codificada uma vez e executada de forma autônoma; a política de operação é declarativa e auditável em repositórios de versionamento; e o Kubernetes garante alta disponibilidade do próprio operator via restarts automáticos \cite{Burns2016}.
-
-% -------------------------------------------------------------------------
-\section{Gêmeo Digital Industrial}
-\label{sec:twin}
-
-\subsection{Conceito Fundador e Origem}
-
-O conceito de \textbf{gêmeo digital} (\textit{digital twin}) origina-se do programa Apollo da NASA, onde gêmeos idênticos de naves espaciais eram mantidos na Terra para espelhar as condições das naves em órbita, permitindo que engenheiros simulassem alternativas e assistissem os astronautas em situações críticas \cite{Boschert2016}. A ideia foi posteriormente adaptada para sistemas terrestres: na indústria aeroespacial, o conceito do \textit{Iron Bird} — uma integração física de sistemas elétricos, hidráulicos e controles de voo com layouts correspondentes aos aviões reais — representa um análogo físico-digital que permite otimização e validação de falhas em estágios iniciais de desenvolvimento \cite{Boschert2016}.
-
-Com o avanço das tecnologias de simulação e integração de dados, o conceito evoluiu para modelos totalmente digitais que acompanham o ativo físico ao longo de todo seu ciclo de vida. O \textbf{gêmeo digital industrial} moderno refere-se a uma \textit{representação digital compreensiva e funcional de um componente, produto ou sistema que inclui informações úteis em todas as fases do ciclo de vida} \cite{Boschert2016}.
-
-\subsection{Gêmeo Digital e Sistemas Cyber-Físicos}
-
-O conceito de \textbf{Sistema Cyber-Físico} (\textit{Cyber-Physical System} — CPS) designa sistemas em que componentes computacionais e físicos estão profundamente integrados, comunicando-se continuamente para que o mundo digital possa influenciar o mundo físico e vice-versa \cite{Hehenberger2016}. O CPS representa o substrato conceitual sobre o qual o gêmeo digital opera: enquanto o gêmeo digital é a representação, o CPS é a arquitetura que mantém a sincronização entre representação e realidade.
-
-\citeonline{Hehenberger2016} discutem a evolução dos sistemas mecatrônicos em direção a CPSs, identificando que o salto qualitativo não é apenas de complexidade, mas de paradigma: em um CPS, a fronteira entre o artefato físico e seu modelo digital é deliberadamente porosa, e a lógica de controle pode residir em qualquer lado dessa fronteira. Essa perspectiva é relevante para este trabalho: o laboratório TEP é um CPS prototípico em que a planta física (simulada em Rust) e o supervisor (Operator Kubernetes) coexistem em camadas distintas mas comunicantes via gRPC.
-
-\subsection{Níveis de Fidelidade}
-
-Uma taxonomia comum classifica os gêmeos digitais em três níveis de fidelidade \cite{Boschert2016}:
-\begin{enumerate}
-  \item \textbf{Modelo digital}: representação estática ou off-line, sem sincronização em tempo real com o ativo.
-  \item \textbf{\textit{Digital shadow}}: representação que recebe dados do ativo físico mas não envia comandos de volta; usada para monitoramento e diagnóstico.
-  \item \textbf{Gêmeo digital completo}: integração bidirecional — recebe dados do ativo e pode enviar atuações e comandos, formando um \textit{cyber-physical loop} que fecha sobre operação e controle.
-\end{enumerate}
-
-O laboratório desenvolvido neste trabalho implementa um gêmeo digital do tipo \textit{shadow} em transição para \textit{completo}: a planta simulada em Rust replica a dinâmica do TEP via modelo matemático de 50 EDOs, e o Operator Kubernetes atua sobre ela em um laço de controle supervisório. Embora não haja uma planta física correspondente no presente trabalho, a arquitetura é deliberadamente construída segundo o paradigma de gêmeo digital: a substituição da planta simulada por dados reais requeriria apenas a troca do endereço gRPC de destino, preservando toda a lógica supervisória.
-
-\subsection{Limite Honesto da Implementação}
-
-É importante delimitar o que foi entregue neste trabalho em relação ao espectro completo de um gêmeo digital. O laboratório TEP implementa o modelo matemático original com fidelidade, mas não inclui: modelos de degradação de equipamentos, estimação de estado baseada em dados reais, ou sincronização com um ativo físico. O sistema é mais precisamente classificado como um \textbf{simulador com interface supervisória} — um passo necessário antes de um gêmeo digital operacional, mas não equivalente a ele \cite{Boschert2016}.
-
-% -------------------------------------------------------------------------
-\section{gRPC como Protocolo de Comunicação}
-\label{sec:grpc}
-
-O gRPC é um \textit{framework} de chamada de procedimento remoto (\textit{Remote Procedure Call} — RPC) de alto desempenho desenvolvido pelo Google, baseado no protocolo HTTP/2 e no sistema de serialização \textit{Protocol Buffers} (protobuf) \cite{GRPC}. Diferentemente de alternativas baseadas em REST/JSON, o gRPC utiliza serialização binária tipada, o que reduz o tamanho das mensagens e o tempo de serialização — vantagem relevante para aplicações de automação que transmitem dados de sensores em alta frequência.
-
-A definição de um serviço gRPC é feita em um arquivo \texttt{.proto}, que especifica os métodos RPC e os tipos de mensagem de forma agnóstica à linguagem. A partir desse arquivo, o compilador \texttt{protoc} gera \textit{stubs} de cliente e servidor para as linguagens desejadas — no caso deste trabalho, Rust (biblioteca \textit{tonic}) para a planta, Go (\textit{google.golang.org/grpc}) para o operator, e Python (\textit{grpcio}) para a IHM.
-
-O gRPC suporta quatro modalidades de comunicação:
-\begin{enumerate}
-  \item \textbf{Unário}: uma requisição e uma resposta — usado para comandos pontuais (\texttt{GetPlantStatus}, \texttt{UpdateController}).
-  \item \textbf{\textit{Server streaming}}: uma requisição e um fluxo contínuo de respostas — usado para streaming de métricas (\texttt{StreamMetrics}).
-  \item \textbf{\textit{Client streaming}}: fluxo de requisições e uma resposta.
-  \item \textbf{Bidirecional}: fluxos simultâneos em ambas as direções.
-\end{enumerate}
-
-No contexto industrial, o \textit{server streaming} é particularmente adequado para a transmissão contínua de dados de processo: a IHM abre um único fluxo gRPC e recebe atualizações das 41~XMEAS e 12~XMV a cada passo de simulação, sem \textit{polling} periódico. O protocolo HTTP/2 subjacente permite múltiplos fluxos simultâneos em uma única conexão TCP, reduzindo overhead de estabelecimento de conexão.
-
-% -------------------------------------------------------------------------
-\section{OPC UA e a Família de Normas IEC~62541}
+\section{Integração e Modelagem Industrial: OPC UA e a Família IEC~62541}
 \label{sec:opcua}
+
+O diagnóstico de qualidade de malhas transformou séries temporais de processo em estados reconhecíveis --- malha saudável, malha degradada, comportamento oscilatório, condição anômala. Essa transformação é necessária, mas insuficiente. O CLPM produz indicadores sobre o comportamento das malhas; ele não modela a planta como um sistema acessível a agentes externos, nem expõe variáveis, equipamentos, alarmes e históricos em uma forma que qualquer cliente externo possa navegar e interpretar. A mesma instituição que aplica diagnóstico de malhas no sistema criogênico do LHC desenvolveu o \textit{framework} UNICOS \cite{Gayet2004} exatamente para endereçar essa lacuna: organizar a planta como uma hierarquia de objetos de controle (\textit{Process Control Objects} --- PCOs) com atributos de modo, estado e intertravamento, tornando-a acessível a sistemas supervisórios de forma estruturada. Para que uma camada supervisória possa observar o estado da planta, subscrever mudanças, consultar históricos e solicitar ações sobre equipamentos, é necessário que a planta exponha suas entidades em um modelo de informação estruturado, padronizado e independente de implementação. Esse é o problema que o OPC UA endereça.
 
 \subsection{Contexto e Motivação}
 
-Antes do OPC UA, a comunicação entre sistemas de automação industrial era dominada por protocolos proprietários e incompatíveis. O OPC clássico (OPC DA, OPC AE, OPC HDA), lançado em 1996, foi a primeira tentativa de padronização — mas era baseado em COM/DCOM da Microsoft, o que o restringia a Windows e criava barreiras de segurança e escalabilidade.
+O \textbf{OPC UA} (\textit{OPC Unified Architecture}), formalizado como família de normas internacionais \textbf{IEC~62541} \cite{IEC62541_1}, surgiu da necessidade de substituir os padrões clássicos OPC --- baseados em COM/DCOM da Microsoft, restritos ao ecossistema Windows --- por uma arquitetura independente de plataforma, orientada a serviços e com segurança nativa por criptografia de chave pública \cite{Mahnke2009intro}. A norma unifica funções antes fragmentadas em padrões distintos: acesso a dados em tempo real (DA), alarmes e eventos (AE) e acesso histórico (HDA). O elemento mais importante dessa arquitetura não é a camada de transporte --- a especificação separa explicitamente os serviços abstratos de interação cliente-servidor dos mapeamentos concretos de comunicação \cite{Mahnke2009services} --- mas o \textbf{modelo de informação}: o OPC UA define como entidades industriais são representadas, organizadas e expostas, não apenas como são transportadas.
 
-O \textbf{OPC UA} (\textit{OPC Unified Architecture}), desenvolvido pela OPC Foundation a partir de 2006 e formalizado como família de normas internacionais \textbf{IEC~62541} \cite{IEC62541_1}, representa uma ruptura com esse modelo: é independente de plataforma e sistema operacional, orientado a serviços, com modelo de segurança nativo baseado em criptografia de chave pública (X.509) e transportável sobre qualquer rede IP \cite{Mahnke2009intro}. A norma unifica os padrões clássicos — acesso a dados em tempo real (DA), alarmes e eventos (AE) e acesso histórico (HDA) — em uma arquitetura coesa e extensível.
+\subsection{Espaço de Endereçamento e Modelo de Informação}
 
-\subsection{Arquitetura}
-
-A arquitetura do OPC UA é centrada no conceito de \textbf{espaço de endereçamento} (\textit{Address Space}): um grafo de nós (\textit{Nodes}) interconectados por referências tipadas (\textit{References}), que representa de forma uniforme todos os dados, metadados, métodos e eventos expostos por um servidor \cite{Mahnke2009arch}. Cada nó possui uma classe (\textit{NodeClass}) que define seu papel:
+O conceito central da IEC~62541-3 \cite{IEC62541_3} é o \textbf{espaço de endereçamento} (\textit{Address Space}): uma estrutura de nós (\textit{Nodes}) interconectados por referências tipadas (\textit{References}), que organiza de forma uniforme todos os dados, metadados, métodos e eventos expostos por um servidor OPC UA. Cada nó possui uma classe (\textit{NodeClass}) que define seu papel:
 
 \begin{itemize}
-  \item \textbf{Object}: representa entidades do mundo real (e.g., um reator, um sensor).
-  \item \textbf{Variable}: armazena um valor escalar ou estruturado com timestamp, qualidade e tipo de dado.
-  \item \textbf{Method}: define uma operação executável (e.g., ligar uma bomba).
-  \item \textbf{ObjectType / VariableType}: tipos reutilizáveis que definem modelos de informação.
+  \item \textbf{Object}: representa uma entidade industrial (e.g., reator, malha de controle, compressor).
+  \item \textbf{Variable}: expõe um valor observável com \textit{timestamp}, qualidade e tipo de dado.
+  \item \textbf{Method}: define uma operação invocável por clientes autorizados.
+  \item \textbf{ObjectType / VariableType}: tipos reutilizáveis que permitem modelar entidades de domínio.
 \end{itemize}
 
-Um cliente OPC UA navega o espaço de endereçamento usando o serviço \texttt{Browse}, lê e escreve valores com \texttt{Read}/\texttt{Write}, e recebe notificações de mudança via \texttt{Subscription}/\texttt{MonitoredItem} \cite{Mahnke2009services}. O servidor publica atualizações periodicamente apenas quando o valor monitorado muda além de um limiar configurável (\textit{DeadBand}), reduzindo tráfego de rede desnecessário.
+Essa estrutura transforma a planta de uma coleção plana de \textit{tags} numéricas para um \textbf{modelo de informação navegável}: um cliente externo pode descobrir a hierarquia do servidor com o serviço \texttt{Browse}, ler atributos e valores com \texttt{Read}, escrever variáveis autorizadas com \texttt{Write}, subscrever mudanças de valor e eventos com \texttt{Subscription}/\texttt{MonitoredItems}, e invocar operações com \texttt{Call} --- tudo por serviços padronizados, independentes da implementação interna do servidor \cite{Mahnke2009services}. Um cliente OPC UA não precisa conhecer previamente os detalhes de implementação do servidor; ele descobre a estrutura navegando o espaço de endereçamento e acessando os metadados associados a cada nó.
+
+\begin{figure}[htbp]
+\centering
+\missingfigure[figwidth=0.88\textwidth]{Diagrama do espaço de endereçamento OPC UA aplicado ao TEP: grafo de nós e referências tipadas. Nó raiz \texttt{TEP\_Plant} (Object) com filhos \texttt{Reactor} (Object), \texttt{Compressor} (Object), \texttt{ControlLoop\_001} (Object); cada objeto com filhos do tipo Variable (e.g., \texttt{Pressure}: AnalogItemType, \texttt{Temperature}: AnalogItemType) e Method (e.g., \texttt{ApplyDisturbance}). Referências tipadas: \texttt{HasComponent}, \texttt{HasProperty}, \texttt{HasTypeDefinition}. Contraste com lista plana de tags à esquerda para evidenciar a diferença. Baseado em \citeauthor{IEC62541_3} (\citeyear{IEC62541_3}).}
+\caption{Espaço de endereçamento OPC UA: a planta como grafo navegável de objetos tipados.}
+\label{fig:opcua_addressspace}
+\end{figure}
 
 \subsection{Família de Normas IEC~62541}
 
-A IEC~62541 é composta por 14 partes, cada uma cobrindo um aspecto distinto da especificação. A Tabela~\ref{tab:iec62541} apresenta as partes mais relevantes para este trabalho.
+A IEC~62541 é composta por múltiplas partes, cada uma cobrindo um aspecto distinto da especificação. A Tabela~\ref{tab:iec62541} apresenta as partes mais relevantes para este trabalho.
 
 \begin{table}[ht!]
 \centering
@@ -233,64 +325,51 @@ A IEC~62541 é composta por 14 partes, cada uma cobrindo um aspecto distinto da 
 \hline
 1 & Visão Geral e Conceitos & Fundamentos, terminologia e motivação do padrão & 2009, 2025 \\
 \hline
-3 & Modelo do Espaço de End. & Nós, referências, navegação — base de todo modelo de informação \cite{IEC62541_3} & 2010, 2020, 2025 \\
+3 & Modelo do Espaço de End. & Nós, referências, navegação --- base de todo modelo de informação \cite{IEC62541_3} & 2010, 2020, 2025 \\
 \hline
-4 & Serviços & API completa do servidor: Read, Write, Browse, Subscribe, Call & 2010, 2020 \\
+4 & Serviços & Serviços abstratos cliente-servidor: Browse, Read, Write, Subscribe, Call & 2010, 2020 \\
 \hline
-8 & Acesso a Dados & Variáveis analógicas com unidade de engenharia, faixa e qualidade — expor XMEAS/XMV \cite{IEC62541_8} & 2011, 2020, 2025 \\
+8 & Acesso a Dados & Tipos de variáveis de processo: \texttt{AnalogItemType}, \texttt{DiscreteItemType}, unidade, faixa, qualidade \cite{IEC62541_8} & 2011, 2020, 2025 \\
 \hline
-9 & Alarmes e Condições & Modelo de alarmes: estados, reconhecimento, supressão — mapeável aos ISDs do TEP & 2012, 2020 \\
+9 & Alarmes e Condições & Modelo de alarmes e condições operacionais; estados, reconhecimento, limites e interlocks & 2012, 2020 \\
 \hline
 11 & Acesso Histórico & Séries temporais: leitura e agregação de dados históricos & 2015, 2020 \\
 \hline
-14 & PubSub & Publish-subscribe sobre MQTT/AMQP/UDP — complemento IIoT & 2020, 2026 \\
+14 & PubSub & Publish-subscribe sobre MQTT/AMQP/UDP --- complemento IIoT & 2020, 2026 \\
 \hline
 \end{tabular}
 \fonte{Elaborado pelo autor com base em \citeonline{IEC62541_1} e \citeonline{Mahnke2009intro}.}
 \end{table}
 
-A \textbf{Parte~8 (Acesso a Dados)} \cite{IEC62541_8} é a mais relevante para expor variáveis de processo: o tipo \texttt{AnalogItemType} encapsula um valor numérico com sua unidade de engenharia, faixa operacional e faixa instrumental — metadados que as XMEAS do TEP possuem intrinsecamente (XMEAS$_7$, por exemplo, é pressão em kPa com faixa operacional definida). A qualidade (\textit{Bad}/\textit{Uncertain}/\textit{Good}) associada a cada leitura permite que clientes OPC UA tomem decisões com base na confiabilidade dos dados.
+A \textbf{Parte~8 (Acesso a Dados)} \cite{IEC62541_8} é particularmente relevante para expor variáveis de processo. Ela define o tipo \texttt{DataItemType} como base para dados vivos de automação, a partir do qual derivam três famílias: \texttt{AnalogItemType}, para grandezas contínuas com unidade de engenharia (\textit{EngineeringUnits}), faixa operacional (\textit{EURange}) e faixa instrumental (\textit{InstrumentRange}); \texttt{DiscreteItemType}, para estados discretos como modos operacionais ou sinalizadores; e \texttt{ArrayItemType}, para dados estruturados como espectros ou janelas de histórico. Cada leitura OPC UA carrega um \textit{StatusCode} (\textit{Good}/\textit{Uncertain}/\textit{Bad}) e \textit{timestamp}, permitindo que clientes distingam valor numérico de confiabilidade da medição. As medições contínuas do TEP podem ser mapeadas conceitualmente a variáveis do tipo \texttt{AnalogItemType}, preservando unidade de engenharia e faixa operacional; medições provenientes de analisadores amostrados, com atraso inerente, requerem metadados temporais adicionais.
 
-\subsection{Integração Empresarial e o Modelo Purdue — IEC~62264}
+\subsection{Arquitetura de Sistema}
 
-A norma \textbf{IEC~62264} \cite{IEC62264} (\textit{Enterprise-Control System Integration}) define modelos e terminologia para integração entre sistemas de gestão empresarial (Nível~4 — ERP) e sistemas de controle de manufatura (Níveis~0 a~3). O modelo de referência hierárquico da IEC~62264 — derivado do Modelo Purdue — organiza as funções de controle em camadas com responsabilidades e horizontes temporais distintos, alinhando-se à hierarquia de Skogestad descrita na Seção~\ref{sec:plantwide}.
+A arquitetura de sistema do OPC UA é projetada para operar em múltiplas camadas industriais, de dispositivos de campo até sistemas corporativos \cite{Mahnke2009arch}. O padrão básico é cliente-servidor: um cliente consome serviços oferecidos por um servidor. Para cenários com múltiplas fontes de informação, a norma descreve o padrão \textbf{Aggregating Server}: um servidor intermediário que incorpora um cliente OPC UA interno e consulta múltiplos servidores subjacentes, processando ou preparando os dados recebidos antes de devolvê-los ao cliente solicitante \cite{Mahnke2009arch}. Para uma camada supervisória que precisa consolidar variáveis de processo, diagnósticos de malha e restrições operacionais em um estado de mais alto nível, esse padrão oferece uma referência arquitetural importante: o orquestrador não precisa consumir diretamente cada sinal cru da planta, mas pode operar sobre um estado consolidado produzido por uma camada intermediária. O mecanismo de \textbf{Discovery} complementa essa arquitetura ao permitir que clientes localizem servidores disponíveis sem conhecer previamente todos os \textit{endpoints}, reduzindo o acoplamento entre os componentes do sistema.
+
+\subsection{Integração Empresarial e o Domínio MOM --- IEC~62264}
+
+A norma \textbf{IEC~62264} \cite{IEC62264} (\textit{Enterprise-Control System Integration}) organiza as funções industriais em níveis hierárquicos derivados do Modelo Purdue. O Nível~3 é o domínio do \textit{Manufacturing Operations Management} (MOM): monitoramento de processos, gestão de produção, qualidade, manutenção e desempenho operacional. A norma organiza a informação desse domínio em quatro categorias: \textit{schedule} (o que deve ser executado), \textit{performance} (o que foi realizado), \textit{definition} (como executar) e \textit{capability} (quais recursos estão disponíveis) \cite{IEC62264}. Essa estrutura é relevante para o projeto porque posiciona a camada supervisória proposta no Nível~3 --- acima do controle regulatório direto (Níveis~0 a~2) --- e porque aproxima a lógica industrial da lógica declarativa: a distinção entre o que deve ser feito (\textit{schedule}/\textit{definition}) e o que está sendo feito e o que é viável (\textit{performance}/\textit{capability}) guarda semelhança estrutural com a separação entre estado desejado e estado observado que fundamenta a reconciliação supervisória.
+
+\begin{figure}[htbp]
+\centering
+\missingfigure[figwidth=0.75\textwidth]{Pirâmide de automação IEC~62264: Nível~0 (processo físico), Nível~1 (sensores/atuadores), Nível~2 (controle regulatório --- PIDs), Nível~3 (MOM --- supervisor K8s-CPS proposto, com as quatro categorias: \textit{schedule}/\textit{definition}/\textit{performance}/\textit{capability}), Nível~4 (ERP). Seta lateral indicando o alcance vertical do OPC UA (Níveis~0 ao~4). Baseado em \citeauthor{IEC62264} (\citeyear{IEC62264}) e \citeauthor{Mahnke2009intro} (\citeyear{Mahnke2009intro}).}
+\caption{Hierarquia IEC~62264: posicionamento do supervisor proposto no Nível~3 (MOM) e alcance vertical do OPC UA.}
+\label{fig:iec62264_pyramid}
+\end{figure}
 
 \subsection{OPC UA no Contexto deste Trabalho}
 
-A comunicação interna do laboratório foi implementada com gRPC por suas vantagens de desempenho e integração nativa com Rust, Go e Python. No entanto, o gRPC é um protocolo interno — não é reconhecido por sistemas SCADA, CLPs ou ferramentas de terceiros. O OPC UA, por sua vez, é o protocolo de interoperabilidade industrial adotado por praticamente todos os fabricantes relevantes e normalizado pela IEC~62541.
-
-A integração futura prevista envolve expor a planta TEP como um servidor OPC UA, mapeando as 41~XMEAS como variáveis \texttt{AnalogItemType} (Parte~8) e os distúrbios IDV como métodos invocáveis (Parte~4). Isso permitiria: (a) conectar controladores reais ao gêmeo digital via OPC UA, substituindo o \texttt{ControllerBank} interno; (b) integrar ferramentas de diagnóstico baseadas em OPC UA para cálculo do Índice de Preditividade; e (c) arquivar os dados de experimentos como séries históricas acessíveis via Parte~11.
+No âmbito deste referencial, o OPC UA e a IEC~62541 ocupam um papel específico: fornecem a linguagem padronizada pela qual a planta se torna um modelo de informação acessível a agentes externos. O CLPM define \textit{o que} observar; o OPC UA define \textit{como} esses observáveis são expostos em uma estrutura navegável, tipada e semanticamente organizada. A camada supervisória pode então operar sobre estados industriais interpretáveis --- em vez de sinais brutos --- sem assumir o papel de controlador regulatório da planta. A implementação concreta dessa interface, incluindo as decisões de mapeamento das variáveis do TEP e os mecanismos de comunicação adotados, é tratada nos capítulos subsequentes.
 
 % -------------------------------------------------------------------------
-\section{Integração Numérica por Runge-Kutta de 4ª Ordem}
-\label{sec:rk4}
 
-A simulação dinâmica do TEP requer a integração numérica de um sistema de 50~EDOs da forma:
-
-\begin{equation}
-  \frac{d\mathbf{y}}{dt} = f(\mathbf{y}, \mathbf{u}, t)
-  \label{eq:ode}
-\end{equation}
-
-\noindent onde $\mathbf{y} \in \mathbb{R}^{50}$ é o vetor de estado, $\mathbf{u} \in \mathbb{R}^{12}$ é o vetor de variáveis manipuladas e $f$ é a função de dinâmica da planta — altamente não-linear, com acoplamentos termodinâmicos e de transferência de massa.
-
-O método de \textbf{Runge-Kutta de 4ª ordem} (RK4) é o integrador clássico para EDOs de valores iniciais com dinâmica suave. Para um passo de tempo $h$, a atualização do estado é:
-
-\begin{align}
-  k_1 &= h \cdot f(\mathbf{y}_n, t_n) \nonumber \\
-  k_2 &= h \cdot f\!\left(\mathbf{y}_n + \tfrac{k_1}{2},\; t_n + \tfrac{h}{2}\right) \nonumber \\
-  k_3 &= h \cdot f\!\left(\mathbf{y}_n + \tfrac{k_2}{2},\; t_n + \tfrac{h}{2}\right) \nonumber \\
-  k_4 &= h \cdot f(\mathbf{y}_n + k_3,\; t_n + h) \nonumber \\
-  \mathbf{y}_{n+1} &= \mathbf{y}_n + \tfrac{1}{6}(k_1 + 2k_2 + 2k_3 + k_4)
-  \label{eq:rk4}
-\end{align}
-
-O RK4 possui erro local de truncamento de ordem $\mathcal{O}(h^5)$ e erro global de ordem $\mathcal{O}(h^4)$. Para o TEP, o modelo original especifica $dt = 0{,}001$~h como passo de integração padrão, valor que garante estabilidade numérica para a dinâmica mais rápida do sistema \cite{DOWNS1993}.
-
-A norma dos derivativos $\|\mathbf{f}(\mathbf{y}, t)\|_\infty$ — denominada \texttt{deriv\_norm} na implementação — serve como indicador de saúde numérica da simulação: valores excessivamente altos indicam instabilidade iminente; valores estabilizados em patamar baixo indicam operação próxima ao estado estacionário.
-
-% -------------------------------------------------------------------------
 \section{Considerações Finais}
 \label{sec:ref_conclusao}
 
-A revisão apresentada fundamenta as escolhas tecnológicas do trabalho segundo a cadeia argumentativa do Big Picture: o TEP provê o problema que força a pergunta sobre supervisão; o controle plant-wide (Skogestad, Larsson) fornece a teoria da resposta; o diagnóstico de malhas (Harris, Bradu) define o que o supervisor deve observar; a analogia cloud-native (Shuiguang, Burns) e os precedentes industriais (Johansson, Mellado) mostram que a abordagem é viável; o IEC~61499 formaliza o modelo de dispositivo sobre o qual o Operator opera; o gêmeo digital enquadra o laboratório como arquitetura válida para investigação de orquestração industrial; e o gRPC e o OPC UA (IEC~62541) formalizam as interfaces entre os subsistemas. Os capítulos seguintes descrevem como esses elementos foram combinados na prova de conceito.
+A revisão apresentada fundamenta as escolhas tecnológicas do trabalho segundo uma cadeia argumentativa coerente. O TEP provê o problema que força a pergunta sobre supervisão; o controle plant-wide (Skogestad, Larsson) fornece a teoria da resposta hierárquica; o diagnóstico de qualidade de malhas (Harris, Bradu) define o que o supervisor deve observar e em que termos; a analogia cloud-native (Shuiguang, Burns) e os precedentes industriais (Johansson, Mellado) mostram que o paradigma é viável para automação industrial; e o OPC UA (IEC~62541), com o enquadramento normativo da IEC~62264, define como a planta se torna um modelo de informação padronizado e acessível à camada de orquestração.
+
+Para colocar essa arquitetura à prova, é necessário que o TEP deixe de operar como uma simulação em lote e passe a funcionar como um processo virtual contínuo, expondo sinais em tempo real e respondendo a comandos externos --- uma \textbf{simulação online}. Essa distinção carrega uma consequência conceitual importante: o TEP não existe como planta física. O conceito de gêmeo digital pressupõe uma contrapartida física sendo modelada e monitorada em tempo real \cite{Boschert2016}; no caso do TEP, não há planta real para espelhar --- o modelo executável é, ele mesmo, a referência do experimento. Chamar essa simulação de gêmeo digital seria conceitualmente impreciso: faltaria o objeto sendo geminado.
+
+O que se configura é, portanto, um \textbf{ambiente experimental cyber-físico}. Sistemas Cyber-Físicos (CPS, \textit{Cyber-Physical Systems}) são caracterizados pela integração entre computação, redes e processos físicos, com ciclos contínuos de observação, decisão e atuação \cite{Hehenberger2016}. Neste trabalho, entretanto, a planta Tennessee Eastman não constitui uma instalação física real, mas uma planta virtual executada de forma contínua. A dimensão física do experimento está nos componentes reais de controle e comunicação eventualmente acoplados ao sistema, como CLPs, redes industriais e dispositivos de supervisão; a dimensão computacional está no modelo executável do TEP, nos serviços de diagnóstico, na orquestração e no modelo de informação. A fronteira entre essas dimensões --- mediada por sinais, comandos, estados observáveis, métricas de desempenho e, futuramente, por OPC UA --- constitui o objeto central de investigação deste trabalho.
+Os capítulos seguintes descrevem como esse ambiente foi construído e instrumentado: a arquitetura do simulador online do TEP, a implementação dos serviços de diagnóstico e do modelo de informação, e os experimentos realizados para avaliar a camada supervisória sob condições de perturbação e degradação de malhas.

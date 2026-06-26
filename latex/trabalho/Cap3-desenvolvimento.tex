@@ -23,7 +23,12 @@ O fluxo de dados é o seguinte:
 
 A planta avança o tempo simulado via integração RK4 (dt = 0,001~h/passo) e publica continuamente o vetor de medidas. O operator lê essas medidas a cada ciclo de reconciliação, avalia se as variáveis de processo estão dentro das faixas declaradas no CRD \texttt{PLCMachine}, e chama \texttt{UpdateController} quando necessário para ajustar setpoints ou ganhos dos controladores. A IHM consome o mesmo fluxo gRPC e transmite as medidas ao navegador via WebSocket, permitindo visualização em tempo real sem intervenção no laço de controle.
 
-\todo[inline]{Inserir figura: diagrama de arquitetura com os quatro componentes, conexões gRPC/WebSocket e camadas.}
+\begin{figure}[htbp]
+\centering
+\missingfigure[figwidth=0.92\textwidth]{Diagrama de arquitetura do laboratório TEP-CPS: quatro componentes (\texttt{tep-plant}, \texttt{tep-operator}, \texttt{tep-ihm}, \texttt{tep-supervisor}) distribuídos em três camadas (campo, supervisão, monitoramento). Conexões: \texttt{tep-plant} → \texttt{tep-ihm} via gRPC \texttt{StreamMetrics} (streaming); \texttt{tep-operator} → \texttt{tep-plant} via gRPC \texttt{UpdateController} (bidirecional de controle); \texttt{tep-ihm} → navegador via WebSocket. Indica o fluxo de dados unidirecional e destaca que o operator não conhece a IHM e a planta não conhece nenhum dos dois.}
+\caption{Arquitetura do laboratório TEP-CPS: componentes, camadas e protocolos de comunicação.}
+\label{fig:arch_overview}
+\end{figure}
 
 A separação de responsabilidades é deliberada e oferece vantagens arquiteturais: o simulador não conhece o operator nem a IHM; o operator não conhece a IHM; a comunicação é unidirecional exceto pelo canal de controle (UpdateController). Isso permite substituir qualquer componente — por exemplo, trocar o simulador Rust por dados de uma planta física — sem alterar os demais.
 
@@ -59,7 +64,7 @@ O tempo simulado avança a 100× a velocidade real (1~h simulada por 36~s de rel
 
 A camada de controle é baseada na trait \texttt{Controller}:
 
-\begin{lstlisting}[language=Rust, caption={Trait Controller e ControllerBank (tep-plant)}]
+\begin{lstlisting}[language=Rust, float=htbp, label={lst:controllerbank}, caption={Trait \texttt{Controller} e \texttt{ControllerBank} (\texttt{tep-plant})}]
 pub trait Controller: Send {
     fn step(&mut self, xmeas: &[f64], xmv: &mut [f64]);
 }
@@ -78,7 +83,7 @@ impl ControllerBank {
 
 Essa abstração separa o modelo da planta da lógica de controle, tornando o \texttt{runtime.rs} agnóstico ao tipo e quantidade de controladores. A implementação concreta \texttt{PController} realiza controle proporcional:
 
-\begin{lstlisting}[language=Rust, caption={Controlador Proporcional (tep-plant)}]
+\begin{lstlisting}[language=Rust, float=htbp, label={lst:pcontroller}, caption={Controlador Proporcional (\texttt{PController}) --- \texttt{tep-plant}}]
 pub struct PController {
     pub xmeas_idx: usize,
     pub xmv_idx:   usize,
@@ -146,7 +151,7 @@ Seu \textit{status} armazena:
 
 Um exemplo de manifest \texttt{PLCMachine} para o baseline TEP é apresentado no Código~\ref{lst:plcmachine}:
 
-\begin{lstlisting}[language=yaml, caption={Manifest PLCMachine para o baseline TEP}, label={lst:plcmachine}]
+\begin{lstlisting}[language=yaml, float=htbp, caption={Manifest \texttt{PLCMachine} para o baseline TEP}, label={lst:plcmachine}]
 apiVersion: infrastructure.tep.io/v1alpha1
 kind: PLCMachine
 metadata:
@@ -217,7 +222,12 @@ A interface web do dashboard foi desenvolvida seguindo as diretrizes da norma IS
   \item \textbf{Status do PLCMachine}: exibe o estado atual do CRD via chamada ao API Server do Kubernetes (fase, última reconciliação, variáveis monitoradas).
 \end{itemize}
 
-\todo[inline]{Inserir figura: captura de tela do dashboard da IHM com os painéis principais.}
+\begin{figure}[htbp]
+\centering
+\missingfigure[figwidth=0.92\textwidth]{Captura de tela do dashboard da IHM em operação: painel SVG da planta (superior esquerdo) com os cinco subsistemas e indicação visual de alarmes; gráficos de tendência das variáveis XMEAS$_7$ (pressão do reator), XMEAS$_9$ (temperatura do reator), XMEAS$_{12}$ (nível do separador) e XMEAS$_{15}$ (nível do stripper) renderizados via ECharts; painel de controladores com valores atuais de XMV e setpoints; botões de ativação/desativação dos IDV$_1$--IDV$_{20}$; painel de status do PLCMachine com fase operacional, timestamp da última reconciliação e estado das variáveis monitoradas.}
+\caption{Dashboard da Interface Homem-Máquina (IHM): monitoramento em tempo real do TEP.}
+\label{fig:ihm_dashboard}
+\end{figure}
 
 \subsection{Registro de Dados (CSV)}
 

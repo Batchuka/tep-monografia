@@ -1,4 +1,8 @@
 {
+  "latex-workshop.formatting.latex": "latexindent",
+  "latex-workshop.formatting.latexindent.args": ["-c", "%DIR%", "%TMPFILE%", "-m", "-l", "c:/Projetos/tep/Monografia/latexindent.yaml"],
+  "latex-workshop.bibtex-format.align-equal.enabled": true,
+  "editor.wordWrap": "on",
   "files.exclude": {
     "**/*.aux": true,
     "**/*.bbl": true,

@@ -1,0 +1,4 @@
+modifyLineBreaks:
+  textWrapOptions:
+    columns: 100
+    huge: overflow

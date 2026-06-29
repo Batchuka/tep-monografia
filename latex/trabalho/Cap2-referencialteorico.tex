@@ -12,9 +12,9 @@ O Processo Tennessee Eastman (\textit{Tennessee Eastman Process} — TEP) é um 
 A planta consiste em cinco unidades de processo interconectadas: um reator, um condensador, um separador de vapor-líquido (\textit{flash separator}), um compressor e uma coluna de \textit{stripping}. Quatro reagentes (A, B, C, D) são alimentados ao reator, onde ocorrem três reações:
 
 \begin{align}
-  A + C + D &\rightarrow G \quad (\text{produto líquido}) \label{eq:rx1} \\
-  A + C + E &\rightarrow H \quad (\text{produto líquido}) \label{eq:rx2} \\
-  A + E     &\rightarrow F \quad (\text{subproduto gasoso}) \label{eq:rx3}
+	A + C + D & \rightarrow G \quad (\text{produto líquido}) \label{eq:rx1}   \\
+	A + C + E & \rightarrow H \quad (\text{produto líquido}) \label{eq:rx2}   \\
+	A + E     & \rightarrow F \quad (\text{subproduto gasoso}) \label{eq:rx3}
 \end{align}
 
 O componente B é inerte e não participa das reações. Os produtos G e H são os produtos desejados; F é um subproduto indesejado. As reações são exotérmicas, e a temperatura do reator é controlada indiretamente pela água de resfriamento (\textit{cooling water} — CW).
@@ -28,10 +28,10 @@ O modelo inclui 20 distúrbios programados (IDV$_1$ a IDV$_{20}$) que simulam ev
 A relevância do TEP como \textit{benchmark} decorre de sua riqueza dinâmica: o modelo combina não-linearidades, acoplamentos entre malhas de controle, laços de reciclo com elevada constante de tempo e perturbações com mecanismos físicos distintos. Essas características tornam o TEP um ambiente adequado para avaliar arquiteturas de controle supervisório — em especial aquelas que dependem de comunicação distribuída e coordenação entre componentes heterogêneos, como a arquitetura proposta neste trabalho.
 
 \begin{figure}[htbp]
-\centering
-\missingfigure[figwidth=0.92\textwidth]{Diagrama de processo do TEP: cinco unidades interconectadas (reator, condensador, separador flash, compressor, coluna de stripping) com indicação das correntes de alimentação (A, B, C, D/E), produtos (G, H) e subproduto (F), pontos de medição XMEAS e variáveis manipuladas XMV, e agua de resfriamento do reator. Baseado na Figura~1 de \citeauthor{DOWNS1993} (\citeyear{DOWNS1993}).}
-\caption{Fluxograma esquemático do Processo Tennessee Eastman.}
-\label{fig:tep_flowsheet}
+	\centering
+	\missingfigure[figwidth=0.92\textwidth]{Diagrama de processo do TEP: cinco unidades interconectadas (reator, condensador, separador flash, compressor, coluna de stripping) com indicação das correntes de alimentação (A, B, C, D/E), produtos (G, H) e subproduto (F), pontos de medição XMEAS e variáveis manipuladas XMV, e agua de resfriamento do reator. Baseado na Figura~1 de \citeauthor{DOWNS1993} (\citeyear{DOWNS1993}).}
+	\caption{Fluxograma esquemático do Processo Tennessee Eastman.}
+	\label{fig:tep_flowsheet}
 \end{figure}
 
 % -------------------------------------------------------------------------
@@ -39,11 +39,34 @@ A relevância do TEP como \textit{benchmark} decorre de sua riqueza dinâmica: o
 \section{Controle Plant-Wide}
 \label{sec:plantwide}
 
-O TEP descreve com precisão \textit{o quê} uma planta complexa expõe: 41 variáveis medidas, 12 variáveis manipuladas, laços de reciclo acoplados e 20 perturbações programadas. O que o modelo não responde é \textit{como} estruturar o controle para lidar com essa complexidade — quais variáveis controlar, quais manipular, como parear entradas e saídas, e como coordenar os objetivos de operação em escala de planta. Essa é uma questão de projeto, não de sintonia.
+O TEP descreve com precisão \textit{o quê} uma planta complexa expõe: 41 variáveis medidas,
+12 variáveis manipuladas, laços de reciclo acoplados e 20 perturbações programadas.
+O que o modelo não responde é \textit{como} estruturar o controle para lidar com essa
+complexidade — quais variáveis controlar, quais manipular, como parear entradas e saídas,
+e como coordenar os objetivos de operação em escala de planta.
+Essa é uma questão de projeto, não de sintonia.
 
-Em plantas de processo contínuo, malhas de controle locais são necessárias, mas insuficientes para garantir desempenho econômico e coordenação global. Cada controlador PID regula uma variável de seu subsistema imediato, mas é incapaz de perceber os efeitos que suas ações propagam ao longo da planta por meio de reciclos, transferências de massa e acoplamentos termodinâmicos. A consequência é que perturbações de grande amplitude podem atravessar toda a cadeia de processo e provocar perda econômica, saturação de variáveis, oscilações sustentadas ou degradação de qualidade em pontos distantes da origem, sem que nenhum controlador local tenha autoridade para reagir \cite{Larsson2000}.
+Em plantas de processo contínuo, malhas de controle locais são necessárias, mas insuficientes
+para garantir desempenho econômico e coordenação global.
+Cada controlador PID regula uma variável de seu subsistema imediato, mas é incapaz de perceber
+os efeitos que suas ações propagam ao longo da planta por meio de reciclos, transferências de
+massa e acoplamentos termodinâmicos.
+A consequência é que perturbações de grande amplitude podem atravessar toda a cadeia de processo
+e provocar perda econômica, saturação de variáveis, oscilações sustentadas ou degradação de
+qualidade em pontos distantes da origem, sem que nenhum controlador local tenha autoridade
+para reagir \cite{Larsson2000}.
 
-O problema não é de sintonia: cada PID pode estar corretamente ajustado para seu subsistema imediato e, ainda assim, o conjunto falhar como sistema integrado. \citeonline{Larsson2000} revisam a literatura e identificam cinco tarefas estruturais que qualquer estratégia de supervisão deve endereçar: (i)~seleção de variáveis controladas (quais saídas manter no setpoint); (ii)~seleção de variáveis manipuladas (quais entradas usar para cada objetivo); (iii)~seleção de medições (quais variáveis medir para fechar as malhas); (iv)~seleção da configuração de controle (como parear variáveis controladas e manipuladas); e (v)~seleção do tipo de controlador (estrutura e grau de descentralização). A ausência de uma resposta sistemática a essas perguntas é, segundo os autores, a principal causa de estratégias de controle que funcionam individualmente mas falham quando integradas.
+O problema não é de sintonia: cada PID pode estar corretamente ajustado para seu subsistema
+imediato e, ainda assim, o conjunto falhar como sistema integrado.
+\citeonline{Larsson2000} revisam a literatura e identificam cinco tarefas estruturais que
+qualquer estratégia de supervisão deve endereçar:
+(i)~seleção de variáveis controladas (quais saídas manter no setpoint);
+(ii)~seleção de variáveis manipuladas (quais entradas usar para cada objetivo);
+(iii)~seleção de medições (quais variáveis medir para fechar as malhas);
+(iv)~seleção da configuração de controle (como parear variáveis controladas e manipuladas); e
+(v)~seleção do tipo de controlador (estrutura e grau de descentralização).
+A ausência de uma resposta sistemática a essas perguntas é, segundo os autores, a principal
+causa de estratégias de controle que funcionam individualmente mas falham quando integradas.
 
 \subsection{Função de custo como ponto de partida}
 
@@ -54,10 +77,10 @@ composição na purga torna-se arbitrária — uma questão de opinião ou conve
 Idealmente, esses objetivos devem ser combinados em uma função de custo escalar $J$ a ser minimizada:
 
 \begin{quote}
-\textit{``The operational objectives must be clearly defined before attempting to design a control
-system. Although this seems obvious, this step is frequently overlooked. Preferably, the operational
-objectives should be combined into a scalar cost function J to be minimized. In many cases, J may be
-simply selected as the operational cost.''} \cite{Skogestad2004}
+	\textit{``The operational objectives must be clearly defined before attempting to design a control
+		system. Although this seems obvious, this step is frequently overlooked. Preferably, the operational
+		objectives should be combined into a scalar cost function J to be minimized. In many cases, J may be
+		simply selected as the operational cost.''} \cite{Skogestad2004}
 \end{quote}
 
 O artigo original de \citeonline{DOWNS1993} fornece exatamente essa função de custo para o TEP,
@@ -70,12 +93,12 @@ vapor. A representação abaixo sintetiza essa estrutura — mas não deve ser e
 literal dos termos da Tabela~9:
 
 \begin{equation}
-  J = c_{\mathrm{purga}} \cdot \dot{m}_{\mathrm{purga}}
-    + c_{\mathrm{prod}} \cdot \dot{m}_{\mathrm{MP,prod}}
-    + c_F \cdot \dot{m}_F
-    + c_{\mathrm{comp}} \cdot W_{\mathrm{comp}}
-    + c_{\mathrm{vapor}} \cdot \dot{Q}_{\mathrm{vapor}}
-  \label{eq:tep_cost}
+	J = c_{\mathrm{purga}} \cdot \dot{m}_{\mathrm{purga}}
+	+ c_{\mathrm{prod}} \cdot \dot{m}_{\mathrm{MP,prod}}
+	+ c_F \cdot \dot{m}_F
+	+ c_{\mathrm{comp}} \cdot W_{\mathrm{comp}}
+	+ c_{\mathrm{vapor}} \cdot \dot{Q}_{\mathrm{vapor}}
+	\label{eq:tep_cost}
 \end{equation}
 
 \noindent onde cada termo representa, respectivamente: custo das matérias-primas perdidas na purga,
@@ -93,15 +116,15 @@ e ruído, mantém $J$ mais próximo do seu valor ótimo $J^*$.
 camadas separadas por escala de tempo:
 
 \begin{enumerate}
-  \item \textbf{Controle regulatório}: malhas PID locais que estabilizam variáveis de processo em
-        torno de um ponto de operação. Esse nível opera em escala de segundos a minutos e não possui
-        visão global da planta.
-  \item \textbf{Controle supervisório}: coordenação das malhas regulatórias via ajuste de setpoints
-        e ativação/desativação de malhas, operando em escala de minutos a horas. Esse é o nível que
-        reage a perturbações que transcendem os limites de uma única malha local.
-  \item \textbf{Otimização em tempo real} (\textit{Real-Time Optimization} --- RTO): recálculo dos
-        setpoints ótimos das variáveis primárias com base nas condições econômicas vigentes e nas
-        restrições ativas, operando em escala de horas a dias.
+	\item \textbf{Controle regulatório}: malhas PID locais que estabilizam variáveis de processo em
+	      torno de um ponto de operação. Esse nível opera em escala de segundos a minutos e não possui
+	      visão global da planta.
+	\item \textbf{Controle supervisório}: coordenação das malhas regulatórias via ajuste de setpoints
+	      e ativação/desativação de malhas, operando em escala de minutos a horas. Esse é o nível que
+	      reage a perturbações que transcendem os limites de uma única malha local.
+	\item \textbf{Otimização em tempo real} (\textit{Real-Time Optimization} --- RTO): recálculo dos
+	      setpoints ótimos das variáveis primárias com base nas condições econômicas vigentes e nas
+	      restrições ativas, operando em escala de horas a dias.
 \end{enumerate}
 
 A separação em camadas é justificada não apenas pela diferença de escala de tempo, mas pela
@@ -112,10 +135,10 @@ otimização estacionária para determinar os setpoints ótimos que a camada sup
 \cite{Skogestad2004}.
 
 \begin{figure}[htbp]
-\centering
-\missingfigure[figwidth=0.80\textwidth]{Hierarquia de controle plant-wide de Skogestad (3 camadas verticais): base = controle regulatório (malhas PID, escala de segundos a minutos); meio = controle supervisório (ajuste de setpoints e modos, escala de minutos a horas); topo = otimização em tempo real --- RTO (recálculo de setpoints ótimos via minimização de $J$, escala de horas a dias). Setas descendentes indicam setpoints; setas ascendentes indicam estados e medições. Adaptado de \citeauthor{Skogestad2004} (\citeyear{Skogestad2004}).}
-\caption{Hierarquia de controle plant-wide: regulatório, supervisório e otimização em tempo real.}
-\label{fig:plantwide_hierarchy}
+	\centering
+	\missingfigure[figwidth=0.80\textwidth]{Hierarquia de controle plant-wide de Skogestad (3 camadas verticais): base = controle regulatório (malhas PID, escala de segundos a minutos); meio = controle supervisório (ajuste de setpoints e modos, escala de minutos a horas); topo = otimização em tempo real --- RTO (recálculo de setpoints ótimos via minimização de $J$, escala de horas a dias). Setas descendentes indicam setpoints; setas ascendentes indicam estados e medições. Adaptado de \citeauthor{Skogestad2004} (\citeyear{Skogestad2004}).}
+	\caption{Hierarquia de controle plant-wide: regulatório, supervisório e otimização em tempo real.}
+	\label{fig:plantwide_hierarchy}
 \end{figure}
 
 \subsection{Controle self-optimizing e a perda econômica}
@@ -127,8 +150,8 @@ fixo, levem automaticamente aos ajustes ótimos das variáveis manipuladas quand
 escolha de $c$ é suficientemente boa, define-se a \textbf{perda econômica} $L$:
 
 \begin{equation}
-  L = J(u, d) - J^*(d)
-  \label{eq:loss}
+	L = J(u, d) - J^*(d)
+	\label{eq:loss}
 \end{equation}
 
 \noindent onde $J(u,d)$ é o valor real da função de custo quando a política de setpoint fixo é
@@ -186,10 +209,10 @@ O termo \textit{cloud-native} designa uma abordagem de desenvolvimento e operaç
 \citeonline{Burns2016} documentam a evolução dos sistemas de orquestração do Google --- Borg, Omega e Kubernetes --- e mostram que a força do Kubernetes está na combinação de uma API uniforme, objetos extensíveis e separação explícita entre estado desejado e estado observado. Cada recurso Kubernetes é representado como um objeto com dois campos centrais: \textit{Spec}, que descreve o estado desejado, e \textit{Status}, que registra o estado observado em tempo de execução. Sobre essa estrutura operam controladores de reconciliação (\textit{reconciliation controller loops}) que comparam continuamente o estado desejado ao estado observado e executam ações para convergir o segundo em direção ao primeiro \cite{Burns2016}. Os autores destacam ainda que a conteinerização muda o paradigma operacional dos data centers --- de uma perspectiva orientada a máquinas para uma perspectiva orientada a aplicações, na qual gerenciar containers significa gerenciar aplicações, não servidores. Essa combinação de API uniforme, objetos Spec/Status, controladores de reconciliação e extensibilidade torna o Kubernetes uma plataforma de operação declarativa para sistemas distribuídos complexos. No ecossistema Kubernetes, essa lógica declarativa pode ser estendida pelo \textit{Operator Pattern}, no qual controladores específicos de domínio observam recursos customizados e executam ações de reconciliação sobre aplicações ou sistemas externos ao cluster.
 
 \begin{figure}[htbp]
-\centering
-\missingfigure[figwidth=0.85\textwidth]{Loop de reconciliação do Kubernetes: (1) objeto com \textit{Spec} (estado desejado declarado pelo operador) e \textit{Status} (estado observado em tempo real); (2) controlador de reconciliação compara Spec e Status; (3) se divergentes, aciona ação corretiva (e.g., reiniciar pod, ajustar réplicas, atualizar rota); (4) sistema converge e Status se aproxima de Spec. Pode incluir exemplo industrial análogo: \textit{Spec} = modo operacional desejado da planta; \textit{Status} = condição observada das malhas; ação = ajuste de setpoint ou reconfiguração. Baseado em \citeauthor{Burns2016} (\citeyear{Burns2016}).}
-\caption{Loop de reconciliação Spec/Status do Kubernetes e sua analogia com supervisão industrial.}
-\label{fig:k8s_reconciliation}
+	\centering
+	\missingfigure[figwidth=0.85\textwidth]{Loop de reconciliação do Kubernetes: (1) objeto com \textit{Spec} (estado desejado declarado pelo operador) e \textit{Status} (estado observado em tempo real); (2) controlador de reconciliação compara Spec e Status; (3) se divergentes, aciona ação corretiva (e.g., reiniciar pod, ajustar réplicas, atualizar rota); (4) sistema converge e Status se aproxima de Spec. Pode incluir exemplo industrial análogo: \textit{Spec} = modo operacional desejado da planta; \textit{Status} = condição observada das malhas; ação = ajuste de setpoint ou reconfiguração. Baseado em \citeauthor{Burns2016} (\citeyear{Burns2016}).}
+	\caption{Loop de reconciliação Spec/Status do Kubernetes e sua analogia com supervisão industrial.}
+	\label{fig:k8s_reconciliation}
 \end{figure}
 
 A relevância desse paradigma para sistemas industriais não está em substituir controladores regulatórios ou malhas de tempo real, mas em oferecer uma forma de organizar camadas superiores de operação: implantação e ciclo de vida de serviços, supervisão de componentes distribuídos, observabilidade, tolerância a falhas, aplicação de políticas e coordenação de estados operacionais. Nesse enquadramento, cloud-native e Kubernetes são considerados como referências para a camada supervisória e informacional do sistema, preservando a distinção entre controle regulatório da planta e orquestração da infraestrutura de software.
@@ -220,8 +243,8 @@ A estimativa de $\sigma^2_{\text{mv}}$ é obtida ajustando-se um modelo univaria
 Em formulações de CLPM posteriores ao trabalho original, o desempenho é expresso como:
 
 \begin{equation}
-  \eta = \frac{\sigma^2_{\text{mv}}}{\sigma^2_y}
-  \label{eq:harris_index}
+	\eta = \frac{\sigma^2_{\text{mv}}}{\sigma^2_y}
+	\label{eq:harris_index}
 \end{equation}
 
 \noindent Valores próximos de 1 indicam operação próxima ao benchmark de variância mínima; valores baixos indicam variância observada substancialmente maior do que o limite alcançável. Deve-se observar que o índice não identifica a causa da degradação: um baixo $\eta$ pode decorrer de má sintonia, mas também de atraso excessivo, saturação de atuador, ruído de medição, ausência de ação feedforward ou perturbação não medida. Quando $\eta$ está próximo de 1, mas a variância absoluta ainda é elevada, a causa é estrutural --- e reduções adicionais de variância só são alcançáveis por modificações no processo, como redução de atraso, troca de variável manipulada ou adição de feedforward \cite{Harris1989}.
@@ -233,15 +256,15 @@ Embora o benchmark de Harris forneça uma referência teórica robusta, sua apli
 O método prediz o erro futuro da malha a partir de seus valores passados. Para um horizonte de predição $b$ e uma ordem de modelo $m$, o erro previsto é:
 
 \begin{equation}
-  \hat{e}(t+b) = a_0 + a_1\,e(t) + a_2\,e(t-1) + \cdots + a_m\,e(t-m-1)
-  \label{eq:pi_pred}
+	\hat{e}(t+b) = a_0 + a_1\,e(t) + a_2\,e(t-1) + \cdots + a_m\,e(t-m-1)
+	\label{eq:pi_pred}
 \end{equation}
 
 A partir do resíduo de predição, calcula-se:
 
 \begin{equation}
-  \text{PI} = \frac{\sigma^2_r}{\text{mse}}
-  \label{eq:pi_index}
+	\text{PI} = \frac{\sigma^2_r}{\text{mse}}
+	\label{eq:pi_index}
 \end{equation}
 
 \noindent onde $\sigma^2_r$ é a variância do resíduo entre o erro medido e o erro previsto e
@@ -256,10 +279,10 @@ A classificação de uma malha como problemática não depende apenas do valor b
 Quando uma malha é declarada problemática pelo PI, o artigo classifica a causa em quatro categorias: (i)~\textit{tuning} --- o controlador precisa ser resintonizado; (ii)~\textit{process} --- o controlador não lida adequadamente com os distúrbios, inclusive por restrições mecânicas; (iii)~\textit{noise} --- a variável medida apresenta ruído excessivo para uma regulagem eficaz; e (iv)~\textit{false positive} --- os parâmetros do PI estão inadequados para aquela malha específica. PI baixo, portanto, não implica diretamente em PID mal sintonizado; a causa exige diagnóstico complementar \cite{Bradu2018}.
 
 \begin{figure}[htbp]
-\centering
-\missingfigure[figwidth=0.90\textwidth]{Pipeline do CLPM: da esquerda para a direita --- (1) série temporal bruta da malha (setpoint, variável medida, saída do controlador); (2) cálculo de índices: Harris $\eta = \sigma^2_{\text{mv}}/\sigma^2_y$ e Predictability Index $\text{PI} = \sigma^2_r/\text{mse}$; (3) estado diagnóstico resultante (malha saudável / degradada / oscilatória / ruidosa). Pode incluir exemplo de série temporal contrastando malha saudável ($\eta \approx 1$, PI alto) com malha degradada ($\eta \ll 1$, PI baixo). Baseado em \citeauthor{Harris1989} (\citeyear{Harris1989}) e \citeauthor{Bradu2018} (\citeyear{Bradu2018}).}
-\caption{Pipeline conceitual do diagnóstico de qualidade de malhas (CLPM): de sinais brutos a estados supervisionáveis.}
-\label{fig:clpm_pipeline}
+	\centering
+	\missingfigure[figwidth=0.90\textwidth]{Pipeline do CLPM: da esquerda para a direita --- (1) série temporal bruta da malha (setpoint, variável medida, saída do controlador); (2) cálculo de índices: Harris $\eta = \sigma^2_{\text{mv}}/\sigma^2_y$ e Predictability Index $\text{PI} = \sigma^2_r/\text{mse}$; (3) estado diagnóstico resultante (malha saudável / degradada / oscilatória / ruidosa). Pode incluir exemplo de série temporal contrastando malha saudável ($\eta \approx 1$, PI alto) com malha degradada ($\eta \ll 1$, PI baixo). Baseado em \citeauthor{Harris1989} (\citeyear{Harris1989}) e \citeauthor{Bradu2018} (\citeyear{Bradu2018}).}
+	\caption{Pipeline conceitual do diagnóstico de qualidade de malhas (CLPM): de sinais brutos a estados supervisionáveis.}
+	\label{fig:clpm_pipeline}
 \end{figure}
 
 \subsection{Detecção de Padrões Dinâmicos e Anomalias}
@@ -296,19 +319,19 @@ O \textbf{OPC UA} (\textit{OPC Unified Architecture}), formalizado como família
 O conceito central da IEC~62541-3 \cite{IEC62541_3} é o \textbf{espaço de endereçamento} (\textit{Address Space}): uma estrutura de nós (\textit{Nodes}) interconectados por referências tipadas (\textit{References}), que organiza de forma uniforme todos os dados, metadados, métodos e eventos expostos por um servidor OPC UA. Cada nó possui uma classe (\textit{NodeClass}) que define seu papel:
 
 \begin{itemize}
-  \item \textbf{Object}: representa uma entidade industrial (e.g., reator, malha de controle, compressor).
-  \item \textbf{Variable}: expõe um valor observável com \textit{timestamp}, qualidade e tipo de dado.
-  \item \textbf{Method}: define uma operação invocável por clientes autorizados.
-  \item \textbf{ObjectType / VariableType}: tipos reutilizáveis que permitem modelar entidades de domínio.
+	\item \textbf{Object}: representa uma entidade industrial (e.g., reator, malha de controle, compressor).
+	\item \textbf{Variable}: expõe um valor observável com \textit{timestamp}, qualidade e tipo de dado.
+	\item \textbf{Method}: define uma operação invocável por clientes autorizados.
+	\item \textbf{ObjectType / VariableType}: tipos reutilizáveis que permitem modelar entidades de domínio.
 \end{itemize}
 
 Essa estrutura transforma a planta de uma coleção plana de \textit{tags} numéricas para um \textbf{modelo de informação navegável}: um cliente externo pode descobrir a hierarquia do servidor com o serviço \texttt{Browse}, ler atributos e valores com \texttt{Read}, escrever variáveis autorizadas com \texttt{Write}, subscrever mudanças de valor e eventos com \texttt{Subscription}/\texttt{MonitoredItems}, e invocar operações com \texttt{Call} --- tudo por serviços padronizados, independentes da implementação interna do servidor \cite{Mahnke2009services}. Um cliente OPC UA não precisa conhecer previamente os detalhes de implementação do servidor; ele descobre a estrutura navegando o espaço de endereçamento e acessando os metadados associados a cada nó.
 
 \begin{figure}[htbp]
-\centering
-\missingfigure[figwidth=0.88\textwidth]{Diagrama do espaço de endereçamento OPC UA aplicado ao TEP: grafo de nós e referências tipadas. Nó raiz \texttt{TEP\_Plant} (Object) com filhos \texttt{Reactor} (Object), \texttt{Compressor} (Object), \texttt{ControlLoop\_001} (Object); cada objeto com filhos do tipo Variable (e.g., \texttt{Pressure}: AnalogItemType, \texttt{Temperature}: AnalogItemType) e Method (e.g., \texttt{ApplyDisturbance}). Referências tipadas: \texttt{HasComponent}, \texttt{HasProperty}, \texttt{HasTypeDefinition}. Contraste com lista plana de tags à esquerda para evidenciar a diferença. Baseado em \citeauthor{IEC62541_3} (\citeyear{IEC62541_3}).}
-\caption{Espaço de endereçamento OPC UA: a planta como grafo navegável de objetos tipados.}
-\label{fig:opcua_addressspace}
+	\centering
+	\missingfigure[figwidth=0.88\textwidth]{Diagrama do espaço de endereçamento OPC UA aplicado ao TEP: grafo de nós e referências tipadas. Nó raiz \texttt{TEP\_Plant} (Object) com filhos \texttt{Reactor} (Object), \texttt{Compressor} (Object), \texttt{ControlLoop\_001} (Object); cada objeto com filhos do tipo Variable (e.g., \texttt{Pressure}: AnalogItemType, \texttt{Temperature}: AnalogItemType) e Method (e.g., \texttt{ApplyDisturbance}). Referências tipadas: \texttt{HasComponent}, \texttt{HasProperty}, \texttt{HasTypeDefinition}. Contraste com lista plana de tags à esquerda para evidenciar a diferença. Baseado em \citeauthor{IEC62541_3} (\citeyear{IEC62541_3}).}
+	\caption{Espaço de endereçamento OPC UA: a planta como grafo navegável de objetos tipados.}
+	\label{fig:opcua_addressspace}
 \end{figure}
 
 \subsection{Família de Normas IEC~62541}
@@ -316,29 +339,29 @@ Essa estrutura transforma a planta de uma coleção plana de \textit{tags} numé
 A IEC~62541 é composta por múltiplas partes, cada uma cobrindo um aspecto distinto da especificação. A Tabela~\ref{tab:iec62541} apresenta as partes mais relevantes para este trabalho.
 
 \begin{table}[ht!]
-\centering
-\caption{Partes selecionadas da família IEC~62541 e sua relevância para o projeto TEP}
-\label{tab:iec62541}
-\begin{tabular}{|c|l|p{5cm}|p{3.2cm}|}
-\hline
-\textbf{Parte} & \textbf{Título} & \textbf{Versa sobre} & \textbf{Edições} \\
-\hline
-1 & Visão Geral e Conceitos & Fundamentos, terminologia e motivação do padrão & 2009, 2025 \\
-\hline
-3 & Modelo do Espaço de End. & Nós, referências, navegação --- base de todo modelo de informação \cite{IEC62541_3} & 2010, 2020, 2025 \\
-\hline
-4 & Serviços & Serviços abstratos cliente-servidor: Browse, Read, Write, Subscribe, Call & 2010, 2020 \\
-\hline
-8 & Acesso a Dados & Tipos de variáveis de processo: \texttt{AnalogItemType}, \texttt{DiscreteItemType}, unidade, faixa, qualidade \cite{IEC62541_8} & 2011, 2020, 2025 \\
-\hline
-9 & Alarmes e Condições & Modelo de alarmes e condições operacionais; estados, reconhecimento, limites e interlocks & 2012, 2020 \\
-\hline
-11 & Acesso Histórico & Séries temporais: leitura e agregação de dados históricos & 2015, 2020 \\
-\hline
-14 & PubSub & Publish-subscribe sobre MQTT/AMQP/UDP --- complemento IIoT & 2020, 2026 \\
-\hline
-\end{tabular}
-\fonte{Elaborado pelo autor com base em \citeonline{IEC62541_1} e \citeonline{Mahnke2009intro}.}
+	\centering
+	\caption{Partes selecionadas da família IEC~62541 e sua relevância para o projeto TEP}
+	\label{tab:iec62541}
+	\begin{tabular}{|c|l|p{5cm}|p{3.2cm}|}
+		\hline
+		\textbf{Parte} & \textbf{Título}          & \textbf{Versa sobre}                                                                                                            & \textbf{Edições} \\
+		\hline
+		1              & Visão Geral e Conceitos  & Fundamentos, terminologia e motivação do padrão                                                                                 & 2009, 2025       \\
+		\hline
+		3              & Modelo do Espaço de End. & Nós, referências, navegação --- base de todo modelo de informação \cite{IEC62541_3}                                             & 2010, 2020, 2025 \\
+		\hline
+		4              & Serviços                 & Serviços abstratos cliente-servidor: Browse, Read, Write, Subscribe, Call                                                       & 2010, 2020       \\
+		\hline
+		8              & Acesso a Dados           & Tipos de variáveis de processo: \texttt{AnalogItemType}, \texttt{DiscreteItemType}, unidade, faixa, qualidade \cite{IEC62541_8} & 2011, 2020, 2025 \\
+		\hline
+		9              & Alarmes e Condições      & Modelo de alarmes e condições operacionais; estados, reconhecimento, limites e interlocks                                       & 2012, 2020       \\
+		\hline
+		11             & Acesso Histórico         & Séries temporais: leitura e agregação de dados históricos                                                                       & 2015, 2020       \\
+		\hline
+		14             & PubSub                   & Publish-subscribe sobre MQTT/AMQP/UDP --- complemento IIoT                                                                      & 2020, 2026       \\
+		\hline
+	\end{tabular}
+	\fonte{Elaborado pelo autor com base em \citeonline{IEC62541_1} e \citeonline{Mahnke2009intro}.}
 \end{table}
 
 A \textbf{Parte~8 (Acesso a Dados)} \cite{IEC62541_8} é particularmente relevante para expor variáveis de processo. Ela define o tipo \texttt{DataItemType} como base para dados vivos de automação, a partir do qual derivam três famílias: \texttt{AnalogItemType}, para grandezas contínuas com unidade de engenharia (\textit{EngineeringUnits}), faixa operacional (\textit{EURange}) e faixa instrumental (\textit{InstrumentRange}); \texttt{DiscreteItemType}, para estados discretos como modos operacionais ou sinalizadores; e \texttt{ArrayItemType}, para dados estruturados como espectros ou janelas de histórico. Cada leitura OPC UA carrega um \textit{StatusCode} (\textit{Good}/\textit{Uncertain}/\textit{Bad}) e \textit{timestamp}, permitindo que clientes distingam valor numérico de confiabilidade da medição. As medições contínuas do TEP podem ser mapeadas conceitualmente a variáveis do tipo \texttt{AnalogItemType}, preservando unidade de engenharia e faixa operacional; medições provenientes de analisadores amostrados, com atraso inerente, requerem metadados temporais adicionais.
@@ -352,10 +375,10 @@ A arquitetura de sistema do OPC UA é projetada para operar em múltiplas camada
 A norma \textbf{IEC~62264} \cite{IEC62264} (\textit{Enterprise-Control System Integration}) organiza as funções industriais em níveis hierárquicos derivados do Modelo Purdue. O Nível~3 é o domínio do \textit{Manufacturing Operations Management} (MOM): monitoramento de processos, gestão de produção, qualidade, manutenção e desempenho operacional. A norma organiza a informação desse domínio em quatro categorias: \textit{schedule} (o que deve ser executado), \textit{performance} (o que foi realizado), \textit{definition} (como executar) e \textit{capability} (quais recursos estão disponíveis) \cite{IEC62264}. Essa estrutura é relevante para o projeto porque posiciona a camada supervisória proposta no Nível~3 --- acima do controle regulatório direto (Níveis~0 a~2) --- e porque aproxima a lógica industrial da lógica declarativa: a distinção entre o que deve ser feito (\textit{schedule}/\textit{definition}) e o que está sendo feito e o que é viável (\textit{performance}/\textit{capability}) guarda semelhança estrutural com a separação entre estado desejado e estado observado que fundamenta a reconciliação supervisória.
 
 \begin{figure}[htbp]
-\centering
-\missingfigure[figwidth=0.75\textwidth]{Pirâmide de automação IEC~62264: Nível~0 (processo físico), Nível~1 (sensores/atuadores), Nível~2 (controle regulatório --- PIDs), Nível~3 (MOM --- supervisor K8s-CPS proposto, com as quatro categorias: \textit{schedule}/\textit{definition}/\textit{performance}/\textit{capability}), Nível~4 (ERP). Seta lateral indicando o alcance vertical do OPC UA (Níveis~0 ao~4). Baseado em \citeauthor{IEC62264} (\citeyear{IEC62264}) e \citeauthor{Mahnke2009intro} (\citeyear{Mahnke2009intro}).}
-\caption{Hierarquia IEC~62264: posicionamento do supervisor proposto no Nível~3 (MOM) e alcance vertical do OPC UA.}
-\label{fig:iec62264_pyramid}
+	\centering
+	\missingfigure[figwidth=0.75\textwidth]{Pirâmide de automação IEC~62264: Nível~0 (processo físico), Nível~1 (sensores/atuadores), Nível~2 (controle regulatório --- PIDs), Nível~3 (MOM --- supervisor K8s-CPS proposto, com as quatro categorias: \textit{schedule}/\textit{definition}/\textit{performance}/\textit{capability}), Nível~4 (ERP). Seta lateral indicando o alcance vertical do OPC UA (Níveis~0 ao~4). Baseado em \citeauthor{IEC62264} (\citeyear{IEC62264}) e \citeauthor{Mahnke2009intro} (\citeyear{Mahnke2009intro}).}
+	\caption{Hierarquia IEC~62264: posicionamento do supervisor proposto no Nível~3 (MOM) e alcance vertical do OPC UA.}
+	\label{fig:iec62264_pyramid}
 \end{figure}
 
 \subsection{OPC UA no Contexto deste Trabalho}

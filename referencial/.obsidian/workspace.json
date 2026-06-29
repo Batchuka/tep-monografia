@@ -13,10 +13,10 @@
             "state": {
               "type": "pdf-annotator",
               "state": {
-                "file": "notes/ft_OPC-UA-Services_Mahnke_Leitner_Damm.md"
+                "file": "notes/ft_IEC_62541-8.md"
               },
               "icon": "lucide-file",
-              "title": "ft_OPC-UA-Services_Mahnke_Leitner_Damm"
+              "title": "ft_IEC_62541-8"
             }
           }
         ]
@@ -42,7 +42,7 @@
                 "autoReveal": false
               },
               "icon": "lucide-folder-closed",
-              "title": "Files"
+              "title": "Explorador de arquivos"
             }
           },
           {
@@ -76,8 +76,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 371.5,
-    "collapsed": true
+    "width": 371.5
   },
   "right": {
     "id": "2b1e6e84b0c00a82",
@@ -181,19 +180,24 @@
   },
   "left-ribbon": {
     "hiddenItems": {
-      "switcher:Open quick switcher": false,
-      "graph:Open graph view": false,
-      "canvas:Create new canvas": false,
-      "daily-notes:Open today's daily note": false,
-      "templates:Insert template": false,
-      "command-palette:Open command palette": false,
-      "bases:Create new base": false
+      "switcher:Abrir a troca rápida": false,
+      "graph:Abrir visualização em gráfico": false,
+      "canvas:Criar novo canvas": false,
+      "daily-notes:Abrir a nota de hoje": false,
+      "templates:Inserir modelo": false,
+      "command-palette:Abrir paleta de comandos": false,
+      "bases:Criar nova base": false
     }
   },
   "active": "8238459c4f8ea800",
   "lastOpenFiles": [
-    "bibTex/IEC_63303.bib",
+    "notes/ft_IEC_62541-3.md",
+    "notes/ft_IEC_62541-1.md",
     "notes/ft_OPC-UA-Introduction_Mahnke_Leitner_Damm.md",
+    "notes/ft_OPC-UA-System-Architecture_Mahnke_Leitner_Damm.md",
+    "notes/ft_OPC-UA-Services_Mahnke_Leitner_Damm.md",
+    "notes/ft_IEC_62264-1.md",
+    "bibTex/IEC_63303.bib",
     "notes/ft_Mechatronic-to-CyberPhysical-Mechatronic-Futures_Hehenberger-et-al.md",
     "notes/ft_DigitalTwin-Mechatronic-Futures_Hehenberger_Bradley.md",
     "books/book1_Mechatronic-to-CyberPhysical-Mechatronic-Futures_Hehenberger-et-al.pdf",
@@ -207,14 +211,9 @@
     "notes/ft_Cloud-Native-Computing-A-Survey-from-the-Perspective-of-Services_Shuiguang_et_al.md",
     "notes/ft_Condition-Monitoring-of-Bearing-Damage-in-Electromechanical-Drive.md",
     "notes/ft_Control-Structure-Desing-for-Complete-Chemical-Plants.md",
-    "notes/ft_IEC_62264-1.md",
-    "notes/ft_IEC_62541-1.md",
-    "notes/ft_IEC_62541-3.md",
     "notes/ft_IEC_62541-8.md",
     "notes/ft_Kubernetes-Orchestration-of-High-Availability_Johansson_et_al.md",
     "notes/ft_Model-Learning-Algorithms-for-Anomaly-Detection-in-CERN-Control-Systems.md",
-    "notes/ft_OPC-UA-Services_Mahnke_Leitner_Damm.md",
-    "notes/ft_OPC-UA-System-Architecture_Mahnke_Leitner_Damm.md",
     "notes/ft_Plantwide-Control-A-Review-and-a-new-Design-Procedure.md",
     "notes/ft_UNICOS-A-Framework-to-Build-Industry-Like-Control-Systems.md",
     "notes/ft_OPC-Unified-Architecture_Mahnke_Leitner_Damm.md",
@@ -227,7 +226,6 @@
     "bibTex/IEC_62541-1.bib",
     "bibTex/ft_IEC_62541-1.bib",
     "bibTex/IEC_62264-1.bib",
-    "bibTex/temp.bib",
     "notes/topicos_dispersos.canvas",
     "notes/monografia.canvas",
     "canvas/monografia.canvas",

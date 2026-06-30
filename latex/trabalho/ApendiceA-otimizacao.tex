@@ -1,0 +1,79 @@
+\chapter[ALGORITMOS DE OTIMIZAÇÃO PARA POLÍTICAS SUPERVISÓRIAS]{ALGORITMOS DE OTIMIZAÇÃO PARA POLÍTICAS SUPERVISÓRIAS}
+\label{apendice:otimizacao}
+
+% TODO: desenvolver este apêndice. Esboço da ideia central, a ser detalhado:
+%
+% A camada de RTO (Seção~\ref{sec:plantwide}) requer um procedimento explícito para
+% transformar a função de custo J em política supervisória, isto é, em setpoints
+% concretos para as variáveis primárias c. Este apêndice explora algoritmos de
+% otimização candidatos a desempenhar esse papel -- o "cérebro" das políticas do
+% supervisor Kubernetes -- partindo de funções objetivo definidas a priori,
+% executando a otimização sobre cada uma e registrando os resultados como
+% políticas supervisórias disponíveis.
+%
+% A função de custo do TEP (Eq.~\ref{eq:tep_cost}) pode ser estendida para
+% incorporar outras dimensões de desempenho operacional além das parcelas
+% originais de Downs e Vogel, compondo um objetivo composto:
+
+\begin{equation}
+	J =
+	J_{\text{operação}}
+	+ J_{\text{qualidade}}
+	+ J_{\text{energia}}
+	+ J_{\text{risco}}
+	+ J_{\text{manutenção}}
+	+ J_{\text{produção perdida}}
+	\label{eq:tep_cost_extended}
+\end{equation}
+
+% TODO: detalhar cada parcela, os algoritmos de otimização avaliados e como o
+% resultado de cada otimização se traduz em política supervisória.
+
+% -------------------------------------------------------------------------
+\section{Algoritmos por tipo de modelo}
+\label{sec:apendice_algoritmos}
+
+% TODO (rascunho a ser detalhado): esta seção apenas situa, de forma tosca, qual
+% família de algoritmo resolve qual tipo de problema. Os exemplos do próprio
+% \citeonline{Williams2013} já são resolvidos por programação matemática: o livro
+% aponta três famílias principais de algoritmos usadas por pacotes comerciais --
+% simplex revisado para programação linear, extensão separável do simplex para
+% programação separável, e branch-and-bound para programação inteira.
+
+Para os casos relevantes a este trabalho, o tipo de modelo resultante da função de
+custo $J$ (Equação~\ref{eq:tep_cost_extended}) determina a família de algoritmo
+candidata, conforme a Tabela~\ref{tab:algoritmos_otimizacao}.
+
+\begin{table}[ht!]
+\centering
+\caption{Famílias de algoritmos por tipo de modelo (rascunho)}
+\label{tab:algoritmos_otimizacao}
+\footnotesize
+\begin{tabular}{|p{3.0cm}|p{3.3cm}|p{6.0cm}|}
+\hline
+\textbf{Caso} & \textbf{Tipo de modelo} & \textbf{Algoritmo típico} \\
+\hline
+Blending & LP & Simplex / interior-point \\
+\hline
+Refinery optimization & LP, ou NLP se houver não linearidade & Simplex / interior-point; eventualmente NLP \\
+\hline
+Factory Planning 1 & LP multi-período & Simplex / interior-point \\
+\hline
+Factory Planning 2, com manutenção & MILP & Branch-and-bound / branch-and-cut \\
+\hline
+Scheduling, lógica, escolhas discretas & MILP / CP-SAT & Branch-and-bound, branch-and-cut, constraint programming \\
+\hline
+MPC linear & QP & Active-set, interior-point, ADMM \\
+\hline
+MPC não linear / TEP completo & NLP / NMPC & SQP, interior-point \\
+\hline
+Planejamento com incerteza & Stochastic programming & LP/MILP com cenários, decomposição \\
+\hline
+\end{tabular}
+\fonte{Elaborado pelo autor, com base em \citeonline{Williams2013}.}
+\end{table}
+
+% TODO: para cada linha relevante ao TEP (em especial MPC não linear / NMPC, que é
+% o caso do problema completo de plant-wide control), detalhar o algoritmo
+% escolhido, sua formulação e como o resultado se traduz em política
+% supervisória concreta para o Kubernetes.

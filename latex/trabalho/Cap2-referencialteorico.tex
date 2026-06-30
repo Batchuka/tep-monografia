@@ -106,6 +106,16 @@ custo das matérias-primas que saem com o produto, custo econômico atribuído �
 do trabalho de compressão e custo do vapor. O sinal de $J$ está formulado como custo (negativo de
 lucro), de modo que minimizar $J$ corresponde a maximizar a eficiência operacional \cite{DOWNS1993}.
 
+Cabe destacar que $J$ não é uma equação natural da planta, derivável de primeiros princípios como
+as Equações~\ref{eq:rx1}--\ref{eq:rx3}: ela é uma escolha de formulação. \citeonline{Williams2013}
+observa que toda formulação de programação matemática compartilha a característica de envolver
+otimização — deseja-se maximizar ou minimizar uma quantidade, denominada função objetivo — e que,
+dado um mesmo conjunto de restrições, objetivos distintos conduzem a soluções ótimas distintas.
+O autor cataloga exemplos típicos de objetivo (maximizar lucro, minimizar custo, maximizar
+utilidade, maximizar valor presente líquido, maximizar robustez) que ilustram o mesmo ponto
+explorado por \citeonline{Skogestad2004} para o TEP: a função de custo traduz uma política
+operacional escolhida pelo projetista, não uma propriedade física da planta.
+
 A existência dessa função de custo transforma as cinco tarefas de Larsson em perguntas técnicas
 respondíveis: a melhor seleção de variáveis controladas é aquela que, sob incerteza de perturbações
 e ruído, mantém $J$ mais próximo do seu valor ótimo $J^*$.
@@ -196,6 +206,12 @@ real, que determinaria os setpoints ótimos de $c$ via minimização de $J$, fic
 trabalho e constitui extensão natural. O TEP, com sua função de custo explícita e seus 41~XMEAS e
 12~XMV, é um ambiente adequado para avaliar se um supervisor consegue manter a planta próxima do
 ótimo operacional sem requerer reotimização a cada perturbação.
+
+A camada de RTO, embora fora do escopo de implementação, é explorada preliminarmente no
+Apêndice~\ref{apendice:otimizacao}, onde a função de custo $J$ é estendida para incorporar outras
+dimensões de desempenho operacional -- operação, qualidade, energia, risco, manutenção e produção
+perdida -- e diferentes algoritmos de otimização são avaliados como candidatos a traduzir essas
+funções objetivo em políticas supervisórias concretas para o Kubernetes.
 
 % -------------------------------------------------------------------------
 

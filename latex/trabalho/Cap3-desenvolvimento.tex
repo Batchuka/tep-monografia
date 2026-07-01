@@ -1,36 +1,39 @@
 \chapter{DESENVOLVIMENTO}
 \label{cha:desenvolvimento}
 
-Este capítulo descreve a arquitetura proposta e os componentes desenvolvidos para implementar o laboratório de gêmeo digital do Processo Tennessee Eastman com supervisão baseada em Kubernetes. A prova de conceito é composta por quatro repositórios com responsabilidades bem delimitadas: \texttt{tep-plant} (simulador da planta), \texttt{tep-operator} (Operator Kubernetes), \texttt{tep-ihm} (Interface Homem-Máquina) e \texttt{tep-supervisor} (infraestrutura local).
+Este capítulo descreve a arquitetura proposta e os componentes desenvolvidos para implementar o ambiente cyber-físico do Processo Tennessee Eastman sobre arquitetura OPC UA, com prova de conceito de supervisão Kubernetes. O ambiente é composto por quatro repositórios com responsabilidades bem delimitadas: \texttt{tep-plant} (simulador da planta), \texttt{tep-operator} (Operator Kubernetes), \texttt{tep-ihm} (Interface Homem-Máquina) e \texttt{tep-supervisor} (infraestrutura local).
 
 % -------------------------------------------------------------------------
 \section{Visão Geral da Arquitetura Proposta}
 \label{sec:arch}
 
-A arquitetura do laboratório segue um modelo em três camadas, inspirado na separação entre campo, supervisão e gerenciamento presente em pirâmides de automação industrial:
+A proposta completa do ambiente TEP-CPS é estruturada sobre a hierarquia funcional da IEC~62264, cobrindo todos os cinco níveis do Modelo de Referência de Purdue, conforme o mapeamento da Figura~\ref{fig:arch_overview}:
 
-\begin{enumerate}
-  \item \textbf{Camada de campo}: \texttt{tep-plant} simula a dinâmica da planta química e expõe seus estados via gRPC.
-  \item \textbf{Camada de supervisão}: \texttt{tep-operator} observa o estado da planta e aplica ações corretivas de acordo com uma política declarativa descrita em um CRD Kubernetes.
-  \item \textbf{Camada de monitoramento}: \texttt{tep-ihm} consome o fluxo de dados da planta e os apresenta ao operador humano via dashboard web em tempo real.
-\end{enumerate}
-
-O fluxo de dados é o seguinte:
-
-\begin{center}
-\texttt{Browser} $\xrightarrow{\text{WebSocket}}$ \texttt{tep-ihm} $\xrightarrow{\text{gRPC StreamMetrics}}$ \texttt{tep-plant} $\xleftarrow{\text{gRPC UpdateController}}$ \texttt{tep-operator}
-\end{center}
-
-A planta avança o tempo simulado via integração RK4 (dt = 0,001~h/passo) e publica continuamente o vetor de medidas. O operator lê essas medidas a cada ciclo de reconciliação, avalia se as variáveis de processo estão dentro das faixas declaradas no CRD \texttt{PLCMachine}, e chama \texttt{UpdateController} quando necessário para ajustar setpoints ou ganhos dos controladores. A IHM consome o mesmo fluxo gRPC e transmite as medidas ao navegador via WebSocket, permitindo visualização em tempo real sem intervenção no laço de controle.
+\begin{itemize}
+  \item \textbf{Nível 0 — Processo físico}: o modelo matemático do TEP (\textit{crate} \texttt{te-core}), com as equações diferenciais e o integrador RK4. Não possui nenhuma lógica de controle.
+  \item \textbf{Nível 1 — Sensing e manipulação}: o \texttt{ControllerBank} com os controladores regulatórios (proporcional) e a interface gRPC que expõe medidas (\texttt{StreamMetrics}) e recebe comandos de atuação (\texttt{UpdateController}). Nível 0 e 1 coexistem dentro do repositório \texttt{tep-plant}.
+  \item \textbf{Nível 2 — Controle supervisório e monitoramento}: políticas de controle declarativas aplicadas pelo Operator Kubernetes (\texttt{tep-operator}) via CRD \texttt{PLCMachine}, e interface de operação em tempo real (\texttt{tep-ihm}) para o operador humano.
+  \item \textbf{Nível 3 — Gerenciamento de operações de manufatura}: fora do escopo deste trabalho.
+  \item \textbf{Nível 4 — Planejamento e logística}: Kubernetes como plataforma de orquestração inteligente, responsável por executar a função objetivo composta $J$ (Equação~\ref{eq:tep_cost_extended}) e produzir as políticas supervisórias entregues ao Nível 2. Este nível é o destino arquitetural da proposta e é explorado preliminarmente no Apêndice~\ref{apendice:otimizacao}.
+\end{itemize}
 
 \begin{figure}[htbp]
 \centering
-\missingfigure[figwidth=0.92\textwidth]{Diagrama de arquitetura do laboratório TEP-CPS: quatro componentes (\texttt{tep-plant}, \texttt{tep-operator}, \texttt{tep-ihm}, \texttt{tep-supervisor}) distribuídos em três camadas (campo, supervisão, monitoramento). Conexões: \texttt{tep-plant} → \texttt{tep-ihm} via gRPC \texttt{StreamMetrics} (streaming); \texttt{tep-operator} → \texttt{tep-plant} via gRPC \texttt{UpdateController} (bidirecional de controle); \texttt{tep-ihm} → navegador via WebSocket. Indica o fluxo de dados unidirecional e destaca que o operator não conhece a IHM e a planta não conhece nenhum dos dois.}
-\caption{Arquitetura do laboratório TEP-CPS: componentes, camadas e protocolos de comunicação.}
+\missingfigure[figwidth=0.92\textwidth]{Hierarquia funcional IEC~62264 adaptada para a proposta TEP-CPS. Nível 0: \texttt{te-core} (equações diferenciais do TEP, integrador RK4). Nível 1: \texttt{ControllerBank} (controladores P) + servidor gRPC — ambos internos ao \texttt{tep-plant}. Nível 2: \texttt{tep-operator} (Operator Kubernetes, CRD \texttt{PLCMachine}) e \texttt{tep-ihm} (IHM/dashboard WebSocket). Nível 3: fora do escopo. Nível 4: Kubernetes com função objetivo $J$ e otimização gerando políticas supervisórias. Indicar visualmente quais níveis estão implementados (0, 1, 2 — escopo deste trabalho) e quais são proposta futura (3, 4).}
+\caption{Hierarquia funcional IEC~62264 do ambiente TEP-CPS: proposta completa e escopo de implementação.}
 \label{fig:arch_overview}
 \end{figure}
 
-A separação de responsabilidades é deliberada e oferece vantagens arquiteturais: o simulador não conhece o operator nem a IHM; o operator não conhece a IHM; a comunicação é unidirecional exceto pelo canal de controle (UpdateController). Isso permite substituir qualquer componente — por exemplo, trocar o simulador Rust por dados de uma planta física — sem alterar os demais.
+O escopo de implementação deste trabalho abrange os Níveis 0, 1 e 2. O Nível 4 — a inteligência supervisória baseada em otimização da função objetivo — é a diretriz arquitetural central da proposta e constitui a principal perspectiva de trabalho futuro.
+
+\begin{figure}[htbp]
+\centering
+\missingfigure[figwidth=0.92\textwidth]{Diagrama de fluxo de dados entre os componentes implementados (Níveis 0--2). Mostrar os quatro componentes como blocos: \texttt{te-core} (Nível 0, dentro de \texttt{tep-plant}), \texttt{ControllerBank} + servidor gRPC (Nível 1, dentro de \texttt{tep-plant}), \texttt{tep-operator} (Nível 2, Kubernetes Operator), \texttt{tep-ihm} (Nível 2, IHM), e \texttt{Browser} (cliente). Setas: Nível 0 $\leftrightarrow$ Nível 1 via chamada interna \texttt{step()} e \texttt{tep\_derivatives()}; Nível 1 $\rightarrow$ \texttt{tep-ihm} via gRPC \texttt{StreamMetrics} (streaming contínuo de medidas); \texttt{tep-operator} $\rightarrow$ Nível 1 via gRPC \texttt{UpdateController} (setpoints/ganhos); \texttt{tep-ihm} $\rightarrow$ \texttt{Browser} via WebSocket (push de medidas). Destacar que \texttt{tep-operator} e \texttt{tep-ihm} não se comunicam entre si.}
+\caption{Fluxo de dados entre os componentes do ambiente TEP-CPS (Níveis 0--2 implementados).}
+\label{fig:data_flow}
+\end{figure}
+
+A separação entre Nível 0 e Nível 1 dentro do \texttt{tep-plant} é deliberada: \texttt{te-core} não conhece nenhum protocolo de comunicação, o que permite reutilizá-lo em contextos de otimização \textit{offline} sem carregar a dependência gRPC. No Nível 2, o \texttt{tep-operator} não conhece a \texttt{tep-ihm} e a \texttt{tep-ihm} não emite comandos de controle — a visualização não interfere no laço de controle.
 
 % -------------------------------------------------------------------------
 \section{Simulador da Planta — \texttt{tep-plant}}

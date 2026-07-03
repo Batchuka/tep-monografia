@@ -94,8 +94,10 @@ DESENVOLVIMENTO
 DESENVOLVIMENTO
 │
 ├── Visão Geral da Arquitetura Proposta
-│     [mantém o que já está — hierarquia IEC 62264, mapeamento dos componentes,
-│      as duas figuras (hierarquia e fluxo de dados), escopo implementado vs. proposta]
+│     Apresenta a hierarquia IEC 62264 (Níveis 0–4) com o mapeamento dos componentes,
+│     delimita o escopo implementado (Níveis 0–2) e posiciona o K8s no Nível 4
+│     como destino arquitetural da proposta.
+│     [duas figuras (hierarquia e fluxo de dados), escopo implementado vs. proposta]
 │
 ├── Do FORTRAN ao Rust: mudança de paradigma
 │     Seção narrativa que justifica a reimplementação do TEP em Rust.
@@ -122,27 +124,106 @@ DESENVOLVIMENTO
 │   │     vetor de distúrbios. A planta é "caixa-preta" com entradas XMV e
 │   │     saídas XMEAS — interface que te-core preserva.
 │   │
-│   ├── Limitações e problemas de implementação
-│   │     — Estado global via COMMON blocks: não reentrante, impede múltiplas
-│   │       instâncias simultâneas da planta.
-│   │     — Ausência de tipos: XMV e XMEAS são arrays de double sem semântica;
-│   │       erros de índice são silenciosos.
-│   │     — Ausência de separação entre modelo e controle: os controladores
-│   │       originais (subrotinas XMEAS → XMV) estão embutidos no loop principal.
-│   │     — Sem interface de rede: o código foi projetado para rodar local,
-│   │       sem nenhuma abstração de comunicação.
-│   │     — Integrador fixo: RK4 com dt fixo, sem possibilidade de troca sem
-│   │       refatoração global.
+│   ├── Limitações e problemas da implementação FORTRAN
+│   │     — Monólito numérico-procedural: a planta aparece como uma sequência
+│   │       rígida de blocos de cálculo, não como equipamentos, streams,
+│   │       sensores, atuadores e interfaces físicas nomeadas.
 │   │
-│   └── O que o Rust endereça — design interno do te-core
-│         Em linhas gerais (sem código ainda), descrever como te-core resolve
-│         cada limitação acima:
-│         — TepPlant como struct encapsulando estado → múltiplas instâncias possíveis.
-│         — tep_derivatives() pura (sem efeitos colaterais) → testável unitariamente.
-│         — Trait Controller + ControllerBank → separação modelo/controle.
-│         — Integrador RK4 como função separada → trocável.
-│         — Interface XMEAS/XMV preservada como contrato público → compatibilidade
-│           com o FORTRAN original para validação.
+│   │     — Estado físico, variáveis algébricas e medições misturados:
+│   │       temperaturas, pressões, vazões, composições e XMEAS são calculados
+│   │       no mesmo corpo de função, dificultando separar dinâmica da planta
+│   │       de instrumentação.
+│   │
+│   │     — Atuadores escondidos no vetor de estado: posições de válvula entram
+│   │       como yy[38..50], mas a semântica "comando → dinâmica do atuador →
+│   │       posição efetiva → vazão" não aparece explicitamente no modelo.
+│   │
+│   │     — Dependências físicas implícitas por ordem de execução: o código sabe
+│   │       que precisa calcular termodinâmica antes de vazões, vazões antes de
+│   │       balanços, pressões antes de fluxos, mas essa dependência não está
+│   │       expressa em tipos ou componentes.
+│   │
+│   │     — Arrays sem identidade industrial: XMEAS, XMV, ftm, fcm, hst e vpos
+│   │       são vetores numéricos; o significado de cada posição vive fora do
+│   │       tipo, em tabelas, comentários ou memória do programador.
+│   │
+│   │     — Mistura de estado diferencial e variáveis algébricas: temperaturas,
+│   │       pressões e composições são variáveis algébricas derivadas do estado —
+│   │       não têm derivada própria. Tratá-las como coordenadas integradas
+│   │       (ex: twr/tws em state[36..37]) obscurece o que o integrador propaga.
+│   │
+│   │     — Fronteira fraca entre modelo e mundo externo: não existe camada
+│   │       formal separando estado interno, medição exposta, comando de atuador,
+│   │       sinal bruto, unidade, qualidade, limite ou tag supervisória.
+│   │
+│   │     — Dificuldade de validação modular: como tudo está acoplado em uma
+│   │       função grande, é difícil testar isoladamente uma válvula, um sensor,
+│   │       uma vazão, uma equação de troca térmica ou um bloco termodinâmico.
+│   │
+│   └── O que o Rust deve endereçar — design interno do te-core
+│         — A primeira coisa que fiz foi tentar comentar a lógica original e 
+│           entender melhor seus blocos funcionais. Isso ainda no FORTRAN que se
+│           encontra em https://github.com/Green-Cinnamon-Labs/tep-plant/tree/main/tennessee-eastman-process
+│ 
+│         — A segunda coisa que fiz foi uma versão 'fidedigna' do FORTRAN em
+│           Rust; trata-se da relase https://github.com/Green-Cinnamon-Labs/tep-plant/releases/tag/v1.0.0
+│
+│         — Na segunda release eu já comecei a refatorar tudo para o padrão `facade`
+|           abstraindo complexidades e organizando mais o código.
+|
+│         — Eu comecei a ter uma atenção maior. Passei por uma poderosa
+│           revisão de nomenclatura de variáveis e tipos, para tornar o código mais
+│           explicito e legível. Além disso, eu separei a lógica em funções e estruturas
+│           com responsabilidades mais claras.
+│
+│         — Daí eu percebi que existe um problema de design
+
+│ 
+│         — Equipamentos como tipos concretos: Reactor, Separator, Stripper,
+│           Compressor deixam de ser funções stateless e passam a ser structs
+│           com estado próprio (moles, energia interna), cada um expondo
+│           compute_thermo() → ThermoState e compute_derivatives() → Vec<f64>.
+│
+│         — Streams como valores tipados: em vez de xst[[f64;13];8] e
+│           tst[f64;13], cada stream é um struct Stream { composition,
+│           temperature, flow, enthalpy, mol_weight } identificado por nome
+│           (AFeed, DFeed, Purge, …), não por índice.
+│
+│         — Separação explícita entre estado diferencial e variáveis algébricas:
+│           o integrador só propaga moles e energia interna. Temperatura,
+│           pressão e composição são recalculadas por flash a cada dynamics() —
+│           nunca vivem como coordenadas integradas.
+│
+│         — Atuadores com semântica completa: Valve e Agitator recebem um
+│           Command, produzem uma Position via dinâmica de primeira ordem, e
+│           expõem position() para o cálculo de vazão. O integrador vê apenas
+│           a derivada da posição, não o comando.
+│
+│         — dynamics() como função pura: recebe &State, devolve Derivatives,
+│           sem efeitos colaterais. Logging, medição e atualização de
+│           ProcessImage ocorrem no integrador, após o commit do passo.
+│
+│         — Camada de instrumentação separada: Sensor<T> lê de um ThermoState
+│           ou FlowsOut, aplica ganho, offset e ruído, e escreve em um
+│           ProcessImage — fora e depois do laço de integração.
+│
+│         — ProcessImage como fronteira formal: um struct nomeado e tipado
+│           (não [f64;41]) que representa exatamente o que o mundo externo
+│           enxerga — tag, valor, unidade, qualidade, timestamp. É a única
+│           superfície que OPC-UA, IHM e historiador tocam.
+│
+│         — Grafo de dependências expresso em tipos: a ordem Disturbances →
+│           Thermo → Flows → Heat → Derivatives não é uma sequência de chamadas
+│           soltas — cada saída é o input tipado da próxima etapa, tornando
+│           impossível chamar Flows sem ter um ThermoState válido.
+│
+│         — Validação modular por construção: cada equipamento, stream e sensor
+│           é testável em isolamento com entradas explícitas. Não existe "rodar
+│           a planta inteira para ver se a válvula está certa".
+│
+│         — Camada industrial como cidadã de primeira classe: AddressSpace,
+│           NodeId, tag supervisória e unidade de engenharia nascem junto com
+│           o modelo — não são adaptadores colados depois.
 │
 ├── Simulador da Planta — tep-plant
 │     [mantém estrutura atual, mas pode ser mais enxuta agora que a seção acima

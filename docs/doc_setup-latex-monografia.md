@@ -25,15 +25,22 @@ Registro do ambiente de escrita da monografia — o que foi instalado, como o pr
 
 ## Estrutura do projeto
 
+O repo hospeda dois documentos LaTeX simétricos e autocontidos — a monografia e um artigo derivado (`paper/`) —, compartilhando `referencial/` (vault Obsidian) e um único `references.bib` na raiz.
+
 ```
-Monografia/
-├── main.tex              ← entry point LaTeX (nunca mover daqui)
-├── ifes8.cls             ← classe da IFES (precisa ficar junto ao main.tex)
-├── references.bib        ← bibliografia
-├── latex/
-│   ├── trabalho/         ← capítulos .tex (Cap0 a Cap5)
-│   └── pdf/              ← PDFs incluídos (folha, aprovacao)
-└── referencial/          ← vault Obsidian (notas + PDFs + config)
+tep-monografia/
+├── references.bib        ← bibliografia compartilhada (monografia + paper)
+├── monografia/
+│   ├── main.tex           ← entry point LaTeX da monografia
+│   ├── ifes8.cls          ← classe da IFES (precisa ficar junto ao main.tex)
+│   ├── latexindent.yaml
+│   ├── trabalho/          ← capítulos .tex (Cap0 a Cap5)
+│   └── pdf/               ← PDFs incluídos (folha, aprovacao)
+├── paper/
+│   ├── main.tex           ← entry point LaTeX do artigo (arxiv-style)
+│   ├── arxiv.sty
+│   └── orcid.pdf
+└── referencial/           ← vault Obsidian (notas + PDFs + config)
     ├── .obsidian/
     ├── articles/
     ├── books/
@@ -59,9 +66,10 @@ Para ativar um capítulo comentado no `main.tex`: remover o `%` antes do `\inclu
 
 | Decisão | Alternativa descartada | Motivo |
 |---------|------------------------|--------|
-| Capítulos em `latex/trabalho/` | raiz do projeto | separar LaTeX de notas Obsidian |
-| `ifes8.cls` na raiz | dentro de `latex/` | LaTeX exige classe no mesmo diretório do `main.tex` |
-| `main.pdf` no `.gitignore` | versionar o PDF | evita conflito de merge a cada compilação |
+| Capítulos em `monografia/trabalho/` | raiz do projeto | separar LaTeX de notas Obsidian |
+| `ifes8.cls` junto ao `main.tex` em `monografia/` | classe solta na raiz do repo | LaTeX exige classe no mesmo diretório do `main.tex`; mover `main.tex` para `monografia/` (revertendo a decisão anterior de nunca movê-lo) deixa o documento simétrico com `paper/` e permite buildar cada um isoladamente |
+| `references.bib` compartilhado na raiz | um `.bib` por documento | monografia e artigo citam a mesma literatura — evita divergência ao adicionar referências |
+| `main.pdf` no `.gitignore` | versionar o PDF | evita conflito de merge a cada compilação (casa `main.pdf` em qualquer profundidade, cobre `monografia/main.pdf` e `paper/main.pdf`) |
 
 ## Problemas em aberto / Próximos passos
 

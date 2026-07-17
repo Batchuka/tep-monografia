@@ -1,5 +1,14 @@
 # Monografia TEP — Protocolo de Notas e Referências
 
+## Estrutura do repositório
+
+Este repo hospeda dois documentos LaTeX autocontidos, cada um com seu próprio `main.tex` e buildável isoladamente:
+
+- **[`monografia/`](monografia/)** — o TCC (ABNT, classe `ifes8`)
+- **[`paper/`](paper/)** — artigo derivado da monografia (estilo arXiv)
+
+Os dois compartilham `referencial/` (vault Obsidian com notas e fontes) e um único `references.bib` na raiz, para não divergir a bibliografia entre monografia e artigo. Detalhes de setup e compilação: [`docs/doc_setup-latex-monografia.md`](docs/doc_setup-latex-monografia.md).
+
 ## Big Picture
 
 <a href="https://batchuka.github.io/tep-monografia/">

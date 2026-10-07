@@ -1,7 +1,7 @@
 \chapter{DESENVOLVIMENTO}
 \label{cha:desenvolvimento}
 
-Este capítulo descreve a arquitetura proposta e os componentes desenvolvidos para implementar o ambiente cyber-físico do Processo Tennessee Eastman sobre arquitetura OPC UA, com prova de conceito de supervisão Kubernetes. O ambiente é composto por quatro repositórios com responsabilidades bem delimitadas: \texttt{tep-plant} (simulador da planta), \texttt{tep-operator} (Operator Kubernetes), \texttt{tep-ihm} (Interface Homem-Máquina) e \texttt{tep-supervisor} (infraestrutura local).
+Este capítulo descreve a arquitetura proposta e os componentes desenvolvidos para implementar o ambiente cyber-físico do Processo Tennessee Eastman sobre arquitetura OPC UA, com prova de conceito de supervisão Kubernetes. O ambiente é composto por quatro repositórios com responsabilidades bem delimitadas: \texttt{tep-plant} (simulador da planta), \texttt{plant-supervisor} (Operator Kubernetes), \texttt{tep-ihm} (Interface Homem-Máquina) e \texttt{tep-lab} (infraestrutura local).
 
 % -------------------------------------------------------------------------
 \section{Visão Geral da Arquitetura Proposta}
@@ -12,14 +12,14 @@ A proposta completa do ambiente TEP-CPS é estruturada sobre a hierarquia funcio
 \begin{itemize}
   \item \textbf{Nível 0 — Processo físico}: o modelo matemático do TEP (\textit{crate} \texttt{te-core}), com as equações diferenciais e o integrador RK4. Não possui nenhuma lógica de controle.
   \item \textbf{Nível 1 — Sensing e manipulação}: o \texttt{ControllerBank} com os controladores regulatórios (proporcional) e a interface gRPC que expõe medidas (\texttt{StreamMetrics}) e recebe comandos de atuação (\texttt{UpdateController}). Nível 0 e 1 coexistem dentro do repositório \texttt{tep-plant}.
-  \item \textbf{Nível 2 — Controle supervisório e monitoramento}: políticas de controle declarativas aplicadas pelo Operator Kubernetes (\texttt{tep-operator}) via CRD \texttt{PLCMachine}, e interface de operação em tempo real (\texttt{tep-ihm}) para o operador humano.
+  \item \textbf{Nível 2 — Controle supervisório e monitoramento}: políticas de controle declarativas aplicadas pelo Operator Kubernetes (\texttt{plant-supervisor}) via CRD \texttt{PLCMachine}, e interface de operação em tempo real (\texttt{tep-ihm}) para o operador humano.
   \item \textbf{Nível 3 — Gerenciamento de operações de manufatura}: fora do escopo deste trabalho.
   \item \textbf{Nível 4 — Planejamento e logística}: Kubernetes como plataforma de orquestração inteligente, responsável por executar a função objetivo composta $J$ (Equação~\ref{eq:tep_cost_extended}) e produzir as políticas supervisórias entregues ao Nível 2. Este nível é o destino arquitetural da proposta e é explorado preliminarmente no Apêndice~\ref{apendice:otimizacao}.
 \end{itemize}
 
 \begin{figure}[htbp]
 \centering
-\missingfigure[figwidth=0.92\textwidth]{Hierarquia funcional IEC~62264 adaptada para a proposta TEP-CPS. Nível 0: \texttt{te-core} (equações diferenciais do TEP, integrador RK4). Nível 1: \texttt{ControllerBank} (controladores P) + servidor gRPC — ambos internos ao \texttt{tep-plant}. Nível 2: \texttt{tep-operator} (Operator Kubernetes, CRD \texttt{PLCMachine}) e \texttt{tep-ihm} (IHM/dashboard WebSocket). Nível 3: fora do escopo. Nível 4: Kubernetes com função objetivo $J$ e otimização gerando políticas supervisórias. Indicar visualmente quais níveis estão implementados (0, 1, 2 — escopo deste trabalho) e quais são proposta futura (3, 4).}
+\missingfigure[figwidth=0.92\textwidth]{Hierarquia funcional IEC~62264 adaptada para a proposta TEP-CPS. Nível 0: \texttt{te-core} (equações diferenciais do TEP, integrador RK4). Nível 1: \texttt{ControllerBank} (controladores P) + servidor gRPC — ambos internos ao \texttt{tep-plant}. Nível 2: \texttt{plant-supervisor} (Operator Kubernetes, CRD \texttt{PLCMachine}) e \texttt{tep-ihm} (IHM/dashboard WebSocket). Nível 3: fora do escopo. Nível 4: Kubernetes com função objetivo $J$ e otimização gerando políticas supervisórias. Indicar visualmente quais níveis estão implementados (0, 1, 2 — escopo deste trabalho) e quais são proposta futura (3, 4).}
 \caption{Hierarquia funcional IEC~62264 do ambiente TEP-CPS: proposta completa e escopo de implementação.}
 \label{fig:arch_overview}
 \end{figure}
@@ -28,12 +28,12 @@ O escopo de implementação deste trabalho abrange os Níveis 0, 1 e 2. O Nível
 
 \begin{figure}[htbp]
 \centering
-\missingfigure[figwidth=0.92\textwidth]{Diagrama de fluxo de dados entre os componentes implementados (Níveis 0--2). Mostrar os quatro componentes como blocos: \texttt{te-core} (Nível 0, dentro de \texttt{tep-plant}), \texttt{ControllerBank} + servidor gRPC (Nível 1, dentro de \texttt{tep-plant}), \texttt{tep-operator} (Nível 2, Kubernetes Operator), \texttt{tep-ihm} (Nível 2, IHM), e \texttt{Browser} (cliente). Setas: Nível 0 $\leftrightarrow$ Nível 1 via chamada interna \texttt{step()} e \texttt{tep\_derivatives()}; Nível 1 $\rightarrow$ \texttt{tep-ihm} via gRPC \texttt{StreamMetrics} (streaming contínuo de medidas); \texttt{tep-operator} $\rightarrow$ Nível 1 via gRPC \texttt{UpdateController} (setpoints/ganhos); \texttt{tep-ihm} $\rightarrow$ \texttt{Browser} via WebSocket (push de medidas). Destacar que \texttt{tep-operator} e \texttt{tep-ihm} não se comunicam entre si.}
+\missingfigure[figwidth=0.92\textwidth]{Diagrama de fluxo de dados entre os componentes implementados (Níveis 0--2). Mostrar os quatro componentes como blocos: \texttt{te-core} (Nível 0, dentro de \texttt{tep-plant}), \texttt{ControllerBank} + servidor gRPC (Nível 1, dentro de \texttt{tep-plant}), \texttt{plant-supervisor} (Nível 2, Kubernetes Operator), \texttt{tep-ihm} (Nível 2, IHM), e \texttt{Browser} (cliente). Setas: Nível 0 $\leftrightarrow$ Nível 1 via chamada interna \texttt{step()} e \texttt{tep\_derivatives()}; Nível 1 $\rightarrow$ \texttt{tep-ihm} via gRPC \texttt{StreamMetrics} (streaming contínuo de medidas); \texttt{plant-supervisor} $\rightarrow$ Nível 1 via gRPC \texttt{UpdateController} (setpoints/ganhos); \texttt{tep-ihm} $\rightarrow$ \texttt{Browser} via WebSocket (push de medidas). Destacar que \texttt{plant-supervisor} e \texttt{tep-ihm} não se comunicam entre si.}
 \caption{Fluxo de dados entre os componentes do ambiente TEP-CPS (Níveis 0--2 implementados).}
 \label{fig:data_flow}
 \end{figure}
 
-A separação entre Nível 0 e Nível 1 dentro do \texttt{tep-plant} é deliberada: \texttt{te-core} não conhece nenhum protocolo de comunicação, o que permite reutilizá-lo em contextos de otimização \textit{offline} sem carregar a dependência gRPC. No Nível 2, o \texttt{tep-operator} não conhece a \texttt{tep-ihm} e a \texttt{tep-ihm} não emite comandos de controle — a visualização não interfere no laço de controle.
+A separação entre Nível 0 e Nível 1 dentro do \texttt{tep-plant} é deliberada: \texttt{te-core} não conhece nenhum protocolo de comunicação, o que permite reutilizá-lo em contextos de otimização \textit{offline} sem carregar a dependência gRPC. No Nível 2, o \texttt{plant-supervisor} não conhece a \texttt{tep-ihm} e a \texttt{tep-ihm} não emite comandos de controle — a visualização não interfere no laço de controle.
 
 % -------------------------------------------------------------------------
 \section{Simulador da Planta — \texttt{tep-plant}}
@@ -128,10 +128,10 @@ O método \texttt{UpdateController} é o canal pelo qual o operator Kubernetes a
 Os distúrbios (IDV$_1$ a IDV$_{20}$) são ativados via variável de ambiente \texttt{ACTIVE\_IDV} ou dinamicamente via painel da IHM. Cada distúrbio é implementado como um modificador das condições de entrada da planta, fiel ao FORTRAN original de Downs e Vogel \cite{DOWNS1993}. A seleção dos distúrbios relevantes para o supervisor é discutida no Capítulo~\ref{cha:resultados}.
 
 % -------------------------------------------------------------------------
-\section{Operator Kubernetes — \texttt{tep-operator}}
+\section{Operator Kubernetes — \texttt{plant-supervisor}}
 \label{sec:operator}
 
-O repositório \texttt{tep-operator} implementa um Operator Kubernetes em Go, construído com o framework Kubebuilder. Seu objetivo neste trabalho é atuar como \textbf{observador supervisório} da planta TEP: conecta-se à planta via gRPC, lê continuamente o estado das variáveis de processo e registra as observações no \textit{status} do CRD \texttt{PLCMachine}. A arquitetura prevê também a capacidade de intervenção via \texttt{UpdateController} — chamada gRPC que permite ajustar setpoints dos controladores — mas nos experimentos realizados o operator operou em modo de observação pura, sem emissão de comandos à planta. A camada de intervenção ativa é o horizonte natural de evolução deste componente.
+O repositório \texttt{plant-supervisor} implementa um Operator Kubernetes em Go, construído com o framework Kubebuilder. Seu objetivo neste trabalho é atuar como \textbf{observador supervisório} da planta TEP: conecta-se à planta via gRPC, lê continuamente o estado das variáveis de processo e registra as observações no \textit{status} do CRD \texttt{PLCMachine}. A arquitetura prevê também a capacidade de intervenção via \texttt{UpdateController} — chamada gRPC que permite ajustar setpoints dos controladores — mas nos experimentos realizados o operator operou em modo de observação pura, sem emissão de comandos à planta. A camada de intervenção ativa é o horizonte natural de evolução deste componente.
 
 \subsection{O CRD \texttt{PLCMachine}}
 
@@ -239,10 +239,10 @@ A IHM suporta gravação de todos os dados recebidos em arquivo CSV, ativada pel
 Cada linha do CSV contém o timestamp, o tempo simulado da planta, os valores de XMEAS$_{1-41}$ e XMV$_{1-12}$, e indicadores calculados como \texttt{deriv\_norm} e o inventário total de vapor.
 
 % -------------------------------------------------------------------------
-\section{Infraestrutura Local — \texttt{tep-supervisor}}
+\section{Infraestrutura Local — \texttt{tep-lab}}
 \label{sec:supervisor}
 
-O repositório \texttt{tep-supervisor} reúne os arquivos de configuração de infraestrutura necessários para executar o laboratório em ambiente local Windows.
+O repositório \texttt{tep-lab} reúne os arquivos de configuração de infraestrutura necessários para executar o laboratório em ambiente local Windows.
 
 \subsection{Modo de Desenvolvimento — Docker Compose}
 
@@ -265,7 +265,7 @@ O roteiro de inicialização do laboratório com o Operator ativo é:
   \item Iniciar a planta e a IHM via Docker Compose.
   \item Criar o cluster Kind: \texttt{kind create cluster --name tep}.
   \item Instalar os CRDs no cluster: \texttt{kubectl apply -f config/crd/}.
-  \item Construir e carregar a imagem do operator no cluster: \texttt{kind load docker-image tep-operator:latest}.
+  \item Construir e carregar a imagem do operator no cluster: \texttt{kind load docker-image plant-supervisor:latest}.
   \item Implantar o operator: \texttt{kubectl apply -f config/manager/}.
   \item Aplicar a política supervisória: \texttt{kubectl apply -f config/samples/}.
 \end{enumerate}

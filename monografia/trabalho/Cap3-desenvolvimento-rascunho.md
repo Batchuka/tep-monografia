@@ -36,7 +36,7 @@ DESENVOLVIMENTO
 │         Explica a ativação dos IDV1–IDV20 via variável de ambiente ou IHM,
 │         com fidelidade ao FORTRAN original de Downs e Vogel.
 │
-├── Operator Kubernetes — tep-operator
+├── Operator Kubernetes — plant-supervisor
 │     Apresenta o Operator Go (Kubebuilder) como observador supervisório da planta,
 │     operando em modo de observação pura nos experimentos realizados.
 │
@@ -68,7 +68,7 @@ DESENVOLVIMENTO
 │         Explica a gravação contínua de XMEAS/XMV ativada por RECORD_CSV=true;
 │         os CSVs são a fonte de dados dos experimentos do Cap. 4.
 │
-├── Infraestrutura Local — tep-supervisor
+├── Infraestrutura Local — tep-lab
 │     Reúne os arquivos de configuração para execução em Windows local.
 │
 │   ├── Modo de Desenvolvimento — Docker Compose
@@ -240,7 +240,7 @@ DESENVOLVIMENTO
 │      relação com a norma IEC 62541, como o servidor OPC UA se relaciona com
 │      o gRPC já existente ou o substitui, e o que foi implementado vs. proposto]
 │
-├── Operator Kubernetes — tep-operator            [mantém estrutura atual]
+├── Operator Kubernetes — plant-supervisor            [mantém estrutura atual]
 │   ├── O CRD PLCMachine
 │   ├── Loop de Reconciliação
 │   └── Conectividade com a Planta
@@ -250,7 +250,7 @@ DESENVOLVIMENTO
 │   ├── Dashboard
 │   └── Registro de Dados (CSV)
 │
-├── Infraestrutura Local — tep-supervisor         [mantém estrutura atual]
+├── Infraestrutura Local — tep-lab         [mantém estrutura atual]
 │   ├── Modo de Desenvolvimento — Docker Compose
 │   └── Modo de Produção — Cluster Kind
 │

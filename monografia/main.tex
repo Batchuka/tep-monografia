@@ -9,6 +9,7 @@
 \usepackage{xcolor}
 \usepackage{tikz}
 \usetikzlibrary[topaths]
+\usetikzlibrary{decorations.pathreplacing,arrows.meta}
 \usepackage{mathtools}
 \usepackage[final]{pdfpages}
 %\usepackage{caption}
@@ -103,7 +104,7 @@
 
 \newcommand{\ifestex}{\textsf{Ifes$8$}}
 
-\titulo{Implementação do Processo Tennessee Eastman em Arquitetura OPC UA: Ambiente Cyber-Físico com Prova de Conceito de Supervisão Kubernetes}
+\titulo{Supervisão Declarativa do Processo Tennessee Eastman com Kubernetes: Função de Custo e Qualidade de Malhas sobre uma Planta Simulada em OPC UA}
 
 \autor{Matheus Corteletti Delfino}
 
@@ -141,9 +142,9 @@
 %
 %\begin{fichacatalografica}
 %  \vspace*{\fill}
-  % Posição vertical
+% Posição vertical
 %  \begin{center}
-    % Minipage Centralizado
+% Minipage Centralizado
 %    \fbox{
 %      \begin{minipage}[t]{12.5cm}
 %        \vspace*{3mm}
@@ -155,18 +156,18 @@
 %      \hspace{0.5cm}\imprimirtitulo\ / \imprimirautor. ---
 %          \imprimirlocal, \imprimirdata.\\ 
 %      \hspace{0.5cm}\pageref{LastPage} p.:\ il. (algumas color.);
- %         30 cm.\\ 
+%         30 cm.\\ 
 %      \hspace{0.5cm}\imprimirorientadorRotulo~\imprimirorientador.\\
 %      \hspace{0.5cm}\imprimirtipotrabalho\ ---
 %         \imprimirinstituicao, %\imprimirdata\\
 %          \hspace{0.5cm}        
- %         1. Palavra-chave1.
+%         1. Palavra-chave1.
 %          2. Palavra-chave2.
 %          I. Orientador.
 %          II. \imprimirinstituicao
 %          III. Faculdade de xxx.
 %          IV. Título.
-          
+
 %          \begin{flushright}
 %            CDU 00:000:000.0
 %          \end{flushright}
@@ -283,27 +284,27 @@
 %%% ====================================================================
 %%% Lista de siglas
 %\begin{siglas}
-  %\simb{ABNT} -- Associação Brasileira de Normas Técnicas
-  %\simb{ACM} -- Association for Computing Machinery
-  %\simb{APA} -- American Psychological Association
-  %\simb{BIOS} -- Basic Input / Output System
-  %\simb{CREA} -- Conselho Regional de Engenharia e Agronomia
-  %\simb{IBGE} -- Instituto Brasileiro de Geografia e Estatística
-  %\simb{IEEE} -- Institute of Electrical and Electronics Engineers
-  %\simb{Ifes} -- Instituo Federal de Educação, Ciência e Tecnologia do Espírito Santo
-  %\simb{ISDN} -- Integrated Services Digital Network
-  %\simb{RISC} -- Reduced Instruction Set Computer
+%\simb{ABNT} -- Associação Brasileira de Normas Técnicas
+%\simb{ACM} -- Association for Computing Machinery
+%\simb{APA} -- American Psychological Association
+%\simb{BIOS} -- Basic Input / Output System
+%\simb{CREA} -- Conselho Regional de Engenharia e Agronomia
+%\simb{IBGE} -- Instituto Brasileiro de Geografia e Estatística
+%\simb{IEEE} -- Institute of Electrical and Electronics Engineers
+%\simb{Ifes} -- Instituo Federal de Educação, Ciência e Tecnologia do Espírito Santo
+%\simb{ISDN} -- Integrated Services Digital Network
+%\simb{RISC} -- Reduced Instruction Set Computer
 %\end{siglas}
 
 
 %%% ====================================================================
 %%% Lista de símbolos
 %\begin{simbolos}
- % \simb{$\Gamma$} -- Letra grega Gama
-  %\simb{$\Lambda$} -- Lambda
-  %\simb{$\zeta$} -- Letra grega minúscula zeta
-  %\simb{$\in$} -- Pertence
-  %\simb{$\top$} -- Valor lógico máximo dentro de um reticulado regular booleano ou quasi-booleano.
+% \simb{$\Gamma$} -- Letra grega Gama
+%\simb{$\Lambda$} -- Lambda
+%\simb{$\zeta$} -- Letra grega minúscula zeta
+%\simb{$\in$} -- Pertence
+%\simb{$\top$} -- Valor lógico máximo dentro de um reticulado regular booleano ou quasi-booleano.
 %\end{simbolos}
 \cleardoublepage
 

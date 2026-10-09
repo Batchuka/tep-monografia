@@ -15,20 +15,21 @@ Larsson e Skogestad usam o próprio TEP como exemplo \cite{Larsson2000}. Um grau
   \node[font=\bfseries] at (5.2,1.2) {8 graus de liberdade};
   \draw[decorate,decoration={brace,mirror,amplitude=6pt}] (0.05,-0.1) -- (6.45,-0.1);
   \draw[decorate,decoration={brace,mirror,amplitude=6pt}] (6.55,-0.1) -- (10.35,-0.1);
-  \node[anchor=north,align=left,text width=6.2cm] at (3.25,-0.5) {%
-    \textbf{5 presos no limite}\\[3pt]
-    pressão do reator no máximo\\
-    nível do reator no mínimo\\
-    agitador no máximo\\
-    válvula de vapor no mínimo\\
-    válvula de reciclo do compressor no mínimo};
-  \node[anchor=north,align=left,text width=4.2cm] at (8.7,-0.5) {%
-    \textbf{3 livres}\\[3pt]
-    boa escolha:\\ temperatura do reator\\[3pt]
-    escolha ruim:\\ composição do inerte B};
+  \node[anchor=north west,align=left] at (0.1,-0.5) {%
+    \textbf{5 no limite}\\[2pt]
+    \textbullet\ pressão do reator: máx.\\
+    \textbullet\ nível do reator: mín.\\
+    \textbullet\ agitador: máx.\\
+    \textbullet\ válvula de vapor: mín.\\
+    \textbullet\ reciclo do compressor: mín.};
+  \node[anchor=north west,align=left] at (6.6,-0.5) {%
+    \textbf{3 livres}\\[2pt]
+    \textbullet\ boa: temperatura do reator\\
+    \textbullet\ ruim: composição de B};
 \end{tikzpicture}
 \caption{Graus de liberdade do TEP em regime estacionário no Modo~1.}
 \label{fig:graus_liberdade_tep}
+\fonte{Adaptado de \citeonline{Larsson2000}.}
 \end{figure}
 
 Na hierarquia de Larsson e Skogestad, quem decide e quem executa estão em camadas diferentes. Escolher a temperatura do reator como variável a manter constante é uma decisão de uma camada de cima; quem mantém a temperatura no valor pedido é uma malha da camada regulatória. E saber se essa escolha está funcionando, isto é, se a planta continua perto do custo mínimo depois de um distúrbio, exige medições que vêm da planta e sobem até a camada que decidiu. Ou seja, para que essa estrutura funcione, a informação precisa descer (os setpoints) e subir (as medições e o estado da planta) entre as camadas o tempo todo. Os autores tratam de quais decisões cada camada toma, mas não de como essa informação passa de uma camada para a outra \cite{Larsson2000, Skogestad2004}. Em uma planta real, essas camadas costumam rodar em equipamentos e programas diferentes, então essa passagem não acontece sozinha: alguém precisa construí-la. A Figura~\ref{fig:camadas_integracao} ilustra essa passagem.
@@ -45,9 +46,9 @@ Na hierarquia de Larsson e Skogestad, quem decide e quem executa estão em camad
     exemplo/.style={font=\scriptsize, align=left, text width=3.4cm, anchor=west}
 ]
   % camadas
-  \node[bloco] (opt) at (0,0)    {Otimização\[-1pt]\scriptsize (horas)};
-  \node[bloco] (sup) at (0,-2.0) {Supervisão\[-1pt]\scriptsize (minutos)};
-  \node[bloco] (reg) at (0,-4.0) {Controle regulatório\[-1pt]\scriptsize (segundos)};
+  \node[bloco] (opt) at (0,0)    {Otimização\\[-1pt]\scriptsize (horas)};
+  \node[bloco] (sup) at (0,-2.0) {Supervisão\\[-1pt]\scriptsize (minutos)};
+  \node[bloco] (reg) at (0,-4.0) {Controle regulatório\\[-1pt]\scriptsize (segundos)};
   \node[bloco] (tep) at (0,-6.0) {Planta (TEP)};
 
   % setpoints descem (esquerda), medições sobem (direita)
@@ -63,6 +64,7 @@ Na hierarquia de Larsson e Skogestad, quem decide e quem executa estão em camad
   \node[rotulo, rotate=90] at (-3.25,-3.0) {integração (foco deste trabalho)};
 
   % exemplo
+  \node[exemplo] at (3.7,0) {escolhe o que é operar bem; é daqui que sai a política};
   \node[exemplo] at (3.7,-2.0) {decide manter a temperatura do reator constante};
   \node[exemplo] at (3.7,-4.0) {malha mantém a temperatura no valor pedido};
   \node[exemplo] at (3.7,-6.0) {mede a temperatura e o custo};
@@ -72,98 +74,38 @@ Na hierarquia de Larsson e Skogestad, quem decide e quem executa estão em camad
 \fonte{Elaborado pelo autor a partir de \citeonline{Larsson2000} e \citeonline{Skogestad2004}.}
 \end{figure}
 
-A resposta formal a esse problema é o conceito de \textbf{Sistema Cyber-Físico} (CPS): a integração entre computação e processos físicos, onde computadores e redes monitoram e controlam o processo por meio de laços de realimentação em que o físico afeta a computação e vice-versa \cite{Hehenberger2016}. Hehenberger et al.\ apontam que uma abordagem de engenharia baseada em CPS impõe dois passos metodológicos: modelar explicitamente cada subsistema e integrar esses modelos em um sistema global coerente \cite{Hehenberger2016}. A \textit{parte cyber} de um CPS é precisamente a rede de integração — a camada que interconecta subsistemas, torna seus estados visíveis e permite que comandos fluam de volta ao processo. Esse requisito de integração horizontal e vertical é o que torna necessária uma camada de comunicação industrial com semântica padronizada e, consequentemente, motiva as escolhas tecnológicas deste trabalho.
+Para mostrar essa ligação funcionando, é preciso uma planta que fique rodando e com a qual outros sistemas consigam se conectar, o que Hehenberger et al.\ chamam de \textbf{Sistema Cyber-Físico} (CPS) \cite{Hehenberger2016}. O TEP, como costuma ser usado, roda do início ao fim e só depois os dados são analisados. Por isso ele foi reescrito como uma planta simulada que roda de forma contínua. Essa é só a forma escolhida para ter onde demonstrar a ideia.
 
+A Figura~\ref{fig:componentes} mostra os componentes. A planta expõe o seu estado via OPC~UA \cite{IEC62541_1} e um \textit{historian} guarda esses sinais. O usuário vai até o Kubernetes e declara a política, isto é, o que é operar bem, trazendo as escolhas da camada de otimização da Figura~\ref{fig:camadas_integracao}. A partir daí, o Kubernetes acompanha a planta e diz se ela está cumprindo essa política. Uma Interface Homem-Máquina (IHM) mostra a planta e esse veredito, para que se possa ver e entender o que está acontecendo.
 
+\begin{figure}[htbp]
+\centering
 \begin{tikzpicture}[
-    >=Latex,
     font=\small,
-    bloco/.style={
-        draw=black,
-        fill=gray!10,
-        minimum width=3.8cm,
-        minimum height=0.85cm,
-        align=center
-    },
+    comp/.style={draw, fill=gray!10, minimum width=2.0cm, minimum height=0.9cm, align=center},
+    k8s/.style={draw, double, rounded corners=6pt, fill=gray!25, minimum width=2.0cm, minimum height=0.9cm, align=center},
     fluxo/.style={-{Latex[length=2mm]}, thick},
-    exemplo/.style={
-        font=\scriptsize,
-        align=left,
-        text width=3.4cm
-    }
+    rotulo/.style={font=\scriptsize}
 ]
+  \node[comp] (tep) at (0,0)    {Planta (TEP)};
+  \node[comp] (his) at (4.0,0)  {\textit{Historian}};
+  \node[k8s]  (k8s) at (8.0,0)  {Kubernetes};
+  \node[comp] (ihm) at (11.8,0) {IHM};
+  \node[align=center] (usr) at (9.9,2.2) {Usuário};
 
-% Blocos da hierarquia
-\node[bloco] (opt) at (0,0)
-    {Otimização\\[-1pt]\scriptsize (horas)};
-
-\node[bloco] (sup) at (0,-2.0)
-    {Supervisão\\[-1pt]\scriptsize (minutos)};
-
-\node[bloco] (reg) at (0,-4.0)
-    {Controle regulatório\\[-1pt]\scriptsize (segundos)};
-
-\node[bloco] (tep) at (0,-6.0)
-    {Planta (TEP)};
-
-% Setas descendentes: setpoints
-\foreach \a/\b in {opt/sup, sup/reg, reg/tep} {
-    \draw[fluxo]
-        ([xshift=-0.85cm]\a.south) --
-        ([xshift=-0.85cm]\b.north)
-        node[midway, left, font=\scriptsize]
-        {setpoints};
-}
-
-% Setas ascendentes: medições / estado
-\foreach \a/\b in {sup/opt, reg/sup, tep/reg} {
-    \draw[fluxo]
-        ([xshift=0.85cm]\a.north) --
-        ([xshift=0.85cm]\b.south)
-        node[midway, right, font=\scriptsize]
-        {medições / estado};
-}
-
-% Região de integração
-\draw[
-    dashed,
-    gray!75,
-    rounded corners=2pt
-]
-    (-2.85,-0.48) rectangle (2.85,-5.52);
-
-\node[
-    font=\scriptsize,
-    align=center,
-    text width=2.5cm,
-    anchor=west
-] at (3.0,-1.0)
-    {integração\\
-     (foco deste trabalho)};
-
-% Exemplos por nível
-\node[exemplo, anchor=west]
-    at (3.0,-2.0)
-    {decide manter a temperatura
-     do reator constante};
-
-\node[exemplo, anchor=west]
-    at (3.0,-4.0)
-    {malha mantém a temperatura
-     no valor pedido};
-
-\node[exemplo, anchor=west]
-    at (3.0,-6.0)
-    {mede a temperatura
-     e o custo};
-
+  % acima da seta: protocolo; abaixo: o que passa
+  \draw[fluxo] (tep) -- node[above, rotulo] {OPC~UA} node[below, rotulo] {sinais} (his);
+  \draw[fluxo] (his) -- node[above, rotulo] {HTTP} node[below, rotulo] {estatísticas} (k8s);
+  \draw[fluxo] (k8s) -- node[above, rotulo] {HTTP} node[below, rotulo] {veredito} (ihm);
+  \draw[fluxo] (usr) -- node[left, rotulo, align=right] {declara\\a política} (k8s);
+  \draw[fluxo] (ihm) -- node[right, rotulo] {acompanha} (usr);
+  \draw[fluxo] (tep.south) -- ++(0,-0.7) -| node[pos=0.25, below, rotulo] {OPC~UA} (ihm.south);
 \end{tikzpicture}
+\caption{Componentes do ambiente desenvolvido.}
+\label{fig:componentes}
+\fonte{Elaborado pelo autor.}
+\end{figure}
 
-
-
-Para a camada supervisória desse CPS — o componente que observa o estado da planta e age para manter a operação dentro de parâmetros declarados — a literatura cloud-native oferece um candidato bem estudado. Shuiguang et al.\ \cite{Shuiguang2023} caracterizam computação cloud-native como a combinação de microserviços, containerização e orquestração automática de componentes distribuídos, com Kubernetes como o orquestrador open-source que se tornou padrão de fato na indústria. O mecanismo central que o torna atraente para esse papel é o \textit{reconciliation controller loop}: uma comparação contínua entre o estado desejado (\textit{Spec}) e o estado observado (\textit{Status}), seguida de ações para convergir um ao outro \cite{Burns2016}. Essa estrutura — declarar política, observar realidade, reconciliar continuamente — guarda uma semelhança estrutural não trivial com o papel que Skogestad atribui à camada supervisória: manter variáveis controladas em setpoints ótimos usando os graus de liberdade da camada regulatória como alavancas. Este trabalho explora a hipótese de que esse padrão arquitetural pode servir como orquestrador supervisório de um CPS industrial baseado no TEP.
-
-O presente trabalho constrói três artefatos como ponto de partida para esse universo de possibilidades. O primeiro é um microserviço da planta TEP implementado em Rust — uma refatoração do modelo original em FORTRAN para uma linguagem de alta performance, exposto via gRPC. O segundo é uma Interface Homem-Máquina (IHM) web em FastAPI com WebSocket, funcionando como cliente dessa planta e permitindo monitoramento em tempo real e injeção dos distúrbios. O terceiro é um Operator Kubernetes básico que observa a planta, demonstrando a viabilidade de usar o padrão declarativo do Kubernetes como orquestrador supervisório sobre componentes industriais. A interface entre os três componentes é mapeada segundo o padrão OPC~UA, respeitando a norma IEC~62541 \cite{IEC62541_1}. O objetivo não é implementar estratégias de controle nem estabelecer lógica supervisória definitiva — é produzir esses artefatos iniciais como fundação técnica e ponto de partida concreto para os trabalhos futuros que o referencial teórico delineia.
 
 \section{PROBLEMA}
 \label{sec:problema}
@@ -173,74 +115,35 @@ O problema abordado neste trabalho é a implementação de controle plant-wide s
 \section{A PROPOSTA}
 \label{sec:proposta}
 
-Este trabalho propõe refatorar o modelo original do TEP de FORTRAN para um microserviço em Rust, modelado segundo a hierarquia de integração da norma IEC~62264 \cite{IEC62264} e com variáveis de processo expostas conforme o padrão OPC~UA \cite{IEC62541_1}. Sobre essa base, são implementados os seguintes componentes:
+Este trabalho propõe montar os componentes da Figura~\ref{fig:componentes} sobre o TEP e mostrar que, juntos, eles permitem acompanhar a planta a partir de uma política declarada. Os componentes são:
 
 \begin{enumerate}
-  \item Simulação da planta TEP em Rust com integração numérica RK4, comunicação via gRPC e modelagem compatível com a hierarquia Purdue definida pela IEC~62264 \cite{IEC62264};
-  \item Interface Homem-Máquina (IHM) web aderente à norma IEC~63303 \cite{IEC63303}, funcionando como cliente da planta para monitoramento em tempo real e injeção de distúrbios;
-  \item Implementação dos distúrbios programados descritos no artigo original de Downs e Vogel \cite{DOWNS1993};
-  \item Verificação da fidelidade dinâmica da simulação por meio da análise do comportamento da planta sob os distúrbios implementados;
-  \item Implementação de um \textit{Custom Resource Definition} (CRD) Kubernetes conectando um contêiner Kind à planta, validando a arquitetura básica do CPS proposto.
+  \item \textbf{Planta simulada}: o TEP reescrito em Rust para rodar de forma contínua, com os distúrbios de Downs e Vogel \cite{DOWNS1993}, expondo o seu estado via OPC~UA. O OPC~UA é o padrão de comunicação industrial definido pela norma IEC~62541 \cite{IEC62541_1};
+  \item \textbf{\textit{Historian}}: coleta os sinais da planta via OPC~UA e entrega estatísticas desses sinais por HTTP;
+  \item \textbf{Camada supervisória no Kubernetes}: recebe do usuário a política do Modo~1 de Downs e Vogel (custo de operação, metas de produção e limites) e diz se a planta está cumprindo essa política. Também diz se as malhas de controle estão saudáveis;
+  \item \textbf{IHM}: mostra a planta e o veredito, seguindo a norma IEC~63303 \cite{IEC63303}, que trata de IHMs para processos industriais.
 \end{enumerate}
+
+Para situar cada componente, usa-se a divisão em níveis da norma IEC~62264 \cite{IEC62264}, que organiza os sistemas de uma indústria do processo físico até o planejamento da empresa.
+
+Sobre esses componentes, a proposta inclui duas verificações: que a planta simulada se comporta como o modelo original de Downs e Vogel e que o veredito do Kubernetes muda quando a planta sofre um distúrbio, sem que a política seja alterada.
 
 \section{OBJETIVOS}
 \label{sec:objetivos}
 
 \subsection{Objetivo Geral}
 
-Implementar uma simulação funcional do Processo Tennessee Eastman em Rust — refatoração do modelo original em FORTRAN — e integrá-la em uma arquitetura de Sistema Cyber-Físico com componentes heterogêneos interoperáveis via protocolos abertos, servindo como base técnica para o desenvolvimento futuro de estratégias de controle plant-wide.
+Mostrar que uma camada supervisória construída sobre o Kubernetes consegue acompanhar uma planta de processo a partir de uma política declarada pelo usuário, usando o TEP como planta e o OPC~UA como meio de comunicação.
 
 \subsection{Objetivos Específicos}
 \begin{enumerate}
-    \item Verificar que a simulação em Rust reproduz fielmente a dinâmica da planta TEP descrita por Downs e Vogel, por meio da análise do comportamento sob os distúrbios programados do artigo original.
-    \item Verificar que a IHM opera corretamente como cliente da planta, respeitando a interface OPC~UA e os requisitos de monitoramento em tempo real definidos pela IEC~63303.
-    \item Demonstrar que os componentes heterogêneos do sistema — simulação, IHM e orquestrador — são interoperáveis via a interface padronizada, sem acoplamento direto entre implementações.
-    \item Validar que o padrão CRD do Kubernetes consegue observar o estado da planta, estabelecendo a viabilidade arquitetural do Kubernetes como orquestrador supervisório de um CPS industrial.
-    \item Estabelecer uma base técnica documentada e reprodutível que permita trabalhos futuros evoluir para estratégias completas de controle plant-wide sobre a mesma infraestrutura.
+    \item Colocar o TEP para rodar como uma planta simulada contínua, exposta via OPC~UA, e verificar que ela se comporta como o modelo original de Downs e Vogel.
+    \item Construir um \textit{historian} que colete os sinais da planta via OPC~UA e entregue estatísticas desses sinais por HTTP.
+    \item Permitir que o usuário declare no Kubernetes a política do Modo~1 (custo de operação, metas de produção, limites e malhas de controle), sem que o supervisor precise conhecer o TEP.
+    \item Verificar que o veredito do Kubernetes acompanha a planta, tanto em operação normal quanto sob distúrbio, com a política fixa.
+    \item Construir uma IHM que mostre a planta e o veredito.
 \end{enumerate}
 
 \section{ORGANIZAÇÃO DO TRABALHO}
 
-Este documento está organizado da seguinte forma. O Capítulo~2 apresenta os fundamentos teóricos: o Processo Tennessee Eastman, os princípios de controle plant-wide, o diagnóstico de qualidade de malhas, a analogia cloud-native, o IEC~61499, o padrão de Operators do Kubernetes, o protocolo gRPC e o OPC UA. O Capítulo~3 descreve o desenvolvimento da infraestrutura proposta, detalhando cada componente e as decisões de arquitetura. O Capítulo~4 apresenta os resultados dos 17 experimentos realizados e a análise do comportamento da planta sob distúrbios. O Capítulo~5 conclui o trabalho e apresenta as direções de trabalhos futuros, incluindo a incorporação de métricas de qualidade de malha à camada supervisória.
-
-Para a camada supervisória desse CPS — o componente que observa o estado da planta e age para manter a operação dentro de parâmetros declarados — a literatura cloud-native oferece um candidato bem estudado. Shuiguang et al.\ \cite{Shuiguang2023} caracterizam computação cloud-native como a combinação de microserviços, containerização e orquestração automática de componentes distribuídos, com Kubernetes como o orquestrador open-source que se tornou padrão de fato na indústria. O mecanismo central que o torna atraente para esse papel é o \textit{reconciliation controller loop}: uma comparação contínua entre o estado desejado (\textit{Spec}) e o estado observado (\textit{Status}), seguida de ações para convergir um ao outro \cite{Burns2016}. Essa estrutura — declarar política, observar realidade, reconciliar continuamente — guarda uma semelhança estrutural não trivial com o papel que Skogestad atribui à camada supervisória: manter variáveis controladas em setpoints ótimos usando os graus de liberdade da camada regulatória como alavancas. Este trabalho explora a hipótese de que esse padrão arquitetural pode servir como orquestrador supervisório de um CPS industrial baseado no TEP.
-
-O presente trabalho constrói três artefatos como ponto de partida para esse universo de possibilidades. O primeiro é um microserviço da planta TEP implementado em Rust — uma refatoração do modelo original em FORTRAN para uma linguagem de alta performance, exposto via gRPC. O segundo é uma Interface Homem-Máquina (IHM) web em FastAPI com WebSocket, funcionando como cliente dessa planta e permitindo monitoramento em tempo real e injeção dos distúrbios. O terceiro é um Operator Kubernetes básico que observa a planta, demonstrando a viabilidade de usar o padrão declarativo do Kubernetes como orquestrador supervisório sobre componentes industriais. A interface entre os três componentes é mapeada segundo o padrão OPC~UA, respeitando a norma IEC~62541 \cite{IEC62541_1}. O objetivo não é implementar estratégias de controle nem estabelecer lógica supervisória definitiva — é produzir esses artefatos iniciais como fundação técnica e ponto de partida concreto para os trabalhos futuros que o referencial teórico delineia.
-
-\section{PROBLEMA}
-\label{sec:problema}
-
-O problema abordado neste trabalho é a implementação de controle plant-wide sobre o Processo Tennessee Eastman como um desafio de integração industrial. A TEP, com suas unidades interconectadas e laços de reciclo, exige uma camada supervisória que coordene componentes heterogêneos em diferentes escalas de tempo. Para que esse sistema seja extensível e interoperável — e não apenas um protótipo isolado —, seus componentes devem expor interfaces segundo normas industriais estabelecidas, de modo que possam ser compostos, observados e substituídos por ferramentas compatíveis. A abordagem adotada é a de um Sistema Cyber-Físico com Kubernetes como orquestrador supervisório candidato, o que impõe que tanto a planta simulada quanto os demais componentes respeitem uma semântica de integração padronizada.
-
-\section{A PROPOSTA}
-\label{sec:proposta}
-
-Este trabalho propõe refatorar o modelo original do TEP de FORTRAN para um microserviço em Rust, modelado segundo a hierarquia de integração da norma IEC~62264 \cite{IEC62264} e com variáveis de processo expostas conforme o padrão OPC~UA \cite{IEC62541_1}. Sobre essa base, são implementados os seguintes componentes:
-
-\begin{enumerate}
-  \item Simulação da planta TEP em Rust com integração numérica RK4, comunicação via gRPC e modelagem compatível com a hierarquia Purdue definida pela IEC~62264 \cite{IEC62264};
-  \item Interface Homem-Máquina (IHM) web aderente à norma IEC~63303 \cite{IEC63303}, funcionando como cliente da planta para monitoramento em tempo real e injeção de distúrbios;
-  \item Implementação dos distúrbios programados descritos no artigo original de Downs e Vogel \cite{DOWNS1993};
-  \item Verificação da fidelidade dinâmica da simulação por meio da análise do comportamento da planta sob os distúrbios implementados;
-  \item Implementação de um \textit{Custom Resource Definition} (CRD) Kubernetes conectando um contêiner Kind à planta, validando a arquitetura básica do CPS proposto.
-\end{enumerate}
-
-\section{OBJETIVOS}
-\label{sec:objetivos}
-
-\subsection{Objetivo Geral}
-
-Implementar uma simulação funcional do Processo Tennessee Eastman em Rust — refatoração do modelo original em FORTRAN — e integrá-la em uma arquitetura de Sistema Cyber-Físico com componentes heterogêneos interoperáveis via protocolos abertos, servindo como base técnica para o desenvolvimento futuro de estratégias de controle plant-wide.
-
-\subsection{Objetivos Específicos}
-\begin{enumerate}
-    \item Verificar que a simulação em Rust reproduz fielmente a dinâmica da planta TEP descrita por Downs e Vogel, por meio da análise do comportamento sob os distúrbios programados do artigo original.
-    \item Verificar que a IHM opera corretamente como cliente da planta, respeitando a interface OPC~UA e os requisitos de monitoramento em tempo real definidos pela IEC~63303.
-    \item Demonstrar que os componentes heterogêneos do sistema — simulação, IHM e orquestrador — são interoperáveis via a interface padronizada, sem acoplamento direto entre implementações.
-    \item Validar que o padrão CRD do Kubernetes consegue observar o estado da planta, estabelecendo a viabilidade arquitetural do Kubernetes como orquestrador supervisório de um CPS industrial.
-    \item Estabelecer uma base técnica documentada e reprodutível que permita trabalhos futuros evoluir para estratégias completas de controle plant-wide sobre a mesma infraestrutura.
-\end{enumerate}
-
-\section{ORGANIZAÇÃO DO TRABALHO}
-
-Este documento está organizado da seguinte forma. O Capítulo~2 apresenta os fundamentos teóricos: o Processo Tennessee Eastman, os princípios de controle plant-wide, o diagnóstico de qualidade de malhas, a analogia cloud-native, o IEC~61499, o padrão de Operators do Kubernetes, o protocolo gRPC e o OPC UA. O Capítulo~3 descreve o desenvolvimento da infraestrutura proposta, detalhando cada componente e as decisões de arquitetura. O Capítulo~4 apresenta os resultados dos 17 experimentos realizados e a análise do comportamento da planta sob distúrbios. O Capítulo~5 conclui o trabalho e apresenta as direções de trabalhos futuros, incluindo a incorporação de métricas de qualidade de malha à camada supervisória.
+O Capítulo~2 apresenta o referencial teórico: o TEP, o controle \textit{plant-wide} e a função de custo de Downs e Vogel, o Kubernetes, o diagnóstico de qualidade de malhas e o OPC~UA com as normas relacionadas. O Capítulo~3 descreve cada componente da Figura~\ref{fig:componentes}. O Capítulo~4 apresenta os resultados: o comportamento da planta simulada, a comparação com o modelo original e o acompanhamento da planta pelo Kubernetes em operação normal e sob distúrbio. O Capítulo~5 traz as conclusões e os trabalhos futuros.

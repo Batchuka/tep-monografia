@@ -1,7 +1,7 @@
 \chapter[REFERENCIAL TEÓRICO]{REFERENCIAL TEÓRICO}
 \label{cha:referencial}
 
-Este capítulo apresenta os fundamentos teóricos que embasam o desenvolvimento deste trabalho. São abordados, em ordem narrativa: o Processo Tennessee Eastman como problema de referência; os princípios de controle plant-wide como teoria da supervisão; a analogia cloud-native e seus precedentes industriais; o padrão IEC~61499 e os Operators do Kubernetes como mecanismo de orquestração; o diagnóstico de qualidade de malhas como o olho do supervisor;  o OPC UA e a família IEC~62541 como padrões de integração.
+Este capítulo apresenta a base teórica do trabalho, na seguinte ordem: o Processo Tennessee Eastman; o controle \textit{plant-wide}, incluindo a função de custo de Downs e Vogel; o Kubernetes e trabalhos que já o usaram na indústria; o diagnóstico de qualidade de malhas; e o OPC~UA, com as normas IEC~62541 e IEC~62264.
 
 % -------------------------------------------------------------------------
 \section{Processo Tennessee Eastman}
@@ -9,27 +9,28 @@ Este capítulo apresenta os fundamentos teóricos que embasam o desenvolvimento 
 
 O Processo Tennessee Eastman (\textit{Tennessee Eastman Process} — TEP) é um \textit{benchmark} amplamente utilizado na comunidade de controle de processos para avaliação de estratégias de controle, detecção de falhas e otimização de operações industriais. Proposto originalmente por Downs e Vogel em 1993, o TEP descreve uma planta química realista com dinâmica não-linear complexa, laços de reciclo e múltiplas perturbações programadas, sendo deliberadamente desafiador do ponto de vista de controle \cite{DOWNS1993}.
 
-A planta consiste em cinco unidades de processo interconectadas: um reator, um condensador, um separador de vapor-líquido (\textit{flash separator}), um compressor e uma coluna de \textit{stripping}. Quatro reagentes (A, B, C, D) são alimentados ao reator, onde ocorrem três reações:
+A planta tem cinco unidades de operação: o reator, o condensador de produto, o separador vapor-líquido, o compressor de reciclo e a coluna de esgotamento de produto (\textit{product stripper}). O processo envolve oito componentes: quatro reagentes (A, C, D e E), dois produtos (G e H), um subproduto (F) e um inerte (B), que não participa das reações. No reator ocorrem quatro reações, todas irreversíveis e exotérmicas \cite{DOWNS1993}:
 
 \begin{align}
-	A + C + D & \rightarrow G \quad (\text{produto líquido}) \label{eq:rx1}   \\
-	A + C + E & \rightarrow H \quad (\text{produto líquido}) \label{eq:rx2}   \\
-	A + E     & \rightarrow F \quad (\text{subproduto gasoso}) \label{eq:rx3}
+	A + C + D & \rightarrow G \quad (\text{produto 1, líquido}) \label{eq:rx1}   \\
+	A + C + E & \rightarrow H \quad (\text{produto 2, líquido}) \label{eq:rx2}   \\
+	A + E     & \rightarrow F \quad (\text{subproduto, líquido}) \label{eq:rx3}  \\
+	3D        & \rightarrow 2F \quad (\text{subproduto, líquido}) \label{eq:rx4}
 \end{align}
 
-O componente B é inerte e não participa das reações. Os produtos G e H são os produtos desejados; F é um subproduto indesejado. As reações são exotérmicas, e a temperatura do reator é controlada indiretamente pela água de resfriamento (\textit{cooling water} — CW).
+Os reagentes entram no reator em fase gasosa e formam produtos líquidos. A quarta reação mostra que F também se forma a partir de D sozinho, o que afeta a seletividade e o custo de operação. As taxas de reação dependem da temperatura (lei de Arrhenius), e o calor gerado é removido por um feixe interno de resfriamento, alimentado pela água de resfriamento do reator. O inerte e o subproduto saem do sistema principalmente pela purga do separador.
 
-O modelo matemático é descrito por um sistema de 50 equações diferenciais ordinárias (EDO), representando os holdups de massa e energia de cada vaso de processo. O vetor de estado $\mathbf{y} \in \mathbb{R}^{50}$ inclui os inventários de cada componente nos reatores, separadores e no espaço de vapor, bem como as energias internas de cada subsistema. O modelo original foi implementado em FORTRAN.
+O modelo tem 50 variáveis de estado, integradas numericamente. Elas representam os inventários dos componentes e as energias no reator, no separador, no \textit{stripper} e nos demais volumes do processo. O código original foi escrito em FORTRAN.
 
-O modelo expõe 41 variáveis medidas (XMEAS$_1$ a XMEAS$_{41}$) e 12 variáveis manipuladas (XMV$_1$ a XMV$_{12}$). As variáveis medidas incluem vazões, composições, temperaturas, pressões e níveis dos principais subsistemas; as variáveis manipuladas correspondem a posições de válvulas e setpoints de controladores de baixo nível. O ponto de operação nominal (Modo 1) é caracterizado por pressão do reator de 2705~kPa, temperatura do reator de 120,4~°C e frações molares de produto (razão G/H) específicas \cite{DOWNS1993}.
+O modelo expõe 41 variáveis medidas (XMEAS$_1$ a XMEAS$_{41}$) e 12 variáveis manipuladas (XMV$_1$ a XMV$_{12}$). As variáveis medidas incluem vazões, composições, temperaturas, pressões e níveis. As variáveis manipuladas incluem vazões de alimentação, posições de válvula (reciclo, purga, vapor do \textit{stripper}), vazões de água de resfriamento e a velocidade do agitador. No ponto de operação nominal (Modo~1), a pressão do reator é de 2705~kPa, a temperatura do reator é de 120,4~°C e a razão mássica G/H é de 50/50 \cite{DOWNS1993}.
 
-O modelo inclui 20 distúrbios programados (IDV$_1$ a IDV$_{20}$) que simulam eventos operacionais como variações de composição de \textit{feed}, falhas em trocadores de calor e contaminações. Cada distúrbio atua diretamente sobre parâmetros do modelo, permitindo avaliar a robustez de estratégias de controle frente a perturbações realistas. O modelo também define condições de parada por segurança (\textit{Interlock Shutdown Device} — ISD), que encerram a simulação quando variáveis críticas ultrapassam limites operacionais (por exemplo, pressão do reator acima de 3000~kPa ou nível do reator abaixo de 10\%).
+O modelo inclui 20 distúrbios (IDV$_1$ a IDV$_{20}$). Entre eles estão mudanças na composição e na temperatura das alimentações, mudanças na temperatura da água de resfriamento, perda da alimentação de A, redução da disponibilidade de C, deriva lenta da cinética de reação e válvulas travando. Cada distúrbio é do tipo degrau, variação aleatória, deriva lenta, travamento ou desconhecido. O artigo também define limites de parada (\textit{shutdown limits}), parte da estratégia de intertravamento do processo: se uma variável ultrapassa esses limites, a planta é desligada. São exemplos a pressão do reator acima de 3000~kPa e o volume de líquido no reator fora da faixa de 2,0 a 24,0~m³. Neste trabalho, esse desligamento é chamado de ISD (\textit{Interlock Shutdown}), nome usado na implementação.
 
-A relevância do TEP como \textit{benchmark} decorre de sua riqueza dinâmica: o modelo combina não-linearidades, acoplamentos entre malhas de controle, laços de reciclo com elevada constante de tempo e perturbações com mecanismos físicos distintos. Essas características tornam o TEP um ambiente adequado para avaliar arquiteturas de controle supervisório — em especial aquelas que dependem de comunicação distribuída e coordenação entre componentes heterogêneos, como a arquitetura proposta neste trabalho.
+O TEP é um bom \textit{benchmark} porque reúne não-linearidades, acoplamento entre malhas, reciclo e distúrbios de naturezas diferentes. Por isso, este trabalho o usa para testar uma arquitetura de controle supervisório que depende de comunicação distribuída e de coordenação entre componentes diferentes. Essa aplicação é uma escolha deste trabalho, e não algo proposto por Downs e Vogel.
 
 \begin{figure}[htbp]
 	\centering
-	\missingfigure[figwidth=0.92\textwidth]{Diagrama de processo do TEP: cinco unidades interconectadas (reator, condensador, separador flash, compressor, coluna de stripping) com indicação das correntes de alimentação (A, B, C, D/E), produtos (G, H) e subproduto (F), pontos de medição XMEAS e variáveis manipuladas XMV, e agua de resfriamento do reator. Baseado na Figura~1 de \citeauthor{DOWNS1993} (\citeyear{DOWNS1993}).}
+	\missingfigure[figwidth=0.92\textwidth]{Diagrama de processo do TEP: cinco unidades interconectadas (reator, condensador de produto, separador vapor-líquido, compressor de reciclo, product stripper) com indicação das correntes de alimentação (A; D; E; A e C), produtos (G, H), purga (inerte B e subproduto F), pontos de medição XMEAS e variáveis manipuladas XMV, e agua de resfriamento do reator. Baseado na Figura~1 de \citeauthor{DOWNS1993} (\citeyear{DOWNS1993}).}
 	\caption{Fluxograma esquemático do Processo Tennessee Eastman.}
 	\label{fig:tep_flowsheet}
 \end{figure}
@@ -107,7 +108,7 @@ do trabalho de compressão e custo do vapor. O sinal de $J$ está formulado como
 lucro), de modo que minimizar $J$ corresponde a maximizar a eficiência operacional \cite{DOWNS1993}.
 
 Cabe destacar que $J$ não é uma equação natural da planta, derivável de primeiros princípios como
-as Equações~\ref{eq:rx1}--\ref{eq:rx3}: ela é uma escolha de formulação. \citeonline{Williams2013}
+as Equações~\ref{eq:rx1}--\ref{eq:rx4}: ela é uma escolha de formulação. \citeonline{Williams2013}
 observa que toda formulação de programação matemática compartilha a característica de envolver
 otimização — deseja-se maximizar ou minimizar uma quantidade, denominada função objetivo — e que,
 dado um mesmo conjunto de restrições, objetivos distintos conduzem a soluções ótimas distintas.

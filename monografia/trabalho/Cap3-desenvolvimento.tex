@@ -102,13 +102,21 @@ impl Controller for PController {
 }
 \end{lstlisting}
 
-No ponto de operação nominal, três malhas P são instanciadas em \texttt{main.rs}:
+No ponto de operação nominal, três malhas P são instanciadas em \texttt{main.rs} (Figura~\ref{fig:tep_malhas}):
 
 \begin{enumerate}
   \item \textbf{Pressão do reator} (XMEAS$_7$ → XMV$_6$): $K_p = 0{,}10$, setpoint = 2705~kPa, bias = 40,06\%.
   \item \textbf{Nível do separador} (XMEAS$_{12}$ → XMV$_7$): $K_p = 1{,}00$, setpoint = 50\%, bias = 38,10\%.
   \item \textbf{Nível do stripper} (XMEAS$_{15}$ → XMV$_8$): $K_p = 1{,}00$, setpoint = 50\%, bias = 46,50\%.
 \end{enumerate}
+
+\begin{figure}[htbp]
+	\centering
+	\caption{Malhas de controle regulatório do \texttt{tep-plant} sobre o fluxograma do TEP.}
+	\includegraphics[width=0.95\textwidth]{imagens/tep-malhas-controle.png}
+	\fonte{Elaborado pelo autor.}
+	\label{fig:tep_malhas}
+\end{figure}
 
 \subsection{Servidor gRPC}
 

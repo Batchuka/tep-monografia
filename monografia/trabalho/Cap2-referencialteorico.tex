@@ -18,22 +18,31 @@ A planta tem cinco unidades de operação: o reator, o condensador de produto, o
 	3D        & \rightarrow 2F \quad (\text{subproduto, líquido}) \label{eq:rx4}
 \end{align}
 
-Os reagentes entram no reator em fase gasosa e formam produtos líquidos. A quarta reação mostra que F também se forma a partir de D sozinho, o que afeta a seletividade e o custo de operação. As taxas de reação dependem da temperatura (lei de Arrhenius), e o calor gerado é removido por um feixe interno de resfriamento, alimentado pela água de resfriamento do reator. O inerte e o subproduto saem do sistema principalmente pela purga do separador.
+Os reagentes entram no reator em fase gasosa e formam produtos líquidos. A quarta reação mostra que F também se forma a partir de D sozinho, o que afeta a seletividade e o custo de operação. As taxas de reação dependem da temperatura (lei de Arrhenius), e o calor gerado é removido por um feixe interno de resfriamento, alimentado pela água de resfriamento do reator. O inerte e o subproduto saem do sistema principalmente pela purga do separador.\footnote{O reator tem uma fase líquida que nunca é drenada. Nela fica dissolvido um catalisador não volátil, que permanece no reator; os produtos saem dele como vapor \cite{DOWNS1993}. O modelo não trata o catalisador como uma variável à parte: o efeito dele está embutido nas equações de taxa das reações. Neste trabalho, essas equações são idênticas às do modelo original dos autores.}
+
+\begin{figure}[htbp]
+	\centering
+	\caption{Fluxograma simplificado do Processo Tennessee Eastman.}
+	\includegraphics[width=0.92\textwidth]{imagens/tep-fluxograma.png}
+	\fonte{Elaborado pelo autor, com base em \citeonline{DOWNS1993}.}
+	\label{fig:tep_flowsheet}
+\end{figure}
 
 O modelo tem 50 variáveis de estado, integradas numericamente. Elas representam os inventários dos componentes e as energias no reator, no separador, no \textit{stripper} e nos demais volumes do processo. O código original foi escrito em FORTRAN.
 
 O modelo expõe 41 variáveis medidas (XMEAS$_1$ a XMEAS$_{41}$) e 12 variáveis manipuladas (XMV$_1$ a XMV$_{12}$). As variáveis medidas incluem vazões, composições, temperaturas, pressões e níveis. As variáveis manipuladas incluem vazões de alimentação, posições de válvula (reciclo, purga, vapor do \textit{stripper}), vazões de água de resfriamento e a velocidade do agitador. No ponto de operação nominal (Modo~1), a pressão do reator é de 2705~kPa, a temperatura do reator é de 120,4~°C e a razão mássica G/H é de 50/50 \cite{DOWNS1993}.
 
-O modelo inclui 20 distúrbios (IDV$_1$ a IDV$_{20}$). Entre eles estão mudanças na composição e na temperatura das alimentações, mudanças na temperatura da água de resfriamento, perda da alimentação de A, redução da disponibilidade de C, deriva lenta da cinética de reação e válvulas travando. Cada distúrbio é do tipo degrau, variação aleatória, deriva lenta, travamento ou desconhecido. O artigo também define limites de parada (\textit{shutdown limits}), parte da estratégia de intertravamento do processo: se uma variável ultrapassa esses limites, a planta é desligada. São exemplos a pressão do reator acima de 3000~kPa e o volume de líquido no reator fora da faixa de 2,0 a 24,0~m³. Neste trabalho, esse desligamento é chamado de ISD (\textit{Interlock Shutdown}), nome usado na implementação.
-
-O TEP é um bom \textit{benchmark} porque reúne não-linearidades, acoplamento entre malhas, reciclo e distúrbios de naturezas diferentes. Por isso, este trabalho o usa para testar uma arquitetura de controle supervisório que depende de comunicação distribuída e de coordenação entre componentes diferentes. Essa aplicação é uma escolha deste trabalho, e não algo proposto por Downs e Vogel.
+O modelo inclui 20 distúrbios (IDV$_1$ a IDV$_{20}$). Entre eles estão mudanças na composição e na temperatura das alimentações, mudanças na temperatura da água de resfriamento, perda da alimentação de A, redução da disponibilidade de C, deriva lenta da cinética de reação e válvulas travando. Cada distúrbio é do tipo degrau, variação aleatória, deriva lenta, travamento ou desconhecido. O artigo também define limites de parada (\textit{shutdown limits}), parte da estratégia de intertravamento do processo: se uma variável ultrapassa esses limites, a planta é desligada. São exemplos a pressão do reator acima de 3000~kPa e o volume de líquido no reator fora da faixa de 2,0 a 24,0~m³. Neste trabalho, esse desligamento é chamado de ISD (\textit{Interlock Shutdown}), nome usado na implementação. A Figura~\ref{fig:tep_blocos} resume as entradas e saídas do modelo.
 
 \begin{figure}[htbp]
 	\centering
-	\missingfigure[figwidth=0.92\textwidth]{Diagrama de processo do TEP: cinco unidades interconectadas (reator, condensador de produto, separador vapor-líquido, compressor de reciclo, product stripper) com indicação das correntes de alimentação (A; D; E; A e C), produtos (G, H), purga (inerte B e subproduto F), pontos de medição XMEAS e variáveis manipuladas XMV, e agua de resfriamento do reator. Baseado na Figura~1 de \citeauthor{DOWNS1993} (\citeyear{DOWNS1993}).}
-	\caption{Fluxograma esquemático do Processo Tennessee Eastman.}
-	\label{fig:tep_flowsheet}
+	\caption{Entradas e saídas do modelo do Processo Tennessee Eastman.}
+	\includegraphics[width=0.85\textwidth]{imagens/tep-modelo-blocos.png}
+	\fonte{Elaborado pelo autor, com base em \citeonline{DOWNS1993}.}
+	\label{fig:tep_blocos}
 \end{figure}
+
+O TEP é um bom \textit{benchmark} porque reúne não-linearidades, acoplamento entre malhas, reciclo e distúrbios de naturezas diferentes. Por isso, este trabalho o usa para testar uma arquitetura de controle supervisório que depende de comunicação distribuída e de coordenação entre componentes diferentes. Essa aplicação é uma escolha deste trabalho, e não algo proposto por Downs e Vogel.
 
 % -------------------------------------------------------------------------
 

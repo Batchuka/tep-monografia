@@ -49,12 +49,9 @@ O TEP é um bom \textit{benchmark} porque reúne não-linearidades, acoplamento 
 \section{Controle Plant-Wide}
 \label{sec:plantwide}
 
-O TEP descreve com precisão \textit{o quê} uma planta complexa expõe: 41 variáveis medidas,
-12 variáveis manipuladas, laços de reciclo acoplados e 20 perturbações programadas.
-O que o modelo não responde é \textit{como} estruturar o controle para lidar com essa
-complexidade — quais variáveis controlar, quais manipular, como parear entradas e saídas,
-e como coordenar os objetivos de operação em escala de planta.
-Essa é uma questão de projeto, não de sintonia.
+O TEP mostra o que a planta tem, mas não diz como organizar o controle dela. Na verdade, o problema proposto sequer seria resolvido com uma simples sintonia de malha, é preciso decidir quais variáveis controlar, quais manipular, como ligar umas às outras e como coordenar a operação da planta inteira. Essas decisões são de projeto da estrutura de controle, e é delas que trata o controle \textit{plant-wide}.
+
+Essas decisões dependem do que se espera da planta. Downs e Vogel definem seis modos de operação, cada um com uma razão G/H e uma taxa de produção \cite{DOWNS1993}. O modo diz o que a planta deve produzir, mas não diz como. Além de cumprir o modo, a planta precisa ficar dentro dos seus limites de operação e não gastar mais do que o necessário. Neste trabalho, o conjunto de modo, limites e custo é chamado de política. Depois de atender a tudo isso, sobra pouca liberdade para o controle, e a pergunta passa a ser como usar bem essa liberdade.
 
 Em plantas de processo contínuo, malhas de controle locais são necessárias, mas insuficientes
 para garantir desempenho econômico e coordenação global.

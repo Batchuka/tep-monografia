@@ -51,33 +51,30 @@ O TEP é um bom \textit{benchmark} porque reúne não-linearidades, acoplamento 
 
 O TEP mostra o que a planta tem, mas não diz como organizar o controle dela. Na verdade, o problema proposto sequer seria resolvido com uma simples sintonia de malha, é preciso decidir quais variáveis controlar, quais manipular, como ligar umas às outras e como coordenar a operação da planta inteira. Essas decisões são de projeto da estrutura de controle, e é delas que trata o controle \textit{plant-wide}.
 
-Essas decisões dependem do que se espera da planta. Downs e Vogel definem seis modos de operação, cada um com uma razão G/H e uma taxa de produção \cite{DOWNS1993}. O modo diz o que a planta deve produzir, mas não diz como. Além de cumprir o modo, a planta precisa ficar dentro dos seus limites de operação e não gastar mais do que o necessário. Neste trabalho, o conjunto de modo, limites e custo é chamado de política. Depois de atender a tudo isso, sobra pouca liberdade para o controle, e a pergunta passa a ser como usar bem essa liberdade.
+Essas decisões dependem do que se espera da planta. Downs e Vogel definem seis modos de operação, cada um com uma razão G/H e uma taxa de produção \cite{DOWNS1993}. O modo diz o que a planta deve produzir, mas não diz como. Além de cumprir o modo, a planta precisa ficar dentro dos seus limites de operação e não gastar mais do que o necessário.\footnote{Mais adiante, veremos que, neste trabalho, esse conjunto de modo, limites de operação e custo será chamado de \textbf{Política da Planta}.} Depois de atender a tudo isso, sobra pouca liberdade para o controle, e a pergunta passa a ser como usar bem essa liberdade.
 
-Em plantas de processo contínuo, malhas de controle locais são necessárias, mas insuficientes
-para garantir desempenho econômico e coordenação global.
-Cada controlador PID regula uma variável de seu subsistema imediato, mas é incapaz de perceber
-os efeitos que suas ações propagam ao longo da planta por meio de reciclos, transferências de
-massa e acoplamentos termodinâmicos.
-A consequência é que perturbações de grande amplitude podem atravessar toda a cadeia de processo
-e provocar perda econômica, saturação de variáveis, oscilações sustentadas ou degradação de
-qualidade em pontos distantes da origem, sem que nenhum controlador local tenha autoridade
-para reagir \cite{Larsson2000}.
+Em uma planta contínua, cada malha regulatória cuida de uma variável do seu equipamento. Isso funciona bem: com malhas locais em cascata, é possível controlar plantas grandes sem precisar de um modelo detalhado \cite{Larsson2000}. O problema é que nenhuma dessas malhas olha para a planta inteira. Larsson e Skogestad lembram que os equipamentos estão ligados uns aos outros, e um acaba agindo como distúrbio para o seguinte. Em regime, por exemplo, todos precisam processar a mesma vazão. Com reciclo e integração de calor, como no TEP, essas interações aumentam. Por isso, além das malhas locais, é preciso pensar o controle da planta como um todo \cite{Larsson2000}.
 
-O problema não é de sintonia: cada PID pode estar corretamente ajustado para seu subsistema
-imediato e, ainda assim, o conjunto falhar como sistema integrado.
-\citeonline{Larsson2000} revisam a literatura e identificam cinco tarefas estruturais que
-qualquer estratégia de supervisão deve endereçar:
-(i)~seleção de variáveis controladas (quais saídas manter no setpoint);
-(ii)~seleção de variáveis manipuladas (quais entradas usar para cada objetivo);
-(iii)~seleção de medições (quais variáveis medir para fechar as malhas);
-(iv)~seleção da configuração de controle (como parear variáveis controladas e manipuladas); e
-(v)~seleção do tipo de controlador (estrutura e grau de descentralização).
-A ausência de uma resposta sistemática a essas perguntas é, segundo os autores, a principal
-causa de estratégias de controle que funcionam individualmente mas falham quando integradas.
+Isso vale até para dizer se uma malha está boa ou não. Em um caso relatado no CERN, uma malha de nível regulava bem, mas fazia o atuador oscilar muito, o que poderia trazer problemas para a operação ao longo do tempo. Os operadores mudaram a sintonia: o atuador ficou mais suave, mas o nível passou a oscilar mais, e a ferramenta de monitoramento passou a classificar a malha como mal sintonizada.\footnote{Por ora, omitimos o método que a ferramenta usa para concluir que a sintonia piorou. Ele será apresentado na Seção~\ref{sec:diagnostico}.} Mesmo assim, a equipe preferiu a nova sintonia, porque o nível podia oscilar um pouco desde que ficasse acima de 50\%, e a oscilação do atuador não \cite{Bradu2018}. Olhando só para a malha, ela piorou; olhando para a operação, ela melhorou.
+
+O Modo~1 ajuda a ver o que isso significa na prática. Nele, a planta deve produzir 7038~kg/h de G e 7038~kg/h de H, ou seja, uma razão G/H de 50/50 \cite{DOWNS1993}. O artigo também define limites de operação, como pressão do reator abaixo de 2895~kPa, temperatura do reator abaixo de 150~°C e faixas para os níveis do reator, do separador e do \textit{stripper}. O modo e os limites funcionam como condições de contorno: dizem aonde a planta precisa chegar e por onde ela não pode passar, mas não dizem por qual caminho.
+
+\begin{figure}[htbp]
+	\centering
+	\caption{Variáveis manipuladas ocupadas pelo modo e pela estabilização dos níveis no Modo~1.}
+	\includegraphics[width=0.95\textwidth]{imagens/tep-variaveis-ocupadas.png}
+	\fonte{Elaborado pelo autor, com base em \citeonline{Larsson2001}.}
+	\label{fig:tep_ocupadas}
+\end{figure}
+
+Cumprir o modo já ocupa parte das escolhas. Das 12 variáveis manipuladas (XMV$_1$ a XMV$_{12}$), cada uma é uma escolha independente. Uma delas precisa fixar a taxa de produção, e outra precisa fixar a razão G/H. No pareamento proposto por \citeonline{Larsson2001}, essas duas tarefas ficam com a alimentação de A e C (XMV$_4$) e com a alimentação de D (XMV$_1$).
+
+Na Figura~\ref{fig:tep_ocupadas}, as duas variáveis em cinza seguram os níveis do separador e do \textit{stripper}. Esses níveis precisam de uma malha de controle para a planta ficar estável, mas o valor deles não muda o custo em regime \cite{Larsson2001}. Descontadas as duas variáveis em roxo e as duas em cinza, sobram $12 - 2 - 2 = 8$ graus de liberdade em regime estacionário; outro pareamento trocaria as válvulas, mas não a conta \cite{Larsson2001}. Há mais de uma forma de usar esses oito graus de liberdade para cumprir o Modo~1, e elas não custam o mesmo \cite{DOWNS1993}. Para escolher entre elas, é preciso um critério de custo.
 
 \subsection{Função de custo como ponto de partida}
+\label{subsec:custo}
 
-Antes de responder a qualquer uma dessas cinco perguntas, \citeonline{Skogestad2004} estabelece um
+Antes de escolher a estrutura de controle, \citeonline{Skogestad2004} estabelece um
 pré-requisito frequentemente negligenciado: a definição explícita dos objetivos operacionais. Sem um
 critério de desempenho claro, a escolha entre controlar temperatura do reator, vazão de reciclo ou
 composição na purga torna-se arbitrária — uma questão de opinião ou convenção, não de análise.
@@ -123,8 +120,50 @@ utilidade, maximizar valor presente líquido, maximizar robustez) que ilustram o
 explorado por \citeonline{Skogestad2004} para o TEP: a função de custo traduz uma política
 operacional escolhida pelo projetista, não uma propriedade física da planta.
 
-A existência dessa função de custo transforma as cinco tarefas de Larsson em perguntas técnicas
-respondíveis: a melhor seleção de variáveis controladas é aquela que, sob incerteza de perturbações
+Com $J$ definida, dá para dizer o que fazer com os oito graus de liberdade. Minimizando $J$ no Modo~1, cinco deles levam variáveis ao limite: pressão do reator no máximo, nível do reator no mínimo, válvula de reciclo do compressor fechada, válvula de vapor do \textit{stripper} fechada e agitador no máximo. Sobram três graus de liberdade livres \cite{Larsson2001}. A Tabela~\ref{tab:graus_liberdade} mostra o uso das 12 variáveis manipuladas, a Figura~\ref{fig:graus_liberdade_tep} resume a conta e a Figura~\ref{fig:tep_modo1} mostra essas variáveis na planta. Usar um grau de liberdade livre significa escolher uma variável e mantê-la constante com uma malha de controle. A combinação da tabela (temperatura do reator, \% de C na purga e vazão de reciclo) é a de menor perda entre as que \citeonline{Larsson2001} consideram aceitáveis.
+
+\begin{figure}[htbp]
+	\centering
+	\caption{Meta, variáveis no limite e uma escolha para os graus de liberdade livres do TEP no Modo~1.}
+	\includegraphics[width=0.95\textwidth]{imagens/tep-modo1-graus-liberdade.png}
+	\fonte{Elaborado pelo autor, com base em \citeonline{DOWNS1993} e \citeonline{Larsson2001}.}
+	\label{fig:tep_modo1}
+\end{figure}
+
+\begin{table}[htbp]
+	\centering
+	\caption{Uso dos 12 graus de liberdade do TEP no ótimo do Modo~1.}
+	\label{tab:graus_liberdade}
+	\small
+	\begin{tabular}{|>{\raggedright\arraybackslash}p{2.9cm}|c|>{\raggedright\arraybackslash}p{3.7cm}|>{\raggedright\arraybackslash}p{3.8cm}|>{\raggedright\arraybackslash}p{2.9cm}|}
+		\hline
+		\textbf{Grupo} & \textbf{XMV} & \textbf{Variável manipulada} & \textbf{Variável controlada} & \textbf{No Modo~1} \\
+		\hline
+		\multirow{2}{2.9cm}{\raggedright Nível sem efeito no custo ($-2$)}
+		  & 7  & líquido do separador          & nível do separador         & qualquer \\
+		  & 8  & produto do \textit{stripper}  & nível do \textit{stripper} & qualquer \\
+		\hline
+		\multirow{2}{2.9cm}{\raggedright Exigido pelo modo ($-2$)}
+		  & 4  & alimentação A + C             & taxa de produção           & 7038~kg/h de G e de H \\
+		  & 1  & alimentação de D              & razão G/H                  & 50/50 \\
+		\hline
+		\multirow{5}{2.9cm}{\raggedright No limite (5)}
+		  & 5  & válvula de reciclo            & a própria válvula          & fechada \\
+		  & 9  & vapor do \textit{stripper}    & a própria válvula          & fechada \\
+		  & 12 & agitador                      & a própria velocidade       & máxima \\
+		  & 2  & alimentação de E              & nível do reator            & mínimo \\
+		  & 6  & válvula de purga              & pressão do reator          & máxima \\
+		\hline
+		\multirow{3}{2.9cm}{\raggedright Livre (3)}
+		  & 10 & resfriamento do reator        & temperatura do reator      & valor ótimo \\
+		  & 3  & alimentação de A              & \% de C na purga           & valor ótimo \\
+		  & 11 & resfriamento do condensador   & vazão de reciclo           & valor ótimo \\
+		\hline
+	\end{tabular}
+	\fonte{Elaborado pelo autor, com base nas Tabelas~1 e 5 de \citeonline{Larsson2001}.}
+\end{table}
+
+A existência dessa função de custo transforma a escolha das variáveis controladas em uma pergunta técnica: a melhor seleção de variáveis controladas é aquela que, sob incerteza de perturbações
 e ruído, mantém $J$ mais próximo do seu valor ótimo $J^*$.
 
 \subsection{Hierarquia de controle e escala de tempo}
@@ -183,20 +222,9 @@ mesmo que todas as malhas estejam corretamente sintonizadas.
 
 \subsection{Aplicação ao TEP: análise de graus de liberdade}
 
-\citeonline{Larsson2000} aplicam essa metodologia diretamente ao TEP. Uma análise de graus de
-liberdade no estado estacionário revela que o processo possui 8 graus de liberdade manipuláveis.
-No Modo~1 de operação, 5 desses graus estão consumidos por restrições economicamente ativas ---
-variáveis que operam em seu limite operacional ótimo e, portanto, devem ser mantidas nesses limites
-como restrições, não como alvos de setpoint livre. Restam 3 graus de liberdade não restringidos,
-para os quais é necessário escolher variáveis self-optimizing \cite{Larsson2000}.
+\citeonline{Larsson2001} aplicam essa metodologia ao TEP. Partem dos 8 graus de liberdade em regime estacionário e das 5 restrições ativas no Modo~1, vistos na Seção~\ref{subsec:custo}, e buscam variáveis \textit{self-optimizing} para os 3 graus de liberdade que sobram.
 
-Avaliando sistematicamente as alternativas pela perda $L$ calculada com a função de custo de
-\citeonline{DOWNS1993}, os autores concluem que boas escolhas self-optimizing incluem: temperatura
-do reator (XMEAS$_9$), vazão de reciclo ou trabalho do compressor (XMEAS$_5$ ou XMEAS$_{20}$), e
-composição de A na purga ou na alimentação do reator. Notavelmente, a fração molar do inerte B ---
-frequentemente indicada por outros autores --- é identificada como uma má escolha nesse contexto:
-controlá-la em setpoint fixo resulta em perda econômica mais elevada do que as alternativas acima
-\cite{Larsson2000}.
+Os autores comparam as alternativas pela perda $L$, calculada com a função de custo de \citeonline{DOWNS1993}. Quatro combinações ficam abaixo da perda que eles consideram aceitável. As duas melhores são a temperatura do reator (XMEAS$_9$), a composição de C na purga e a vazão de reciclo (XMEAS$_5$) ou o trabalho do compressor (XMEAS$_{20}$). Controlar a composição do inerte B, uma sugestão comum, foi uma escolha ruim: com distúrbios ou erros de implementação, a planta pode chegar a um ponto de operação inviável \cite{Larsson2001}.
 
 Essa análise revela a função concreta que uma camada supervisória deve exercer no TEP: não apenas
 estabilizar a planta, mas garantir que as variáveis primárias $c$ --- aquelas identificadas como

@@ -1,40 +1,12 @@
 \chapter[INTRODUÇÃO]{INTRODUÇÃO}
 
-A pergunta clássica da teoria de controle é como sintonizar uma malha para que ela fique estável, mas às vezes esse objetivo é insuficiente. Também faz sentido perguntar como a planta deve ser operada como um todo, uma questão que a literatura de controle \textit{plant-wide} associa a uma camada supervisória acima das malhas regulatórias \cite{Larsson2000, Skogestad2004}. Um problema de referência bastante usado para estudar essa questão é o \textbf{Processo Tennessee Eastman} (TEP), proposto por Downs e Vogel em 1993 \cite{DOWNS1993}. Ele descreve uma planta química com cinco unidades principais interligadas, reações não lineares, reciclo e um conjunto de 20 distúrbios pré-definidos. Os autores o publicaram como um problema aberto de controle da planta inteira, o que ajuda a explicar por que ele aparece em tantos trabalhos da área.
+A pergunta clássica da teoria de controle é como sintonizar uma malha para que ela fique estável. Quando o assunto é a operação de uma planta de processo, porém, essa é só uma parte do problema. Também faz sentido perguntar como a planta deve ser operada como um todo, uma questão que a literatura de controle \textit{plant-wide} associa a uma camada supervisória acima das malhas regulatórias \cite{Larsson2000, Skogestad2004}. 
 
-Larsson e Skogestad apontam que a maioria das teorias de controle já parte de uma estrutura de controle pronta e, por isso, não responde às perguntas que Foss levantou em 1973: quais variáveis controlar, quais medir, quais manipular e como ligar umas às outras \cite{Larsson2000}. Para eles, o tipo de controlador (PID, MPC, LQG) só é escolhido por último \cite{Skogestad2004}. Skogestad sugere fazer essas escolhas de cima para baixo, a partir dos objetivos de operação, e de baixo para cima, a partir da camada regulatória que estabiliza a planta. O resultado é uma hierarquia com escalas de tempo diferentes: controle regulatório (segundos), supervisório (minutos) e otimização (horas). Cada camada usa os setpoints da camada de baixo como graus de liberdade \cite{Larsson2000, Skogestad2004}. 
+Um problema de referência bastante usado para estudar essa questão é o \textbf{Processo Tennessee Eastman} (TEP), proposto por Downs e Vogel em 1993 \cite{DOWNS1993}. Ele descreve uma planta química com cinco unidades principais interligadas, reações não lineares, reciclo e um conjunto de 20 distúrbios pré-definidos. Os autores o publicaram como um problema aberto de controle da planta inteira, o que ajuda a explicar por que ele aparece em tantos trabalhos da área.
 
-Larsson e Skogestad usam o próprio TEP como exemplo \cite{Larsson2000}. Um grau de liberdade, aqui, é algo que se pode ajustar para mudar a operação da planta, como a abertura de uma válvula. Em regime estacionário, o TEP tem 8 graus de liberdade, representados pelas 8 caixas da Figura~\ref{fig:graus_liberdade_tep}. No modo de operação nominal (o Modo~1 de Downs e Vogel), a forma mais barata de operar a planta é levar 5 variáveis até o seu limite. Sobram 3 graus de liberdade (as caixas brancas), e é preciso decidir quais variáveis manter constantes com eles. Essa escolha importa quando um distúrbio chega: se a variável escolhida for boa, mantê-la constante deixa a planta perto do custo mínimo; se for ruim, a planta passa a operar mais cara. Os autores indicam a temperatura do reator como uma boa escolha e a composição do inerte B como uma escolha ruim \cite{Larsson2000}.
+Larsson e Skogestad apontam que a maioria das teorias de controle já parte de uma estrutura de controle pronta e, por isso, não responde às perguntas que Foss levantou em 1973: quais variáveis controlar, quais medir, quais manipular e como ligar umas às outras \cite{Larsson2000}. Para eles, o tipo de controlador (PID, MPC, LQG) só é escolhido por último \cite{Skogestad2004}. 
 
-\begin{figure}[htbp]
-\centering
-\begin{tikzpicture}[font=\small]
-  % 8 graus de liberdade: 5 presos no limite (cinza) e 3 livres (branco)
-  \foreach \i in {0,...,4} \draw[fill=black!20] (\i*1.3,0) rectangle ++(1.3,0.8);
-  \foreach \i in {5,...,7} \draw (\i*1.3,0) rectangle ++(1.3,0.8);
-  \node[font=\bfseries] at (5.2,1.2) {8 graus de liberdade};
-  \draw[decorate,decoration={brace,mirror,amplitude=6pt}] (0.05,-0.1) -- (6.45,-0.1);
-  \draw[decorate,decoration={brace,mirror,amplitude=6pt}] (6.55,-0.1) -- (10.35,-0.1);
-  \node[anchor=north west,align=left] at (0.1,-0.5) {%
-    \textbf{5 no limite}\\[2pt]
-    \textbullet\ pressão do reator: máx.\\
-    \textbullet\ nível do reator: mín.\\
-    \textbullet\ agitador: máx.\\
-    \textbullet\ válvula de vapor: mín.\\
-    \textbullet\ reciclo do compressor: mín.};
-  \node[anchor=north west,align=left] at (6.6,-0.5) {%
-    \textbf{3 livres}\\[2pt]
-    \textbullet\ boa: temperatura do reator\\
-    \textbullet\ ruim: composição de B};
-\end{tikzpicture}
-\caption{Graus de liberdade do TEP em regime estacionário no Modo~1.}
-\label{fig:graus_liberdade_tep}
-\fonte{Adaptado de \citeonline{Larsson2000}.}
-\end{figure}
-
-Na hierarquia de Larsson e Skogestad, quem decide e quem executa estão em camadas diferentes. Escolher a temperatura do reator como variável a manter constante é uma decisão de uma camada de cima; quem mantém a temperatura no valor pedido é uma malha da camada regulatória. E saber se essa escolha está funcionando, isto é, se a planta continua perto do custo mínimo depois de um distúrbio, exige medições que vêm da planta e sobem até a camada que decidiu. Ou seja, para que essa estrutura funcione, a informação precisa descer (os setpoints) e subir (as medições e o estado da planta) entre as camadas o tempo todo. Os autores tratam de quais decisões cada camada toma, mas não de como essa informação passa de uma camada para a outra \cite{Larsson2000, Skogestad2004}. Em uma planta real, essas camadas costumam rodar em equipamentos e programas diferentes, então essa passagem não acontece sozinha: alguém precisa construí-la. A Figura~\ref{fig:camadas_integracao} ilustra essa passagem.
-
-É nessa passagem que este trabalho se concentra. Ele é desenvolvido na ênfase de \textbf{Integração de Sistemas de Controle} do curso de Engenharia de Controle e Automação e, por isso, o foco não é escolher as variáveis controladas nem sintonizar controladores, mas construir a ligação entre as camadas: como a planta expõe o seu estado, como esse estado chega a uma camada supervisória e como essa camada registra o que observou. O TEP é usado como a planta sobre a qual essa ligação é montada.
+Skogestad sugere fazer essas escolhas de cima para baixo, a partir dos objetivos de operação, e de baixo para cima, a partir da camada regulatória que estabiliza a planta \cite{Larsson2000, Skogestad2004}. O resultado é a hierarquia da Figura~\ref{fig:camadas_integracao}: cada camada, na sua escala de tempo, passa setpoints para a de baixo e depende das medições que sobem dela.
 
 \begin{figure}[htbp]
 \centering
@@ -47,38 +19,90 @@ Na hierarquia de Larsson e Skogestad, quem decide e quem executa estão em camad
 ]
   % camadas
   \node[bloco] (opt) at (0,0)    {Otimização\\[-1pt]\scriptsize (horas)};
-  \node[bloco] (sup) at (0,-2.0) {Supervisão\\[-1pt]\scriptsize (minutos)};
+  \node[bloco] (sup) at (0,-2.0) {Controle supervisório\\[-1pt]\scriptsize (minutos)};
   \node[bloco] (reg) at (0,-4.0) {Controle regulatório\\[-1pt]\scriptsize (segundos)};
   \node[bloco] (tep) at (0,-6.0) {Planta (TEP)};
 
-  % setpoints descem (esquerda), medições sobem (direita)
-  \foreach \a/\b in {opt/sup, sup/reg, reg/tep} {
+  % entre camadas: setpoints descem (esquerda)
+  \foreach \a/\b in {opt/sup, sup/reg} {
     \draw[fluxo] ([xshift=-0.7cm]\a.south) -- ([xshift=-0.7cm]\b.north)
       node[midway, left, rotulo] {setpoints};
-    \draw[fluxo] ([xshift=0.7cm]\b.north) -- ([xshift=0.7cm]\a.south)
-      node[midway, right, rotulo] {medições / estado};
   }
+  % o que sobe (direita)
+  \draw[fluxo] ([xshift=0.7cm]sup.north) -- ([xshift=0.7cm]opt.south)
+    node[midway, right, rotulo] {medições / estado};
+  \draw[fluxo] ([xshift=0.7cm]reg.north) -- ([xshift=0.7cm]sup.south)
+    node[midway, right, rotulo, align=left] {estado\\das malhas};
+  % medições da planta chegam ao supervisório sem passar pelo regulatório
+  \draw[fluxo] (tep.east) -- ++(1.25,0) |- (sup.east)
+    node[pos=0.3, sloped, above, rotulo] {medições};
+  % regulatório e planta: só sinal, analógico ou digital
+  \draw[fluxo] ([xshift=-0.7cm]reg.south) -- ([xshift=-0.7cm]tep.north)
+    node[midway, left, rotulo, align=right] {sinal atuador};
+  \draw[fluxo] ([xshift=0.7cm]tep.north) -- ([xshift=0.7cm]reg.south)
+    node[midway, right, rotulo, align=left] {sinal do sensor};
 
   % região de integração
   \draw[dashed, gray!70, rounded corners=2pt] (-2.9,-0.5) rectangle (3.3,-5.5);
-  \node[rotulo, rotate=90] at (-3.25,-3.0) {integração (foco deste trabalho)};
+  \node[rotulo, rotate=90] at (-3.25,-3.0) {foco deste trabalho};
 
   % exemplo
-  \node[exemplo] at (3.7,0) {escolhe o que é operar bem; é daqui que sai a política};
-  \node[exemplo] at (3.7,-2.0) {decide manter a temperatura do reator constante};
-  \node[exemplo] at (3.7,-4.0) {malha mantém a temperatura no valor pedido};
-  \node[exemplo] at (3.7,-6.0) {mede a temperatura e o custo};
+  \node[exemplo] at (3.7,0) {Calcula quais são os setpoins ideais};
+  \node[exemplo] at (3.7,-2.0) {Aplica e Observa os setpoints definidos};
+  \node[exemplo] at (3.7,-4.0) {Persegue os setpoints definidos atuando};
+  \node[exemplo] at (3.7,-6.0) {Responde aos setpoints definidos};
 \end{tikzpicture}
 \caption{Camadas de controle e a informação que passa entre elas.}
 \label{fig:camadas_integracao}
 \fonte{Elaborado pelo autor a partir de \citeonline{Larsson2000} e \citeonline{Skogestad2004}.}
 \end{figure}
 
-Para mostrar essa ligação funcionando, é preciso uma planta que fique rodando e com a qual outros sistemas consigam se conectar, o que Hehenberger et al.\ chamam de \textbf{Sistema Cyber-Físico} (CPS) \cite{Hehenberger2016}. O TEP, como costuma ser usado, roda do início ao fim e só depois os dados são analisados. Por isso ele foi reescrito como uma planta simulada que roda de forma contínua. Essa é só a forma escolhida para ter onde demonstrar a ideia.
+O TEP mistura problemas: achar o ponto de operação mais barato, decidir o que manter constante quando chega um distúrbio e fazer as malhas seguirem os valores pedidos. Eles se confundem com facilidade, então vale separar onde cada um começa e termina. A Figura~\ref{fig:problemas} mostra como eles se relacionam.
 
-A Figura~\ref{fig:componentes} mostra os componentes. A planta expõe o seu estado via OPC~UA \cite{IEC62541_1} e um \textit{historian} guarda esses sinais. O usuário vai até o Kubernetes e declara a política, isto é, o que é operar bem, trazendo as escolhas da camada de otimização da Figura~\ref{fig:camadas_integracao}. A partir daí, o Kubernetes acompanha a planta e diz se ela está cumprindo essa política. Uma Interface Homem-Máquina (IHM) mostra a planta e esse veredito, para que se possa ver e entender o que está acontecendo.
+\begin{enumerate}[label=\textbf{P\arabic*}]
+	\item \textbf{Otimização}: qual é o melhor ponto de operação, no sentido econômico, em regime, respeitando o modo e os limites. Não diz como controlar a planta, só diz qual é o ponto.
+	\item \textbf{Estabilidade}: um subproblema do P1. Pode ser entendido como uma restrição sobre o ponto de operação, para evitar que a planta entre em colapso ou fique à deriva. Também não diz como controlar, só restringe o ponto.
+	\item \textbf{\textit{Self-optimizing}}: quais são as melhores variáveis para observar e para atuar. Aqui se deixa de olhar só para o ponto de operação e se passa a pensar na melhor forma de interagir com a planta, para que ela seja auto-regulada e robusta a distúrbios.
+	\item \textbf{Controle}: o problema de controle puro. Qual controlador e qual estratégia de controle usar para seguir o setpoint. O setpoint só vem depois do P3.
+	\item \textbf{Supervisão}: verificar se a planta cumpre a política de operação, definida a partir dos quatro problemas anteriores. É possível que essa camada opere para fazer cumprir a política, mas neste trabalho \textit{nos restringiremos a avaliar}.
+\end{enumerate}
 
 \begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    font=\small,
+    rotulo/.style={font=\scriptsize},
+    fluxo/.style={-{Latex[length=2mm]}, thick}
+]
+  % P1, P3 e P4 em sequência; P2 dentro do P1
+  \draw (0,0)   circle (2.5);
+  \draw (4.0,0) circle (2.5);
+  \draw (8.0,0) circle (2.5);
+  \draw[fill=gray!12] (0,-1.2) circle (1.15);
+
+  \node[align=center] at (0,0.6)   {\textbf{P1}\\Otimização};
+  \node[align=center] at (0,-1.2)  {\textbf{P2}\\Estabilidade};
+  \node[align=center] at (4.0,0.6) {\textbf{P3}\\\textit{Self-optimizing}};
+  \node[align=center] at (8.0,0.6) {\textbf{P4}\\Controle};
+
+  % o que sai das interseções
+  \draw[fluxo] (2.0,-0.4) -- (2.0,-3.2) node[below, rotulo] {ponto ótimo};
+  \draw[fluxo] (6.0,-0.4) -- (6.0,-3.2) node[below, rotulo] {setpoints};
+
+  % P5 envolve todos
+  \draw[dashed] (-3.1,-3.9) rectangle (11.1,3.2);
+  \node[anchor=south] at (4.0,3.2) {\textbf{P5} Supervisão};
+\end{tikzpicture}
+\caption{Relação entre os cinco problemas.}
+\label{fig:problemas}
+\fonte{Elaborado pelo autor.}
+\end{figure}
+
+As respostas aos problemas P1 a P4 dizem como a planta deveria ser operada. Neste trabalho, esse conjunto de respostas é chamado de \textbf{política de operação}: o que a planta deve produzir, por onde ela não pode passar, qual custo de operação se espera e quais malhas precisam estar funcionando. Para o TEP, boa parte dessas respostas já está na literatura \cite{DOWNS1993, Ricker1995, Larsson2001}. O que ela não trata é de acompanhar, com a planta rodando, se a política está sendo cumprida. Este trabalho parte da ideia de que a operação de uma planta só fica bem enquadrada quando existe uma camada que faz esse acompanhamento e, por isso, trata do P5. Os problemas P1 a P4 entram como dados.
+
+O P5 é desenvolvido na ênfase de \textbf{Integração de Sistemas de Controle} do curso de Engenharia de Controle e Automação e, por isso, o foco não é escolher as variáveis controladas nem sintonizar controladores, mas construir a ligação entre as camadas: como a planta expõe o seu estado, como esse estado chega a uma camada supervisória e como essa camada compara o que observou com a política. A ideia é que a política seja declarada pelo usuário, e não programada dentro do supervisor, e que o supervisor não precise conhecer a planta. Assim, a mesma forma de acompanhar pode ser estendida a outras plantas. O TEP é usado como a planta sobre a qual essa ligação é montada.
+
+\begin{figure}[tbp]
 \centering
 \begin{tikzpicture}[
     font=\small,
@@ -100,6 +124,11 @@ A Figura~\ref{fig:componentes} mostra os componentes. A planta expõe o seu esta
   \draw[fluxo] (usr) -- node[left, rotulo, align=right] {declara\\a política} (k8s);
   \draw[fluxo] (ihm) -- node[right, rotulo] {acompanha} (usr);
   \draw[fluxo] (tep.south) -- ++(0,-0.7) -| node[pos=0.25, below, rotulo] {OPC~UA} (ihm.south);
+
+  % foco do trabalho: historian e Kubernetes
+  \draw[dashed, gray!70, rounded corners=2pt]
+    ([xshift=-0.12cm, yshift=0.7cm]his.west) rectangle ([xshift=0.12cm, yshift=-0.7cm]k8s.east);
+  \node[rotulo, anchor=south west] at ([xshift=-0.12cm, yshift=0.7cm]his.west) {foco deste trabalho};
 \end{tikzpicture}
 \caption{Componentes do ambiente desenvolvido.}
 \label{fig:componentes}
@@ -107,10 +136,18 @@ A Figura~\ref{fig:componentes} mostra os componentes. A planta expõe o seu esta
 \end{figure}
 
 
+
+Entretanto, a supervisão ocorre \textit{no tempo}: só dá para verificar se a planta cumpre a política enquanto ela está rodando. O TEP, como costuma ser usado, roda do início ao fim e só depois os dados são analisados, o que não permite esse acompanhamento. Por isso ele foi reescrito como uma versão digital da planta, que roda de forma contínua e expõe o seu estado para outros sistemas. De certa forma, essa versão é um \textbf{gêmeo digital} do TEP, apesar de a planta não existir fisicamente.\footnote{Boschert e Rosen descrevem o gêmeo digital como um conjunto de modelos executáveis que acompanha um sistema real ao longo da vida dele e ajuda a tomar decisões sobre esse sistema \cite{Boschert2016}. O TEP não existe como instalação física, então não há sistema real para acompanhar.}
+
+O candidato escolhido para ser o supervisor é o Kubernetes, um orquestrador de \textit{containers} que nasceu do Borg, o gerenciador de \textit{clusters} do Google. Segundo \citeonline{Shuiguang2023}, ele é hoje o orquestrador de código aberto mais popular. A ideia central do Kubernetes se parece com o P5. Cada objeto tem um estado desejado (\textit{Spec}), declarado pelo usuário, e um estado observado (\textit{Status}), e controladores comparam os dois o tempo todo e agem para aproximá-los \cite{Burns2016}. Trocando o estado desejado pela política e o observado pelo estado da planta, é isso que se espera do supervisor; neste trabalho, ele fica na parte de comparar. Esse mecanismo também aceita tipos de objeto novos, então a política pode ser declarada como um objeto próprio, sem mudar o Kubernetes. Já existem trabalhos que o usam em automação industrial, como o de \citeonline{Johansson2022}, que orquestra controladores distribuídos que se comunicam via OPC~UA. O Kubernetes não foi feito para controle em tempo real, mas a supervisão não precisa de tempo real: ela não executa as malhas, que continuam na camada regulatória.
+
+A Figura~\ref{fig:componentes} mostra os componentes. A planta expõe o seu estado via OPC~UA \cite{IEC62541_1} e um \textit{historian} guarda esses sinais. O usuário vai até o Kubernetes e declara a política. A partir daí, o Kubernetes acompanha a planta e diz se ela está cumprindo essa política. Uma Interface Homem-Máquina (IHM) mostra a planta e esse veredito, para que se possa ver e entender o que está acontecendo.
+
+
 \section{PROBLEMA}
 \label{sec:problema}
 
-O problema abordado neste trabalho é a implementação de controle plant-wide sobre o Processo Tennessee Eastman como um desafio de integração industrial. A TEP, com suas unidades interconectadas e laços de reciclo, exige uma camada supervisória que coordene componentes heterogêneos em diferentes escalas de tempo. Para que esse sistema seja extensível e interoperável — e não apenas um protótipo isolado —, seus componentes devem expor interfaces segundo normas industriais estabelecidas, de modo que possam ser compostos, observados e substituídos por ferramentas compatíveis. A abordagem adotada é a de um Sistema Cyber-Físico com Kubernetes como orquestrador supervisório candidato, o que impõe que tanto a planta simulada quanto os demais componentes respeitem uma semântica de integração padronizada.
+O problema abordado neste trabalho é o P5 aplicado ao TEP: acompanhar, com a planta rodando, se ela cumpre a política do Modo~1. Esse acompanhamento depende de componentes diferentes, como a planta, quem guarda os sinais, o supervisor e a IHM, que precisam trocar informação entre si. Para que o sistema seja extensível e não apenas um protótipo isolado, esses componentes devem se comunicar segundo normas industriais, de modo que possam ser trocados por ferramentas compatíveis. E, para que a mesma forma de acompanhar sirva para outras plantas, a política deve ser declarada pelo usuário, sem que o supervisor precise conhecer o TEP.
 
 \section{A PROPOSTA}
 \label{sec:proposta}
@@ -118,10 +155,10 @@ O problema abordado neste trabalho é a implementação de controle plant-wide s
 Este trabalho propõe montar os componentes da Figura~\ref{fig:componentes} sobre o TEP e mostrar que, juntos, eles permitem acompanhar a planta a partir de uma política declarada. Os componentes são:
 
 \begin{enumerate}
-  \item \textbf{Planta simulada}: o TEP reescrito em Rust para rodar de forma contínua, com os distúrbios de Downs e Vogel \cite{DOWNS1993}, expondo o seu estado via OPC~UA. O OPC~UA é o padrão de comunicação industrial definido pela norma IEC~62541 \cite{IEC62541_1};
-  \item \textbf{\textit{Historian}}: coleta os sinais da planta via OPC~UA e entrega estatísticas desses sinais por HTTP;
-  \item \textbf{Camada supervisória no Kubernetes}: recebe do usuário a política do Modo~1 de Downs e Vogel (custo de operação, metas de produção e limites) e diz se a planta está cumprindo essa política. Também diz se as malhas de controle estão saudáveis;
-  \item \textbf{IHM}: mostra a planta e o veredito, seguindo a norma IEC~63303 \cite{IEC63303}, que trata de IHMs para processos industriais.
+  \item \textbf{Planta simulada}: Refatoração e modificação do FORTRAN original do TEP para Rust permitindo rodar de forma contínua, com os distúrbios, expondo o seu estado via OPC~UA. O OPC~UA é o padrão de comunicação industrial definido pela norma IEC~62541 \cite{IEC62541_1};
+  \item \textbf{\textit{Historian}}: uma camada em Python que coleta, via OPC~UA, todos os sinais que a planta publica e entrega por HTTP estatísticas desses sinais em uma janela de tempo, como média e desvio padrão. Também calcula o índice de desempenho das malhas de controle apresentado na Seção~\ref{sec:diagnostico}.
+  \item \textbf{Camada supervisória no Kubernetes}: roda em um \textit{cluster} local criado com o Kind (\textit{Kubernetes in Docker}). Foram criados três tipos de objeto: a função de custo, a política de operação (metas de produção, limites, custo máximo e critérios para as malhas) e a planta. Um controlador próprio, escrito em Go, lê as estatísticas do \textit{historian}, avalia a planta contra a política ativa e escreve o veredito no objeto da planta.
+  \item \textbf{IHM}: uma aplicação web com servidor em Python e interface em HTML, CSS e JavaScript puro. Mostra a planta e o veredito, seguindo a norma IEC~63303 \cite{IEC63303}, que trata de IHMs para processos industriais.
 \end{enumerate}
 
 Para situar cada componente, usa-se a divisão em níveis da norma IEC~62264 \cite{IEC62264}, que organiza os sistemas de uma indústria do processo físico até o planejamento da empresa.
@@ -146,4 +183,4 @@ Mostrar que uma camada supervisória construída sobre o Kubernetes consegue aco
 
 \section{ORGANIZAÇÃO DO TRABALHO}
 
-O Capítulo~2 apresenta o referencial teórico: o TEP, o controle \textit{plant-wide} e a função de custo de Downs e Vogel, o Kubernetes, o diagnóstico de qualidade de malhas e o OPC~UA com as normas relacionadas. O Capítulo~3 descreve cada componente da Figura~\ref{fig:componentes}. O Capítulo~4 apresenta os resultados: o comportamento da planta simulada, a comparação com o modelo original e o acompanhamento da planta pelo Kubernetes em operação normal e sob distúrbio. O Capítulo~5 traz as conclusões e os trabalhos futuros.
+O Capítulo~2 apresenta o referencial teórico: o TEP; o controle \textit{plant-wide}, de onde vêm as respostas aos problemas P1 a P3; o diagnóstico de qualidade de malhas, que acompanha o P4; o Kubernetes; e o OPC~UA com as normas relacionadas. O Capítulo~3 descreve cada componente da Figura~\ref{fig:componentes}. O Capítulo~4 apresenta os resultados: a comparação da planta simulada com o modelo original e o acompanhamento da planta pelo Kubernetes em operação normal e sob distúrbio, com a política fixa. O Capítulo~5 traz as conclusões e os trabalhos futuros.

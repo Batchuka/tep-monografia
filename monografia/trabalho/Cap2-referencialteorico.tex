@@ -1,7 +1,7 @@
 \chapter[REFERENCIAL TEÓRICO]{REFERENCIAL TEÓRICO}
 \label{cha:referencial}
 
-Este capítulo apresenta a base teórica do trabalho, na seguinte ordem: o Processo Tennessee Eastman; o controle \textit{plant-wide}, incluindo a função de custo de Downs e Vogel; o Kubernetes e trabalhos que já o usaram na indústria; o diagnóstico de qualidade de malhas; e o OPC~UA, com as normas IEC~62541 e IEC~62264.
+Este capítulo apresenta a base teórica do trabalho, na seguinte ordem: o Processo Tennessee Eastman; o controle \textit{plant-wide}, incluindo a função de custo de Downs e Vogel; o diagnóstico de qualidade de malhas; o Kubernetes e trabalhos que já o usaram na indústria; e o OPC~UA, com as normas IEC~62541 e IEC~62264. Para não misturar os assuntos, vale ter em mente os cinco problemas separados na introdução.
 
 % -------------------------------------------------------------------------
 \section{Processo Tennessee Eastman}
@@ -10,13 +10,12 @@ Este capítulo apresenta a base teórica do trabalho, na seguinte ordem: o Proce
 O Processo Tennessee Eastman (\textit{Tennessee Eastman Process} — TEP) é um \textit{benchmark} amplamente utilizado na comunidade de controle de processos para avaliação de estratégias de controle, detecção de falhas e otimização de operações industriais. Proposto originalmente por Downs e Vogel em 1993, o TEP descreve uma planta química realista com dinâmica não-linear complexa, laços de reciclo e múltiplas perturbações programadas, sendo deliberadamente desafiador do ponto de vista de controle \cite{DOWNS1993}.
 
 A planta tem cinco unidades de operação: o reator, o condensador de produto, o separador vapor-líquido, o compressor de reciclo e a coluna de esgotamento de produto (\textit{product stripper}). O processo envolve oito componentes: quatro reagentes (A, C, D e E), dois produtos (G e H), um subproduto (F) e um inerte (B), que não participa das reações. No reator ocorrem quatro reações, todas irreversíveis e exotérmicas \cite{DOWNS1993}:
-
-\begin{align}
-	A + C + D & \rightarrow G \quad (\text{produto 1, líquido}) \label{eq:rx1}   \\
-	A + C + E & \rightarrow H \quad (\text{produto 2, líquido}) \label{eq:rx2}   \\
-	A + E     & \rightarrow F \quad (\text{subproduto, líquido}) \label{eq:rx3}  \\
-	3D        & \rightarrow 2F \quad (\text{subproduto, líquido}) \label{eq:rx4}
-\end{align}
+\begin{alignat}{2}
+	A(\mathrm{g}) + C(\mathrm{g}) + D(\mathrm{g}) & \rightarrow G(\mathrm{liq})  & \qquad & \text{produto 1} \label{eq:rx1}  \\
+	A(\mathrm{g}) + C(\mathrm{g}) + E(\mathrm{g}) & \rightarrow H(\mathrm{liq})  &        & \text{produto 2} \label{eq:rx2}  \\
+	A(\mathrm{g}) + E(\mathrm{g})                 & \rightarrow F(\mathrm{liq})  &        & \text{subproduto} \label{eq:rx3} \\
+	3D(\mathrm{g})                                & \rightarrow 2F(\mathrm{liq}) &        & \text{subproduto} \label{eq:rx4}
+\end{alignat}
 
 Os reagentes entram no reator em fase gasosa e formam produtos líquidos. A quarta reação mostra que F também se forma a partir de D sozinho, o que afeta a seletividade e o custo de operação. As taxas de reação dependem da temperatura (lei de Arrhenius), e o calor gerado é removido por um feixe interno de resfriamento, alimentado pela água de resfriamento do reator. O inerte e o subproduto saem do sistema principalmente pela purga do separador.\footnote{O reator tem uma fase líquida que nunca é drenada. Nela fica dissolvido um catalisador não volátil, que permanece no reator; os produtos saem dele como vapor \cite{DOWNS1993}. O modelo não trata o catalisador como uma variável à parte: o efeito dele está embutido nas equações de taxa das reações. Neste trabalho, essas equações são idênticas às do modelo original dos autores.}
 
@@ -28,7 +27,7 @@ Os reagentes entram no reator em fase gasosa e formam produtos líquidos. A quar
 	\label{fig:tep_flowsheet}
 \end{figure}
 
-O modelo tem 50 variáveis de estado, integradas numericamente. Elas representam os inventários dos componentes e as energias no reator, no separador, no \textit{stripper} e nos demais volumes do processo. O código original foi escrito em FORTRAN.
+O modelo tem 50 variáveis de estado, integradas numericamente.\footnote{O Apêndice~\ref{apendice:estados} lista os 50 estados do modelo e mostra como cada um aparece no \texttt{tep-plant}.} Elas representam os inventários dos componentes e as energias no reator, no separador, no \textit{stripper} e nos demais volumes do processo. O código original foi escrito em FORTRAN.
 
 O modelo expõe 41 variáveis medidas (XMEAS$_1$ a XMEAS$_{41}$) e 12 variáveis manipuladas (XMV$_1$ a XMV$_{12}$). As variáveis medidas incluem vazões, composições, temperaturas, pressões e níveis. As variáveis manipuladas incluem vazões de alimentação, posições de válvula (reciclo, purga, vapor do \textit{stripper}), vazões de água de resfriamento e a velocidade do agitador. No ponto de operação nominal (Modo~1), a pressão do reator é de 2705~kPa, a temperatura do reator é de 120,4~°C e a razão mássica G/H é de 50/50 \cite{DOWNS1993}.
 
@@ -51,13 +50,32 @@ O TEP é um bom \textit{benchmark} porque reúne não-linearidades, acoplamento 
 
 O TEP mostra o que a planta tem, mas não diz como organizar o controle dela. Na verdade, o problema proposto sequer seria resolvido com uma simples sintonia de malha, é preciso decidir quais variáveis controlar, quais manipular, como ligar umas às outras e como coordenar a operação da planta inteira. Essas decisões são de projeto da estrutura de controle, e é delas que trata o controle \textit{plant-wide}.
 
-Essas decisões dependem do que se espera da planta. Downs e Vogel definem seis modos de operação, cada um com uma razão G/H e uma taxa de produção \cite{DOWNS1993}. O modo diz o que a planta deve produzir, mas não diz como. Além de cumprir o modo, a planta precisa ficar dentro dos seus limites de operação e não gastar mais do que o necessário.\footnote{Mais adiante, veremos que, neste trabalho, esse conjunto de modo, limites de operação e custo será chamado de \textbf{Política da Planta}.} Depois de atender a tudo isso, sobra pouca liberdade para o controle, e a pergunta passa a ser como usar bem essa liberdade.
+Essas decisões dependem do que se espera da planta. Downs e Vogel definem seis modos de operação, cada um com uma razão G/H e uma taxa de produção \cite{DOWNS1993}. O modo diz o que a planta deve produzir, mas não diz como. Além de cumprir o modo, a planta precisa ficar dentro dos seus limites de operação e não gastar mais do que o necessário.\footnote{Neste trabalho, esse conjunto de modo, limites de operação e custo faz parte da \textbf{política de operação}, definida na introdução.} Depois de atender a tudo isso, sobra pouca liberdade para o controle, e a pergunta passa a ser como usar bem essa liberdade.
 
 Em uma planta contínua, cada malha regulatória cuida de uma variável do seu equipamento. Isso funciona bem: com malhas locais em cascata, é possível controlar plantas grandes sem precisar de um modelo detalhado \cite{Larsson2000}. O problema é que nenhuma dessas malhas olha para a planta inteira. Larsson e Skogestad lembram que os equipamentos estão ligados uns aos outros, e um acaba agindo como distúrbio para o seguinte. Em regime, por exemplo, todos precisam processar a mesma vazão. Com reciclo e integração de calor, como no TEP, essas interações aumentam. Por isso, além das malhas locais, é preciso pensar o controle da planta como um todo \cite{Larsson2000}.
 
 Isso vale até para dizer se uma malha está boa ou não. Em um caso relatado no CERN, uma malha de nível regulava bem, mas fazia o atuador oscilar muito, o que poderia trazer problemas para a operação ao longo do tempo. Os operadores mudaram a sintonia: o atuador ficou mais suave, mas o nível passou a oscilar mais, e a ferramenta de monitoramento passou a classificar a malha como mal sintonizada.\footnote{Por ora, omitimos o método que a ferramenta usa para concluir que a sintonia piorou. Ele será apresentado na Seção~\ref{sec:diagnostico}.} Mesmo assim, a equipe preferiu a nova sintonia, porque o nível podia oscilar um pouco desde que ficasse acima de 50\%, e a oscilação do atuador não \cite{Bradu2018}. Olhando só para a malha, ela piorou; olhando para a operação, ela melhorou.
 
-O Modo~1 ajuda a ver o que isso significa na prática. Nele, a planta deve produzir 7038~kg/h de G e 7038~kg/h de H, ou seja, uma razão G/H de 50/50 \cite{DOWNS1993}. O artigo também define limites de operação, como pressão do reator abaixo de 2895~kPa, temperatura do reator abaixo de 150~°C e faixas para os níveis do reator, do separador e do \textit{stripper}. O modo e os limites funcionam como condições de contorno: dizem aonde a planta precisa chegar e por onde ela não pode passar, mas não dizem por qual caminho.
+A Tabela~\ref{tab:modos_tep} reproduz os seis modos do artigo original. O Modo~1, o caso base, ajuda a ver o que isso significa na prática. Nele, a planta deve produzir 7038~kg/h de G e 7038~kg/h de H, ou seja, uma razão G/H de 50/50 \cite{DOWNS1993}. O artigo também define limites de operação na sua Tabela~6, como pressão do reator abaixo de 2895~kPa, temperatura do reator abaixo de 150~°C e faixas para os níveis do reator, do separador e do \textit{stripper}. O modo e os limites funcionam como condições de contorno: dizem aonde a planta precisa chegar e por onde ela não pode passar, mas não dizem por qual caminho.
+
+\begin{table}[htbp]
+	\centering
+	\caption{Modos de operação do TEP.}
+	\label{tab:modos_tep}
+	\begin{tabular}{|c|c|l|}
+		\hline
+		\textbf{Modo} & \textbf{Razão G/H (massa)} & \textbf{Taxa de produção} \\
+		\hline
+		1 & 50/50 & 7038~kg/h de G e 7038~kg/h de H (caso base) \\
+		2 & 10/90 & 1408~kg/h de G e 12\,669~kg/h de H \\
+		3 & 90/10 & 10\,000~kg/h de G e 1111~kg/h de H \\
+		4 & 50/50 & máxima \\
+		5 & 10/90 & máxima \\
+		6 & 90/10 & máxima \\
+		\hline
+	\end{tabular}
+	\fonte{\citeonline{DOWNS1993}.}
+\end{table}
 
 \begin{figure}[htbp]
 	\centering
@@ -69,58 +87,102 @@ O Modo~1 ajuda a ver o que isso significa na prática. Nele, a planta deve produ
 
 Cumprir o modo já ocupa parte das escolhas. Das 12 variáveis manipuladas (XMV$_1$ a XMV$_{12}$), cada uma é uma escolha independente. Uma delas precisa fixar a taxa de produção, e outra precisa fixar a razão G/H. No pareamento proposto por \citeonline{Larsson2001}, essas duas tarefas ficam com a alimentação de A e C (XMV$_4$) e com a alimentação de D (XMV$_1$).
 
-Na Figura~\ref{fig:tep_ocupadas}, as duas variáveis em cinza seguram os níveis do separador e do \textit{stripper}. Esses níveis precisam de uma malha de controle para a planta ficar estável, mas o valor deles não muda o custo em regime \cite{Larsson2001}. Descontadas as duas variáveis em roxo e as duas em cinza, sobram $12 - 2 - 2 = 8$ graus de liberdade em regime estacionário; outro pareamento trocaria as válvulas, mas não a conta \cite{Larsson2001}. Há mais de uma forma de usar esses oito graus de liberdade para cumprir o Modo~1, e elas não custam o mesmo \cite{DOWNS1993}. Para escolher entre elas, é preciso um critério de custo.
+Na Figura~\ref{fig:tep_ocupadas}, as duas variáveis em cinza seguram os níveis do separador e do \textit{stripper}. Esses níveis precisam de uma malha de controle para a planta ficar estável (P2), mas o valor deles não muda o custo em regime \cite{Larsson2001}. Descontadas as duas variáveis em roxo e as duas em cinza, sobram $12 - 2 - 2 = 8$ graus de liberdade em regime estacionário; outro pareamento trocaria as válvulas, mas não a conta \cite{Larsson2001}. Há mais de uma forma de usar esses oito graus de liberdade para cumprir o Modo~1, e elas não custam o mesmo \cite{DOWNS1993}. Para escolher entre elas, é preciso um critério de custo.
 
-\subsection{Função de custo como ponto de partida}
+\subsection{Função de custo como ponto de partida (P1)}
 \label{subsec:custo}
 
-Antes de escolher a estrutura de controle, \citeonline{Skogestad2004} estabelece um
-pré-requisito frequentemente negligenciado: a definição explícita dos objetivos operacionais. Sem um
-critério de desempenho claro, a escolha entre controlar temperatura do reator, vazão de reciclo ou
-composição na purga torna-se arbitrária — uma questão de opinião ou convenção, não de análise.
-Idealmente, esses objetivos devem ser combinados em uma função de custo escalar $J$ a ser minimizada:
+Esse critério vem de uma função de custo, também chamada de função objetivo: uma expressão que calcula quanto custa operar a planta de um certo jeito. Com essa função em mãos, otimizar é ajustar os graus de liberdade até encontrar, entre as formas de operar que respeitam as restrições, aquela que leva a função ao melhor valor: o menor, quando ela mede custo, ou o maior, quando mede lucro. A função de custo não é uma lei física da planta, como as Equações~\ref{eq:rx1}--\ref{eq:rx4}.
+
+\citeonline{Skogestad2004} coloca essa definição como o primeiro passo do projeto da estrutura de controle. Sem ela, escolher o que controlar com os graus de liberdade vira uma questão de opinião:
 
 \begin{quote}
-	\textit{``The operational objectives must be clearly defined before attempting to design a control
-		system. Although this seems obvious, this step is frequently overlooked. Preferably, the operational
-		objectives should be combined into a scalar cost function J to be minimized. In many cases, J may be
-		simply selected as the operational cost.''} \cite{Skogestad2004}
+	\textit{``The operational objectives must be clearly defined before attempting to design a control system. Although this seems obvious, this step is frequently overlooked. Preferably, the operational objectives should be combined into a scalar cost function J to be minimized. In many cases, J may be simply selected as the operational cost.''} \cite{Skogestad2004}
 \end{quote}
 
-O artigo original de \citeonline{DOWNS1993} fornece exatamente essa função de custo para o TEP,
-expressa em termos de custos operacionais com coeficientes numéricos específicos (Tabela~9 do artigo
-original). De forma conceitual, a lógica econômica dessa função pode ser entendida como a soma
-ponderada de cinco componentes de perda: (a)~perda de reagentes não convertidos na corrente de
-purga; (b)~perda de matérias-primas na corrente de produto; (c)~formação do subproduto F, que
-representa reagentes consumidos sem retorno econômico; (d)~trabalho do compressor; e (e)~consumo de
-vapor. A representação abaixo sintetiza essa estrutura — mas não deve ser entendida como transcrição
-literal dos termos da Tabela~9:
+Para o TEP, a função de custo vem do próprio artigo original. Na sua Tabela~9, Downs e Vogel definem o custo de operação, em dólares por hora, como a soma de quatro parcelas \cite{DOWNS1993}:
 
 \begin{equation}
-	J = c_{\mathrm{purga}} \cdot \dot{m}_{\mathrm{purga}}
-	+ c_{\mathrm{prod}} \cdot \dot{m}_{\mathrm{MP,prod}}
-	+ c_F \cdot \dot{m}_F
-	+ c_{\mathrm{comp}} \cdot W_{\mathrm{comp}}
-	+ c_{\mathrm{vapor}} \cdot \dot{Q}_{\mathrm{vapor}}
+	J = C_{\mathrm{purga}}\,F_{\mathrm{purga}} + C_{\mathrm{prod}}\,F_{\mathrm{prod}} + c_{\mathrm{comp}}\,W_{\mathrm{comp}} + c_{\mathrm{vapor}}\,F_{\mathrm{vapor}}
 	\label{eq:tep_cost}
 \end{equation}
 
-\noindent onde cada termo representa, respectivamente: custo das matérias-primas perdidas na purga,
-custo das matérias-primas que saem com o produto, custo econômico atribuído à formação de F, custo
-do trabalho de compressão e custo do vapor. O sinal de $J$ está formulado como custo (negativo de
-lucro), de modo que minimizar $J$ corresponde a maximizar a eficiência operacional \cite{DOWNS1993}.
+\noindent onde $F_{\mathrm{purga}}$ e $F_{\mathrm{prod}}$ são as vazões molares da purga e do produto, $W_{\mathrm{comp}}$ é a potência consumida pelo compressor e $F_{\mathrm{vapor}}$ é a vazão mássica de vapor do \textit{stripper}. Na planta, essas grandezas estão associadas às medições XMEAS$_{10}$, XMEAS$_{17}$, XMEAS$_{20}$ e XMEAS$_{19}$, respectivamente. A purga (XMEAS$_{10}$) é medida em milhares de metros cúbicos padrão por hora (kscmh), e o produto (XMEAS$_{17}$) em metros cúbicos de líquido por hora (m³/h), então as duas precisam ser convertidas para vazão molar. Na Tabela~9, Downs e Vogel usam, para o caso base, 44,79~kmol/kscm na purga e 9,21~kmol/m³ no produto. Este último depende da densidade molar do produto, que varia com a composição e a temperatura, e por isso não deve ser tomado como constante em todos os modos de operação.
 
-Cabe destacar que $J$ não é uma equação natural da planta, derivável de primeiros princípios como
-as Equações~\ref{eq:rx1}--\ref{eq:rx4}: ela é uma escolha de formulação. \citeonline{Williams2013}
-observa que toda formulação de programação matemática compartilha a característica de envolver
-otimização — deseja-se maximizar ou minimizar uma quantidade, denominada função objetivo — e que,
-dado um mesmo conjunto de restrições, objetivos distintos conduzem a soluções ótimas distintas.
-O autor cataloga exemplos típicos de objetivo (maximizar lucro, minimizar custo, maximizar
-utilidade, maximizar valor presente líquido, maximizar robustez) que ilustram o mesmo ponto
-explorado por \citeonline{Skogestad2004} para o TEP: a função de custo traduz uma política
-operacional escolhida pelo projetista, não uma propriedade física da planta.
+Os coeficientes $C_{\mathrm{purga}}$ e $C_{\mathrm{prod}}$ são o custo de um kmol de cada corrente, calculado a partir da sua composição:
 
-Com $J$ definida, dá para dizer o que fazer com os oito graus de liberdade. Minimizando $J$ no Modo~1, cinco deles levam variáveis ao limite: pressão do reator no máximo, nível do reator no mínimo, válvula de reciclo do compressor fechada, válvula de vapor do \textit{stripper} fechada e agitador no máximo. Sobram três graus de liberdade livres \cite{Larsson2001}. A Tabela~\ref{tab:graus_liberdade} mostra o uso das 12 variáveis manipuladas, a Figura~\ref{fig:graus_liberdade_tep} resume a conta e a Figura~\ref{fig:tep_modo1} mostra essas variáveis na planta. Usar um grau de liberdade livre significa escolher uma variável e mantê-la constante com uma malha de controle. A combinação da tabela (temperatura do reator, \% de C na purga e vazão de reciclo) é a de menor perda entre as que \citeonline{Larsson2001} consideram aceitáveis.
+\begin{equation}
+	C_{\mathrm{purga}} = \sum_{i \in \{A,C,D,E,F,G,H\}} x_{i,\mathrm{purga}}\, c_i, \qquad C_{\mathrm{prod}} = \sum_{i \in \{D,E,F\}} x_{i,\mathrm{prod}}\, c_i
+	\label{eq:tep_cost_coef}
+\end{equation}
+
+\noindent em que $x_i$ é a fração molar do componente $i$ na corrente e $c_i$ é o custo atribuído a esse componente, em dólares por kmol. As composições vêm das medições XMEAS$_{29}$ a XMEAS$_{36}$, para a purga, e XMEAS$_{37}$ a XMEAS$_{39}$, para as impurezas do produto, com a porcentagem molar convertida em fração. O inerte B não tem custo atribuído, e G e H só contam como perda quando saem na purga. A formação do subproduto F também é penalizada, pelo seu custo atribuído, quando ele aparece na purga ou no produto. O compressor e o vapor têm custos fixos, de 0,0536~\$/kWh e 0,0318~\$/kg. No caso base do Modo~1, $J = 170{,}6$~\$/h, e a maior parcela desse valor vem das perdas na purga \cite{DOWNS1993}.
+
+\subsection{Otimização em regime estacionário (P1)}
+\label{subsec:otimizacao}
+
+Com $J$ definida, otimizar é procurar, entre as formas de operar que cumprem o modo e respeitam os limites, aquela que deixa $J$ no menor valor. No TEP, isso quer dizer escolher o valor de cada um dos oito graus de liberdade. \citeonline{Ricker1995} fez essa conta para os seis modos usando o modelo completo de Downs e Vogel. A Figura~\ref{fig:otimizar} mostra a ideia com dois dos oito graus de liberdade, a pressão e a temperatura do reator.
+
+\begin{figure}[htbp]
+	\centering
+	\caption{O que é otimizar, em esquema: curvas de mesmo custo $J$ para a pressão e a temperatura do reator no Modo~1.}
+	\begin{tikzpicture}[
+	    font=\small,
+	    rotulo/.style={font=\scriptsize},
+	    limite/.style={red!70!black}
+	]
+	  % escala: x = (P - 2650)/300 * 9 cm; y = (T - 119)/7 * 5,5 cm
+	  % lado inviável (P > 2800 kPa)
+	  \fill[gray!12] (4.5,0) rectangle (9,5.5);
+
+	  % curvas de mesmo J, centradas no mínimo sem o limite
+	  \begin{scope}
+	    \clip (0,0) rectangle (9,5.5);
+	    \foreach \r in {0.6,1.1,2.3,3.1,3.9}
+	      \draw[gray!55] (7,3.06) ellipse ({1.6*\r} and {\r});
+	    % curva que encosta no limite, no ponto ótimo
+	    \draw[gray!80!black] (7,3.06) ellipse (2.5 and 1.5625);
+	  \end{scope}
+
+	  % eixos
+	  \draw (0,0) rectangle (9,5.5);
+	  \foreach \p/\x in {2700/1.5, 2800/4.5, 2900/7.5}
+	    \draw (\x,0) -- (\x,-0.1) node[below, rotulo] {\p};
+	  \foreach \t/\y in {120/0.786, 122/2.357, 124/3.929}
+	    \draw (0,\y) -- (-0.1,\y) node[left, rotulo] {\t};
+	  \node[below] at (4.5,-0.45) {pressão do reator (kPa)};
+	  \node[rotate=90, above] at (-0.55,2.75) {temperatura do reator (°C)};
+
+	  % limite de pressão adotado por Ricker
+	  \draw[limite, very thick] (4.5,0) -- (4.5,5.5);
+	  \foreach \y in {0.1,0.4,...,5.3}
+	    \draw[limite] (4.5,\y) -- ++(0.18,0.18);
+	  \node[above, rotulo, limite, align=center] at (4.5,5.5) {pressão máxima adotada (2800~kPa)};
+	  \node[rotulo, gray!60!black] at (7.4,0.35) {região inviável};
+
+	  % caso base -> ótimo
+	  \draw[dashed, -{Latex[length=2mm]}, blue!70!black] (1.72,1.15) -- (4.38,2.98);
+	  \draw[thick, fill=white] (1.65,1.1) circle (0.09);
+	  \node[below right, rotulo, align=left, fill=white, inner sep=1pt] at (1.7,1.0) {caso base\\$J = 170{,}6$~\$/h};
+	  \fill[blue!70!black] (4.5,3.06) circle (0.1);
+	  \node[above left, rotulo, align=right, blue!70!black, fill=white, inner sep=1pt] at (4.4,3.15) {ótimo do Modo~1\\$J \approx 114{,}3$~\$/h};
+
+	  % mínimo de J sem o limite
+	  \draw (7,3.06) circle (0.1);
+	  \fill (7,3.06) circle (0.03);
+	  \node[below, rotulo, align=center, fill=gray!12, inner sep=1pt] at (7,2.9) {menor $J$\\sem o limite};
+
+	  \node[right, rotulo, fill=white, inner sep=1pt] at (0.15,5.0) {curvas de mesmo $J$};
+	\end{tikzpicture}
+	\fonte{Elaborado pelo autor. Esquema ilustrativo: só os pontos do caso base e do ótimo vêm de \citeonline{Ricker1995}.}
+	\label{fig:otimizar}
+\end{figure}
+
+Ricker escreveu o problema como uma programação não linear. As variáveis são os 50 estados do modelo. As restrições de igualdade são 42: as 38 derivadas do modelo iguais a zero, para a planta estar em regime, os níveis do separador e do \textit{stripper} fixados em 50\% e as produções de G e de H pedidas pelo modo. As de desigualdade são duas: a pressão do reator abaixo de um máximo e o nível do reator acima de um mínimo. Sobram $50 - 42 = 8$ graus de liberdade, os mesmos contados na Seção~\ref{sec:plantwide}. Para resolver o problema, ele usou o programa MINOS~5.1, que segue uma estratégia de Lagrangiano aumentado, com as derivadas calculadas numericamente e a busca partindo do caso base de Downs e Vogel \cite{Ricker1995}. Nesse tipo de método, a busca pode passar por pontos que violam as restrições, e a violação entra no custo como uma penalidade \cite{Nocedal1999}. O próprio Ricker encontrou mínimos locais e avisa que não há como garantir que a solução seja o ótimo global \cite{Ricker1995}. Neste trabalho, só o resultado do Modo~1 é usado.\footnote{Fora do escopo deste trabalho, a otimização do Modo~1 foi reproduzida em um projeto paralelo, o \texttt{tep-optimizer} (\url{https://github.com/Green-Cinnamon-Labs/tep-optimizer}). Ele chama o modelo da planta como uma função, sem integrar no tempo, e resolve o problema com um método de região de confiança \cite{Nocedal1999}, na implementação \textit{trust-constr} da biblioteca SciPy. O resultado bate com o de Ricker: 114,32~\$/h, com as doze válvulas iguais às do artigo até a terceira casa decimal. Partindo do caso base, o mesmo projeto encontrou outro mínimo local, um pouco mais barato (112,58~\$/h), com a válvula de reciclo aberta.}
+
+No caso base de Downs e Vogel, o custo é de 170,6~\$/h. No ótimo do Modo~1, ele cai para cerca de 114,3~\$/h, mais de 30\% a menos, principalmente porque se perde menos matéria-prima na purga \cite{Ricker1995}. Para chegar lá, cinco graus de liberdade vão até um limite, o que se chama de restrição ativa: a pressão do reator sobe até o máximo que Ricker adotou (2800~kPa, abaixo do alarme de 2895~kPa), o nível do reator desce até o mínimo (65\%), as válvulas de reciclo do compressor e de vapor do \textit{stripper} fecham e o agitador vai à velocidade máxima. 
+
+O agitador é uma exceção: em regime, ele não muda o custo, e Ricker o deixou no máximo para ampliar a faixa de resfriamento do reator \cite{Ricker1995}. Os outros três não batem em limite nenhum. Para cada um, $J$ tem um mínimo no meio da faixa, e o ótimo diz qual é esse valor. Na Figura~\ref{fig:otimizar}, a pressão é um exemplo do primeiro grupo: o menor $J$ fica além do limite, e o melhor que se pode fazer é encostar nele.\footnote{No ponto ótimo, a curva de mesmo custo só toca o limite. Essa é a ideia geométrica das condições de Karush-Kuhn-Tucker (KKT), que caracterizam o ótimo de um problema com restrições \cite{Nocedal1999}. Uma boa explicação visual dessas condições está em \citeonline{SyntheticMind2026}.} A temperatura é um exemplo do segundo: ao longo do limite, $J$ é menor em 122,9~°C. A Figura~\ref{fig:tep_modo1} mostra onde esses oito graus de liberdade ficam na planta.
 
 \begin{figure}[htbp]
 	\centering
@@ -130,79 +192,17 @@ Com $J$ definida, dá para dizer o que fazer com os oito graus de liberdade. Min
 	\label{fig:tep_modo1}
 \end{figure}
 
-\begin{table}[htbp]
-	\centering
-	\caption{Uso dos 12 graus de liberdade do TEP no ótimo do Modo~1.}
-	\label{tab:graus_liberdade}
-	\small
-	\begin{tabular}{|>{\raggedright\arraybackslash}p{2.9cm}|c|>{\raggedright\arraybackslash}p{3.7cm}|>{\raggedright\arraybackslash}p{3.8cm}|>{\raggedright\arraybackslash}p{2.9cm}|}
-		\hline
-		\textbf{Grupo} & \textbf{XMV} & \textbf{Variável manipulada} & \textbf{Variável controlada} & \textbf{No Modo~1} \\
-		\hline
-		\multirow{2}{2.9cm}{\raggedright Nível sem efeito no custo ($-2$)}
-		  & 7  & líquido do separador          & nível do separador         & qualquer \\
-		  & 8  & produto do \textit{stripper}  & nível do \textit{stripper} & qualquer \\
-		\hline
-		\multirow{2}{2.9cm}{\raggedright Exigido pelo modo ($-2$)}
-		  & 4  & alimentação A + C             & taxa de produção           & 7038~kg/h de G e de H \\
-		  & 1  & alimentação de D              & razão G/H                  & 50/50 \\
-		\hline
-		\multirow{5}{2.9cm}{\raggedright No limite (5)}
-		  & 5  & válvula de reciclo            & a própria válvula          & fechada \\
-		  & 9  & vapor do \textit{stripper}    & a própria válvula          & fechada \\
-		  & 12 & agitador                      & a própria velocidade       & máxima \\
-		  & 2  & alimentação de E              & nível do reator            & mínimo \\
-		  & 6  & válvula de purga              & pressão do reator          & máxima \\
-		\hline
-		\multirow{3}{2.9cm}{\raggedright Livre (3)}
-		  & 10 & resfriamento do reator        & temperatura do reator      & valor ótimo \\
-		  & 3  & alimentação de A              & \% de C na purga           & valor ótimo \\
-		  & 11 & resfriamento do condensador   & vazão de reciclo           & valor ótimo \\
-		\hline
-	\end{tabular}
-	\fonte{Elaborado pelo autor, com base nas Tabelas~1 e 5 de \citeonline{Larsson2001}.}
-\end{table}
+É por isso que a otimização entra na política de operação. Ela diz o que a planta deve perseguir, isto é, em quais limites operar e em que valor travar os graus de liberdade livres, e qual custo se espera dela. Sem a otimização, não se sabe o que a planta tem que perseguir nem com que valor de $J$ ela deve ser avaliada. 
 
-A existência dessa função de custo transforma a escolha das variáveis controladas em uma pergunta técnica: a melhor seleção de variáveis controladas é aquela que, sob incerteza de perturbações
-e ruído, mantém $J$ mais próximo do seu valor ótimo $J^*$.
+Neste trabalho, a política declarada é a do caso base de Downs e Vogel, com custo máximo de 170,6~\$/h. O ótimo de Ricker não entra nela, mas mostra o que uma política melhor perseguiria: o mesmo Modo~1 a cerca de 114,3~\$/h. Ele não foi adotado porque persegui-lo obrigaria o trabalho a se aprofundar na implementação e na sintonia das malhas de controle. Por isso, a política fica no caso base, perto de onde a planta simulada já opera com as malhas atuais.
 
-\subsection{Hierarquia de controle e escala de tempo}
 
-\citeonline{Skogestad2004} propõe organizar a resposta a essas perguntas em uma hierarquia de
-camadas separadas por escala de tempo:
-
-\begin{enumerate}
-	\item \textbf{Controle regulatório}: malhas PID locais que estabilizam variáveis de processo em
-	      torno de um ponto de operação. Esse nível opera em escala de segundos a minutos e não possui
-	      visão global da planta.
-	\item \textbf{Controle supervisório}: coordenação das malhas regulatórias via ajuste de setpoints
-	      e ativação/desativação de malhas, operando em escala de minutos a horas. Esse é o nível que
-	      reage a perturbações que transcendem os limites de uma única malha local.
-	\item \textbf{Otimização em tempo real} (\textit{Real-Time Optimization} --- RTO): recálculo dos
-	      setpoints ótimos das variáveis primárias com base nas condições econômicas vigentes e nas
-	      restrições ativas, operando em escala de horas a dias.
-\end{enumerate}
-
-A separação em camadas é justificada não apenas pela diferença de escala de tempo, mas pela
-diferença de informação disponível em cada nível. A camada regulatória opera com medições locais e
-sem modelo da planta inteira. A camada supervisória opera sobre os setpoints das malhas regulatórias,
-sem necessidade de acessar diretamente as válvulas. A RTO, por sua vez, resolve um problema de
-otimização estacionária para determinar os setpoints ótimos que a camada supervisória deve perseguir
-\cite{Skogestad2004}.
-
-\begin{figure}[htbp]
-	\centering
-	\missingfigure[figwidth=0.80\textwidth]{Hierarquia de controle plant-wide de Skogestad (3 camadas verticais): base = controle regulatório (malhas PID, escala de segundos a minutos); meio = controle supervisório (ajuste de setpoints e modos, escala de minutos a horas); topo = otimização em tempo real --- RTO (recálculo de setpoints ótimos via minimização de $J$, escala de horas a dias). Setas descendentes indicam setpoints; setas ascendentes indicam estados e medições. Adaptado de \citeauthor{Skogestad2004} (\citeyear{Skogestad2004}).}
-	\caption{Hierarquia de controle plant-wide: regulatório, supervisório e otimização em tempo real.}
-	\label{fig:plantwide_hierarchy}
-\end{figure}
-
-\subsection{Controle self-optimizing e a perda econômica}
+\subsection{Controle self-optimizing e a perda econômica (P3)}
 
 O conceito central que conecta a função de custo $J$ à estrutura de controle é o de
 \textbf{controle self-optimizing}: escolher variáveis controladas $c$ tais que, mantidas em setpoint
-fixo, levem automaticamente aos ajustes ótimos das variáveis manipuladas quando ocorrem perturbações
---- sem necessidade de reotimização explícita \cite{Skogestad2004}. Para quantificar quando uma
+fixo, conduzam a planta a condições de operação economicamente próximas do ótimo quando ocorrem
+perturbações, sem necessidade de reotimização explícita \cite{Skogestad2004}. Para quantificar quando uma
 escolha de $c$ é suficientemente boa, define-se a \textbf{perda econômica} $L$:
 
 \begin{equation}
@@ -215,126 +215,203 @@ aplicada sob perturbação $d$, e $J^*(d)$ é o valor ótimo que seria atingido 
 completa. O controle self-optimizing é alcançado quando existe uma política de setpoint constante
 que resulta em perda $L$ aceitável para o espectro esperado de perturbações \cite{Skogestad2004}.
 
-A implicação prática é significativa: se as variáveis controladas forem bem escolhidas, o supervisor
-não precisa resolver um problema de otimização a cada perturbação --- basta regular $c$ no setpoint.
-A escolha errada das variáveis controladas, por outro lado, pode resultar em perda econômica elevada
-mesmo que todas as malhas estejam corretamente sintonizadas.
-
-\subsection{Aplicação ao TEP: análise de graus de liberdade}
-
-\citeonline{Larsson2001} aplicam essa metodologia ao TEP. Partem dos 8 graus de liberdade em regime estacionário e das 5 restrições ativas no Modo~1, vistos na Seção~\ref{subsec:custo}, e buscam variáveis \textit{self-optimizing} para os 3 graus de liberdade que sobram.
-
-Os autores comparam as alternativas pela perda $L$, calculada com a função de custo de \citeonline{DOWNS1993}. Quatro combinações ficam abaixo da perda que eles consideram aceitável. As duas melhores são a temperatura do reator (XMEAS$_9$), a composição de C na purga e a vazão de reciclo (XMEAS$_5$) ou o trabalho do compressor (XMEAS$_{20}$). Controlar a composição do inerte B, uma sugestão comum, foi uma escolha ruim: com distúrbios ou erros de implementação, a planta pode chegar a um ponto de operação inviável \cite{Larsson2001}.
-
-Essa análise revela a função concreta que uma camada supervisória deve exercer no TEP: não apenas
-estabilizar a planta, mas garantir que as variáveis primárias $c$ --- aquelas identificadas como
-self-optimizing --- permaneçam próximas de seus setpoints ótimos frente às perturbações IDV.
-Qualquer arquitetura supervisória proposta pode ser avaliada, em última instância, pelo valor de $L$
-que produz em simulação.
-
-A hierarquia de Skogestad fornece o enquadramento teórico para a separação de responsabilidades na
-arquitetura proposta neste trabalho: a camada regulatória é implementada pelo conjunto de
-controladores PID do \texttt{ControllerBank}; a camada supervisória é o objeto de investigação
-central deste trabalho --- responsável por coordenar setpoints, modos e condições observadas das
-malhas regulatórias frente a perturbações e transições operacionais. A camada de otimização em tempo
-real, que determinaria os setpoints ótimos de $c$ via minimização de $J$, fica fora do escopo deste
-trabalho e constitui extensão natural. O TEP, com sua função de custo explícita e seus 41~XMEAS e
-12~XMV, é um ambiente adequado para avaliar se um supervisor consegue manter a planta próxima do
-ótimo operacional sem requerer reotimização a cada perturbação.
-
-A camada de RTO, embora fora do escopo de implementação, é explorada preliminarmente no
-Apêndice~\ref{apendice:otimizacao}, onde a função de custo $J$ é estendida para incorporar outras
-dimensões de desempenho operacional -- operação, qualidade, energia, risco, manutenção e produção
-perdida -- e diferentes algoritmos de otimização são avaliados como candidatos a traduzir essas
-funções objetivo em políticas supervisórias concretas para o Kubernetes.
-
-% -------------------------------------------------------------------------
-
-\section{Cloud-Native como Paradigma de Orquestração Industrial}
-\label{sec:cloudnative}
-
-A hierarquia de controle plant-wide estabelece a existência e a função de uma camada supervisória: ela deve observar o estado de múltiplos controladores distribuídos pela planta, propagar decisões de coordenação --- setpoints, modos, políticas --- e reagir a perturbações sem executar diretamente as malhas regulatórias. Isso coloca uma questão de implementação que o referencial de controle de processos não responde: qual paradigma tecnológico suporta construir um sistema distribuído capaz de observar componentes heterogêneos, manter um estado operacional desejado e tomar ações corretivas de forma contínua e autônoma? É a esse problema que o paradigma cloud-native se dirige.
-
-O termo \textit{cloud-native} designa uma abordagem de desenvolvimento e operação de sistemas distribuídos que explora recursos típicos da computação em nuvem --- conteinerização, microsserviços, orquestração automática de containers, DevOps e pipelines de entrega contínua \cite{Shuiguang2023}. Conforme \citeonline{Shuiguang2023}, uma aplicação cloud-native pode ser entendida como um sistema distribuído, elástico e escalável horizontalmente, composto por microsserviços inter-relacionados empacotados em containers leves e orquestrados sobre múltiplos servidores. Nesse paradigma, a orquestração é descrita pelos autores como a configuração, o gerenciamento e a coordenação automatizados do ciclo de vida dos containers --- provisionamento, implantação, agendamento, escalonamento, configuração de rede e balanceamento de carga --- de modo a manter as funcionalidades da aplicação elásticas e disponíveis. O Kubernetes, originado do gerenciador de clusters Borg do Google, é descrito pelos mesmos autores como o software open-source de orquestração de containers mais popular e como um padrão de fato amplamente adotado pela indústria.
-
-\citeonline{Burns2016} documentam a evolução dos sistemas de orquestração do Google --- Borg, Omega e Kubernetes --- e mostram que a força do Kubernetes está na combinação de uma API uniforme, objetos extensíveis e separação explícita entre estado desejado e estado observado. Cada recurso Kubernetes é representado como um objeto com dois campos centrais: \textit{Spec}, que descreve o estado desejado, e \textit{Status}, que registra o estado observado em tempo de execução. Sobre essa estrutura operam controladores de reconciliação (\textit{reconciliation controller loops}) que comparam continuamente o estado desejado ao estado observado e executam ações para convergir o segundo em direção ao primeiro \cite{Burns2016}. Os autores destacam ainda que a conteinerização muda o paradigma operacional dos data centers --- de uma perspectiva orientada a máquinas para uma perspectiva orientada a aplicações, na qual gerenciar containers significa gerenciar aplicações, não servidores. Essa combinação de API uniforme, objetos Spec/Status, controladores de reconciliação e extensibilidade torna o Kubernetes uma plataforma de operação declarativa para sistemas distribuídos complexos. No ecossistema Kubernetes, essa lógica declarativa pode ser estendida pelo \textit{Operator Pattern}, no qual controladores específicos de domínio observam recursos customizados e executam ações de reconciliação sobre aplicações ou sistemas externos ao cluster.
-
-\begin{figure}[htbp]
+\begin{figure}[!htb]
 	\centering
-	\missingfigure[figwidth=0.85\textwidth]{Loop de reconciliação do Kubernetes: (1) objeto com \textit{Spec} (estado desejado declarado pelo operador) e \textit{Status} (estado observado em tempo real); (2) controlador de reconciliação compara Spec e Status; (3) se divergentes, aciona ação corretiva (e.g., reiniciar pod, ajustar réplicas, atualizar rota); (4) sistema converge e Status se aproxima de Spec. Pode incluir exemplo industrial análogo: \textit{Spec} = modo operacional desejado da planta; \textit{Status} = condição observada das malhas; ação = ajuste de setpoint ou reconfiguração. Baseado em \citeauthor{Burns2016} (\citeyear{Burns2016}).}
-	\caption{Loop de reconciliação Spec/Status do Kubernetes e sua analogia com supervisão industrial.}
-	\label{fig:k8s_reconciliation}
+	\caption{Por onde o distúrbio IDV(1) entra no TEP e os graus de liberdade que passam a precisar de novo valor no Modo~1.}
+	\includegraphics[width=0.95\textwidth]{imagens/tep-modo1-disturbio-idv1.png}
+	\fonte{Elaborado pelo autor, com base em \citeonline{DOWNS1993} e \citeonline{Larsson2001}.}
+	\label{fig:idv1_planta}
 \end{figure}
 
-A relevância desse paradigma para sistemas industriais não está em substituir controladores regulatórios ou malhas de tempo real, mas em oferecer uma forma de organizar camadas superiores de operação: implantação e ciclo de vida de serviços, supervisão de componentes distribuídos, observabilidade, tolerância a falhas, aplicação de políticas e coordenação de estados operacionais. Nesse enquadramento, cloud-native e Kubernetes são considerados como referências para a camada supervisória e informacional do sistema, preservando a distinção entre controle regulatório da planta e orquestração da infraestrutura de software.
+No TEP, essa ideia foi aplicada por \citeonline{Larsson2001}. O ponto de partida é o que já foi visto: Downs e Vogel definiram a função de custo, e Ricker resolveu a otimização em regime, com cinco restrições ativas no ótimo do Modo~1. Dos oito graus de liberdade em regime, restam três. Um grau de liberdade, porém, não é uma variável controlada: os três graus de liberdade livres podem ser ocupados mantendo constantes diferentes combinações de variáveis. O problema dos autores era escolher quais três variáveis controlar em setpoints constantes para que a perda continuasse aceitável diante de distúrbios, sem reotimizar a planta o tempo todo \cite[seção~3, Tabela~1]{Larsson2001}.
 
-\subsection{Precedentes Industriais}
+\begin{figure}[t]
+	\centering
+	\caption{O distúrbio IDV(1) muda o ótimo do Modo~1, e a perda depende do que se mantém constante.}
+	\begin{tikzpicture}[
+	    font=\small,
+	    rotulo/.style={font=\scriptsize},
+	    otimo/.style={blue!70!black},
+	    boa/.style={green!45!black},
+	    ruim/.style={red!70!black}
+	]
+	  % curvas de mesmo J sem distúrbio (tracejadas) e com IDV(1) (contínuas)
+	  \begin{scope}
+	    \clip (0,0) rectangle (9,5.5);
+	    \foreach \r in {0.5,1.0,1.6,2.3}
+	      \draw[gray!45, dashed] (2.8,2.4) ellipse ({1.6*\r} and {\r});
+	    \foreach \r in {0.5,1.0,1.6,2.3}
+	      \draw[gray!75] (5.6,3.4) ellipse ({1.6*\r} and {\r});
+	  \end{scope}
+	  \draw (0,0) rectangle (9,5.5);
+	  \node[below] at (4.5,-0.1) {um grau de liberdade livre};
+	  \node[rotate=90, above] at (-0.1,2.75) {outro grau de liberdade livre};
 
-Trabalhos recentes indicam que essa aproximação entre infraestrutura cloud-native e automação industrial já é objeto de pesquisa. \citeonline{Johansson2022} investigam o uso de Kubernetes para orquestrar nós controladores distribuídos virtualizados (\textit{Virtual Distributed Control Nodes}, VDCNs) em cenários de alta disponibilidade. A lógica de controle permanece no interior dos VDCNs; o Kubernetes atua como camada de orquestração, executando o agendamento situacional dos containers, gerenciando os laços de reconciliação que empurram o estado atual em direção ao estado desejado, e atualizando as rotas de comunicação conforme o estado da aplicação --- determinando qual instância VDCN recebe comandos OPC~UA e, portanto, qual controlador participa ativamente da operação. Diante de falhas de nó, o Kubernetes detecta o evento, reimplanta o VDCN afetado e, no caso redundante, promove o backup a primário enquanto cria uma nova instância de backup \cite{Johansson2022}. Esse resultado é relevante porque mostra um precedente em que o Kubernetes é usado não apenas como infraestrutura genérica, mas como camada responsável por recompor componentes de controle industrial diante de falhas, com efeito direto sobre a continuidade operacional do sistema.
+	  % o distúrbio desloca o ótimo
+	  \draw[ruim, dashed, -{Latex[length=2mm]}] (2.9,2.47) -- (5.45,3.32)
+	    node[pos=0.45, above, sloped, rotulo, fill=white, inner sep=1pt] {IDV(1)};
 
-\citeonline{Mellado2022} propõem o \textbf{IoT-PLC}, uma arquitetura baseada em containers para CLPs orientados à Indústria~4.0, na qual cada funcionalidade --- controle regulatório, armazenamento de dados de campo, interfaces sem fio --- é encapsulada em um container separado. O IoT-PLC é posicionado como nó de fog computing, mantendo a execução próxima à planta enquanto permite gerenciamento direto a partir da nuvem, reconfiguração a quente de malhas de controle e ajuste de recursos computacionais por container sem interromper o processo. O artigo utiliza também um \textit{modelo de dispositivo virtual} que abstrai a interface do controlador para camadas superiores. Embora não constitua uma implementação baseada em Kubernetes, o IoT-PLC é relevante como antecedente conceitual: ele mostra que a literatura industrial já considera plausível decompor funções de CLP em componentes conteinerizados, reconfiguráveis e gerenciáveis externamente, e representar entidades físicas por abstrações digitais acessíveis a camadas superiores --- uma preocupação compatível com a lógica de recursos declarativos usada em arquiteturas cloud-native.
+	  % ótimo nominal e novo ótimo
+	  \draw[thick, fill=white] (2.8,2.4) circle (0.09);
+	  \node[rotulo, below, align=center, fill=white, inner sep=1pt] at (2.8,2.25) {ótimo sem distúrbio\\114,3~\$/h};
+	  \fill[otimo] (5.6,3.4) circle (0.09);
+	  \node[rotulo, otimo, above, align=center, fill=white, inner sep=1pt] at (5.6,3.55) {novo ótimo\\111,6~\$/h};
 
-Em conjunto, esses trabalhos indicam uma convergência entre práticas cloud-native e sistemas industriais, mas também delimitam seu escopo. Uma limitação importante é que o Kubernetes não foi projetado para controle determinístico de tempo real: seus mecanismos de agendamento, reinicialização e redistribuição de cargas são adequados para disponibilidade e operação de aplicações distribuídas, mas não garantem, por si só, tempos de resposta compatíveis com malhas regulatórias industriais. A contribuição mais defensável dos princípios cloud-native está na camada supervisória --- observação de componentes distribuídos, manutenção de configurações desejadas, recomposição de serviços após falhas e disponibilização de abstrações operacionais para camadas superiores ---, sem substituir a execução determinística de controladores de baixo nível. A integração com ativos industriais pressupõe ainda uma camada de comunicação capaz de representar medições, comandos e estados de equipamentos de forma estruturada; protocolos como OPC~UA são relevantes nesse ponto, funcionando como possível interface entre a camada de orquestração e os dispositivos de automação.
+	  % escolha boa: fica praticamente no novo ótimo
+	  \fill[boa] (5.75,3.3) circle (0.06);
+	  \node[rotulo, boa, right, align=left, fill=white, inner sep=1pt] at (6.3,3.0) {temperatura, C na purga\\e reciclo constantes:\\perda de 0,0~\$/h (arred.)};
+	  \draw[boa] (5.8,3.28) -- (6.3,3.05);
+
+	  % escolha ruim: sai para longe
+	  \draw[ruim, thick, -{Latex[length=2mm]}] (2.85,2.3) -- (8.7,0.35);
+	  \node[rotulo, ruim, anchor=south east, align=right, fill=white, inner sep=1pt] at (8.85,1.6) {só a vazão de A constante:\\perda de 709,8~\$/h};
+
+	  % legenda das curvas
+	  \fill[white] (0.1,4.6) rectangle (3.55,5.4);
+	  \draw[gray!45, dashed] (0.25,5.2) -- (0.75,5.2);
+	  \node[rotulo, right] at (0.75,5.2) {mesmo $J$, sem distúrbio};
+	  \draw[gray!75] (0.25,4.85) -- (0.75,4.85);
+	  \node[rotulo, right] at (0.75,4.85) {mesmo $J$, com IDV(1)};
+	\end{tikzpicture}
+	\fonte{Elaborado pelo autor. Representação conceitual: as curvas não foram calculadas com o modelo do TEP, o problema real tem três graus de liberdade livres e as distâncias no gráfico não medem a perda. Só os custos e as perdas vêm das Tabelas~3 e~4 de \citeonline{Larsson2001}.}
+	\label{fig:idv1}
+\end{figure}
+
+Para isso, eles eliminaram candidatas aos poucos, por critérios físicos, por redundância entre variáveis muito parecidas, por inviabilidade e por perda econômica. Depois, compararam as combinações restantes sob dois distúrbios na composição da alimentação e variações de $\pm 15\%$ na produção \cite[seções~4 e~5]{Larsson2001}. A temperatura do reator, a composição de C na purga e a vazão de reciclo tiveram a menor perda, 3,8~\$/h. Esse valor é a soma das perdas calculadas nos quatro cenários (os dois distúrbios e as duas variações de produção), e não a perda de uma única operação. Os próprios autores adotaram 6~\$/h, somados nos mesmos quatro cenários, como limite aceitável. A combinação usada antes por Ricker em um trabalho de controle descentralizado do TEP somou 9,8~\$/h \cite[Tabela~4]{Larsson2001}. Por fim, os autores verificaram com simulações dinâmicas em malha fechada que essa escolha pode ser implementada \cite[seções~6 e~7]{Larsson2001}.
+
+Um exemplo é o distúrbio IDV(1), uma mudança na razão entre A e C na alimentação \cite{DOWNS1993}. A Figura~\ref{fig:idv1_planta} mostra por onde ele entra na planta. Com ele, o ótimo do Modo~1 muda de lugar, e o custo mínimo passa de 114,3 para 111,6~\$/h (Figura~\ref{fig:idv1}). Mantendo constantes a temperatura do reator, a composição de C na purga e a vazão de reciclo, a perda calculada pelos autores para esse distúrbio é de 0,0~\$/h, já arredondada na Tabela~4. Esse valor vale para o IDV(1) e não garante operação ótima em qualquer situação: com o outro distúrbio de composição, a mesma escolha perde 1,9~\$/h. Manter constante a vazão de alimentação de A, mesmo reotimizando os outros dois graus de liberdade, custaria 709,8~\$/h a mais \cite[seção~3, Tabelas~3 e~4]{Larsson2001}.
+
+Na prática, se as variáveis controladas forem bem escolhidas, não é preciso resolver um problema de otimização a cada distúrbio: basta que as malhas regulatórias mantenham cada variável $c$ no seu setpoint. A escolha das variáveis e dos setpoints faz parte da política de operação; quem a executa, continuamente, são as malhas. Uma escolha ruim, por outro lado, pode levar a uma perda econômica grande mesmo com todas as malhas bem sintonizadas.
 
 % -------------------------------------------------------------------------
 
-\section{Diagnóstico de Qualidade de Malhas}
+\section{Diagnóstico de Qualidade de Malhas (P4)}
 \label{sec:diagnostico}
 
-O paradigma cloud-native oferece a infraestrutura para observar componentes distribuídos, manter estados desejados e acionar ações corretivas. O problema é que o Kubernetes --- ou qualquer camada supervisória de software --- opera sobre abstrações que nada têm a ver com o vocabulário da planta: ele conhece pods, serviços, configurações e rotas, não variáveis de processo, setpoints ou oscilações em malhas PID. Para que um orquestrador possa tomar decisões sobre o estado operacional de uma planta, é necessário um passo anterior: sair dos sinais brutos gerados pelos controladores e produzir estados reconhecíveis em nível de supervisão. Isso exige uma camada analítica que saiba interpretar séries temporais de processo e traduzi-las em condições que o supervisor possa consumir --- malha saudável, malha degradada, atuador saturado, comportamento o'scilatório. É dessa tradução que trata o diagnóstico de qualidade de malhas.
+A Seção~\ref{sec:plantwide} tratou de P1 a P3: qual é o ponto de operação e quais variáveis manter constantes para ficar perto dele. Depois dessas escolhas, cada variável fica a cargo de uma malha de controle, e entra o P4: qual controlador usar e se ele, de fato, segue o setpoint. Tentei evitar o máximo discutir sobre sintonias aqui neste trabalho, mas senti a necessidade de revisar técnicas para saber se os setpoints estão sendo alcançados, porque as malhas funcionando fazem parte da política de operação. Para isso, é preciso transformar os sinais de cada malha em estados que digam algo sobre ela, como malha saudável, malha degradada, atuador saturado ou comportamento oscilatório. É dessa tradução que trata o diagnóstico de qualidade de malhas.
 
 A qualidade de uma malha de controle não é binária: um controlador pode estar em modo automático e ainda assim apresentar desempenho degradado. Malhas excessivamente agressivas podem induzir oscilações e desgaste de atuadores; malhas conservadoras demais respondem lentamente e permitem a propagação de distúrbios; e restrições de atuador, ruído de medição ou perturbações externas podem comprometer o comportamento da malha sem necessariamente acionar alarmes discretos. Em plantas com centenas ou milhares de controladores, a identificação manual de condições degradadas torna-se impraticável, motivando técnicas de \textit{control loop performance monitoring} (CLPM). O objetivo do CLPM não é controlar melhor diretamente, mas transformar históricos de sinais da malha --- setpoint, variável medida e saída do controlador --- em indicadores de desempenho que permitam priorizar quais malhas exigem análise especializada \cite{Bradu2018}.
 
 \subsection{Benchmark de Variância Mínima e o Índice de Harris}
 
-O trabalho de \citeonline{Harris1989} tornou-se um marco clássico na avaliação quantitativa de desempenho de malhas fechadas ao propor um benchmark baseado em controle de variância mínima. A ideia central é que, para processos representáveis por funções de transferência lineares sujeitos a perturbações aditivas, existe um limite inferior teórico para a variância da variável controlada: a variância que seria obtida por um controlador de variância mínima (MVC), dado o atraso discreto inerente ao processo. A principal contribuição de Harris é que esse limite pode ser estimado a partir de dados rotineiros de operação em malha fechada --- sem experimentos de identificação ou conhecimento completo do modelo --- bastando conhecer o atraso discreto efetivo $f$ (número de períodos de amostragem entre a ação de controle e seu efeito mensurável na saída).
+O trabalho de \citeonline{Harris1989} parte da observação de que, quando uma perturbação inesperada afeta um processo, a ação corretiva do controlador não produz efeito instantaneamente. Existe um atraso durante o qual parte da perturbação, por sua natureza imprevisível, não pode ser compensada a tempo. Mesmo um controlador ideal, portanto, não conseguiria eliminar completamente a variabilidade da variável controlada. Para processos que podem ser representados por modelos lineares com perturbações aditivas\footnote{Um modelo linear descreve um processo em que os efeitos das entradas podem ser somados. Perturbações aditivas são aquelas que acrescentam seu efeito à saída do processo.}, Harris demonstra que essa parcela inevitável estabelece um limite inferior teórico para a variância da saída, denominado variância mínima. Sua contribuição consiste em mostrar que esse limite pode ser estimado a partir dos dados históricos da variável controlada, fornecendo uma referência para avaliar quanto o desempenho da malha ainda pode ser melhorado. A Figura~\ref{fig:harris_atraso} ilustra essa ideia.
 
-A estimativa de $\sigma^2_{\text{mv}}$ é obtida ajustando-se um modelo univariado de séries temporais à variável controlada em malha fechada e extraindo a variância do erro de previsão $f+1$ passos à frente. Essa variância corresponde à parcela da saída que não pode ser removida por \textit{feedback} antes que o efeito do atraso se manifeste, e está associada aos primeiros coeficientes da representação de médias móveis da dinâmica de perturbação \cite{Harris1989}. Uma propriedade diagnóstica importante decorre diretamente da teoria: sob controle de variância mínima, a autocorrelação da variável controlada é nula além do lag $f$. Portanto, autocorrelação significativa para lags maiores que $f$ indica que o controlador não está extraindo todo o desempenho possível com a estrutura de controle vigente.
+\begin{figure}[htbp]
+	\centering
+	\caption{Ideia da variância mínima de Harris: durante o atraso, nenhum controlador consegue evitar o desvio causado pelo distúrbio.}
+	\begin{tikzpicture}[
+	    font=\small,
+	    rotulo/.style={font=\scriptsize},
+	    ideal/.style={blue!70!black, thick},
+	    ruim/.style={red!70!black, thick, dashed}
+	]
+	  % janela do atraso
+	  \fill[gray!12] (3,0.2) rectangle (5,3.9);
+	  \node[rotulo, align=center] at (4,4.2) {atraso: nenhuma ação de\\controle chega à saída};
 
-Em formulações de CLPM posteriores ao trabalho original, o desempenho é expresso como:
+	  % eixos
+	  \draw[-{Latex[length=2mm]}] (0,0.2) -- (12.4,0.2) node[below left, rotulo] {tempo};
+	  \draw[-{Latex[length=2mm]}] (0,0.2) -- (0,4.0) node[above, rotulo] {saída $y$};
+
+	  % setpoint
+	  \draw[gray!70, dashed] (0,1.5) -- (12.2,1.5) node[above left, rotulo, gray!50!black] {setpoint};
+
+	  % desvio inevitável (área sombreada)
+	  \fill[red!18] (3,1.5) .. controls (3.8,1.55) and (4.4,2.4) .. (5,2.9) -- (5,1.5) -- cycle;
+
+	  % saída antes e durante o atraso
+	  \draw[thick] (0,1.5) -- (3,1.5) .. controls (3.8,1.55) and (4.4,2.4) .. (5,2.9);
+
+	  % depois do atraso: controlador ideal e malha mal ajustada
+	  \draw[ideal] (5,2.9) .. controls (5.4,2.95) and (5.9,1.7) .. (6.6,1.55) .. controls (7.0,1.47) and (7.4,1.5) .. (12,1.5);
+	  \draw[ruim] (5,2.9) .. controls (5.6,3.4) and (6.4,3.1) .. (7,2.4)
+	    .. controls (7.6,1.6) and (8.2,1.0) .. (8.9,1.2)
+	    .. controls (9.6,1.4) and (10.2,1.7) .. (11,1.55) -- (12,1.5);
+
+	  % distúrbio
+	  \draw[-{Latex[length=2mm]}, red!70!black, thick] (2.2,3.3) -- (2.95,2.0);
+	  \node[rotulo, red!70!black, anchor=south east] at (2.3,3.25) {distúrbio};
+
+	  % rótulos
+	  \draw[red!50!black] (4.45,1.85) -- (4.2,1.0);
+	  \node[rotulo, anchor=north, align=center] at (4,0.98) {desvio não compensável\\durante o atraso};
+	  \node[rotulo, blue!70!black, anchor=north west, align=left] at (5.8,1.42) {controle\\bem ajustado};
+	  \node[rotulo, red!70!black, anchor=west] at (7.3,2.9) {malha mal ajustada};
+	\end{tikzpicture}
+	\fonte{Elaborado pelo autor, com base em \citeonline{Harris1989}. Esquema ilustrativo com um único distúrbio, que não demonstra a variância mínima: no método, a perturbação é um processo aleatório contínuo, e o que se mede é a variância de erros de previsão.}
+	\label{fig:harris_atraso}
+\end{figure}
+
+A região em vermelho é o desvio que acontece durante o atraso. Nenhum controlador consegue compensá-lo, porque a ação de controle só chega à saída depois de $b = f + 1$ períodos de amostragem, em que $f$ é a parte inteira da razão entre o tempo morto do processo e o intervalo de controle \cite[Equação~2]{Harris1989}. Essa é a intuição por trás da variância mínima, mas a figura mostra um único distúrbio. No método, a perturbação é um processo aleatório contínuo, e a cada instante a parte dela que chega durante o atraso não pode ser compensada. Harris mostra que a variância dessa parte, que é a variância do erro de previsão da saída $f+1$ passos à frente, é a menor variância que uma realimentação pode alcançar: a variância mínima, $\sigma^2_{\text{mv}}$ \cite{Harris1989}. Na figura, um controle bem ajustado deixa a saída perto desse limite (curva azul), e uma malha mal ajustada acrescenta variabilidade (curva tracejada), o que eleva a variância medida da saída, $\sigma^2_y$. O índice de Harris compara as duas:
 
 \begin{equation}
 	\eta = \frac{\sigma^2_{\text{mv}}}{\sigma^2_y}
 	\label{eq:harris_index}
 \end{equation}
 
-\noindent Valores próximos de 1 indicam operação próxima ao benchmark de variância mínima; valores baixos indicam variância observada substancialmente maior do que o limite alcançável. Deve-se observar que o índice não identifica a causa da degradação: um baixo $\eta$ pode decorrer de má sintonia, mas também de atraso excessivo, saturação de atuador, ruído de medição, ausência de ação feedforward ou perturbação não medida. Quando $\eta$ está próximo de 1, mas a variância absoluta ainda é elevada, a causa é estrutural --- e reduções adicionais de variância só são alcançáveis por modificações no processo, como redução de atraso, troca de variável manipulada ou adição de feedforward \cite{Harris1989}.
+\noindent Com $\eta$ perto de 1, a malha está perto do limite, como a curva azul. Com $\eta$ baixo, a variância observada excede significativamente o limite teórico, como na curva tracejada. Harris mostra que $\sigma^2_{\text{mv}}$ pode ser estimada a partir de dados rotineiros de operação, sem perturbar o processo: basta ajustar um modelo de séries temporais à saída e conhecer o atraso. Em um dos exemplos do artigo, com dados de produção de um polímero, o desvio padrão medido da saída era 4,44, e o estimado para a variância mínima, 3,86 \cite{Harris1989}. Isso dá $\eta = (3{,}86/4{,}44)^2 \approx 0{,}76$: no limite teórico, a variância da saída poderia ser cerca de 24\% menor. O índice, porém, não diz a causa. Um $\eta$ baixo pode vir de má sintonia, mas também de saturação do atuador ou de comportamentos que fogem das hipóteses lineares do método.
+
+Como o cálculo usa só os dados que a malha já produz em operação normal, essa avaliação pode ser feita online, em janelas de tempo: a cada janela, estimam-se $\sigma^2_{\text{mv}}$ e $\sigma^2_y$ e recalcula-se $\eta$. Isso interessa à camada supervisória, porque transforma o histórico de cada malha em um número que ela pode acompanhar sem perturbar a operação e sem um modelo detalhado da planta, bastando conhecer o atraso de cada malha.
 
 \subsection{Índice de Preditividade e a Abordagem do CERN}
 
-Embora o benchmark de Harris forneça uma referência teórica robusta, sua aplicação pressupõe hipóteses de linearidade e requer o conhecimento de $f$. Abordagens posteriores de CLPM buscaram métricas mais simples de implantar em larga escala, operando diretamente sobre históricos de malhas sem modelo físico da planta. É nesse contexto que se insere o \textit{Predictability Index} (PI) aplicado por \citeonline{Bradu2018} ao sistema criogênico do LHC, que opera milhares de malhas PID distribuídas ao longo do acelerador. Nessa escala, a inspeção manual é inviável, e o PI funciona como métrica automática de triagem.
-
-O método prediz o erro futuro da malha a partir de seus valores passados. Para um horizonte de predição $b$ e uma ordem de modelo $m$, o erro previsto é:
-
-\begin{equation}
-	\hat{e}(t+b) = a_0 + a_1\,e(t) + a_2\,e(t-1) + \cdots + a_m\,e(t-m-1)
-	\label{eq:pi_pred}
-\end{equation}
-
-A partir do resíduo de predição, calcula-se:
-
-\begin{equation}
-	\text{PI} = \frac{\sigma^2_r}{\text{mse}}
-	\label{eq:pi_index}
-\end{equation}
-
-\noindent onde $\sigma^2_r$ é a variância do resíduo entre o erro medido e o erro previsto e
-$\text{mse}$ é o erro quadrático médio da malha. Operacionalmente, PI baixo indica comportamento
-errático ou imprevisível; PI alto indica comportamento regular compatível com o modelo adotado
-\cite{Bradu2018}.
-
-Os parâmetros do método são derivados de grandezas operacionais: intervalo de amostragem $t_s$, janela de análise $T_W$ e constante de tempo característica da malha $T$. A partir dessas grandezas, calculam-se o número de amostras da janela $n = \lceil T_W/t_s \rceil$, o horizonte de predição $b = \lceil T/t_s \rceil$ e a ordem do modelo $m = 2b$. Essa estrutura permite configurar o método por grupos de malhas, sem ajuste individual para cada controlador.
-
-A classificação de uma malha como problemática não depende apenas do valor bruto do PI. Os autores adicionam duas condições operacionais para reduzir falsos positivos: (i)~a saída do controlador deve apresentar variação significativa ($\sigma_y > \bar{\sigma}_y$), evitando classificar como degradadas malhas saturadas, inativas ou em modo manual; e (ii)~a condição PI~$< PI_L$ deve persistir em mais de $N$ janelas dentro de um período de 24 horas, evitando que transientes breves sejam interpretados como degradação estrutural. O limiar $PI_L$ não é uma constante universal: no artigo do CERN, ele é definido empiricamente por grupos de controladores --- temperatura, pressão, vazão e nível --- com valores distintos conforme a dinâmica e os objetivos operacionais de cada grupo \cite{Bradu2018}.
-
-Quando uma malha é declarada problemática pelo PI, o artigo classifica a causa em quatro categorias: (i)~\textit{tuning} --- o controlador precisa ser resintonizado; (ii)~\textit{process} --- o controlador não lida adequadamente com os distúrbios, inclusive por restrições mecânicas; (iii)~\textit{noise} --- a variável medida apresenta ruído excessivo para uma regulagem eficaz; e (iv)~\textit{false positive} --- os parâmetros do PI estão inadequados para aquela malha específica. PI baixo, portanto, não implica diretamente em PID mal sintonizado; a causa exige diagnóstico complementar \cite{Bradu2018}.
+O método de Harris estima um modelo estatístico da série temporal da saída e requer o atraso de cada malha. No CERN, \citeonline{Bradu2018} precisavam de algo mais simples de aplicar em escala: o sistema criogênico do LHC tem mais de 5000 malhas PID, e os operadores não conseguem acompanhá-las uma a uma. Eles usaram um índice de preditividade (PI), uma variação da ideia de Harris proposta antes por outro grupo. O método tenta prever o erro da malha, isto é, a diferença entre o setpoint e a variável medida, alguns instantes à frente, a partir dos valores passados desse erro, e compara o que sobra depois da previsão com o tamanho do próprio erro. Se o erro tem um padrão previsível, como uma oscilação, sobra pouco depois da previsão, e o PI fica baixo: é um sinal de que pode haver algo a melhorar na malha. Se o erro parece ruído, não há o que prever, e o PI fica perto de 1 \cite{Bradu2018}.\footnote{O artigo descreve os extremos ao contrário, com PI igual a 1 para uma malha previsível e 0 para ruído branco. A fórmula do índice, que divide a variância do resíduo de previsão pelo erro quadrático médio, e os próprios exemplos do artigo, como o caso discutido adiante, seguem a leitura adotada aqui \cite{Bradu2018}.} A Figura~\ref{fig:cern_pi} mostra a ideia.
 
 \begin{figure}[htbp]
 	\centering
-	\missingfigure[figwidth=0.90\textwidth]{Pipeline do CLPM: da esquerda para a direita --- (1) série temporal bruta da malha (setpoint, variável medida, saída do controlador); (2) cálculo de índices: Harris $\eta = \sigma^2_{\text{mv}}/\sigma^2_y$ e Predictability Index $\text{PI} = \sigma^2_r/\text{mse}$; (3) estado diagnóstico resultante (malha saudável / degradada / oscilatória / ruidosa). Pode incluir exemplo de série temporal contrastando malha saudável ($\eta \approx 1$, PI alto) com malha degradada ($\eta \ll 1$, PI baixo). Baseado em \citeauthor{Harris1989} (\citeyear{Harris1989}) e \citeauthor{Bradu2018} (\citeyear{Bradu2018}).}
-	\caption{Pipeline conceitual do diagnóstico de qualidade de malhas (CLPM): de sinais brutos a estados supervisionáveis.}
-	\label{fig:clpm_pipeline}
+	\caption{Ideia do índice de preditividade usado no CERN e a triagem diária das malhas do LHC.}
+	\begin{tikzpicture}[
+	    font=\small,
+	    rotulo/.style={font=\scriptsize},
+	    medido/.style={black, thick},
+	    previsto/.style={blue!70!black, thick, dashed},
+	    caixa/.style={draw, fill=gray!10, rounded corners=2pt, minimum width=3.1cm, minimum height=1.0cm, align=center, font=\scriptsize},
+	    fluxo/.style={-{Latex[length=2mm]}, thick}
+	]
+	  % ---------- erro com padrão previsível ----------
+	  \begin{scope}
+	    \node[anchor=south] at (3.3,1.25) {erro com padrão previsível: PI baixo};
+	    \draw[-{Latex[length=2mm]}] (0,0) -- (6.6,0);
+	    \node[rotulo, anchor=north east] at (6.6,-1.05) {tempo};
+	    \draw (0,-1.1) -- (0,1.1);
+	    \node[rotulo, rotate=90, above] at (0,0) {erro};
+	    \draw[medido] plot[domain=0.1:6.3, samples=90, smooth] (\x, {0.6*sin(1.8*\x r) + 0.25*sin(0.6*\x r)});
+	    \draw[previsto] plot[domain=0.6:6.3, samples=90, smooth] (\x, {0.55*sin(1.8*\x r - 0.18) + 0.25*sin(0.6*\x r)});
+	  \end{scope}
+
+	  % ---------- erro sem padrão ----------
+	  \begin{scope}[xshift=7.8cm]
+	    \node[anchor=south] at (3.3,1.25) {erro sem padrão, como ruído: PI perto de 1};
+	    \draw[-{Latex[length=2mm]}] (0,0) -- (6.6,0);
+	    \node[rotulo, anchor=north east] at (6.6,-1.05) {tempo};
+	    \draw (0,-1.1) -- (0,1.1);
+	    \pgfmathsetseed{11}
+	    \draw[medido] plot[domain=0.1:6.3, samples=60] (\x, {0.75*rand});
+	    \draw[previsto] plot[domain=0.6:6.3, samples=40, smooth] (\x, {0.08*sin(2.2*\x r)});
+	  \end{scope}
+
+	  % legenda
+	  \draw[medido] (3.6,-1.8) -- (4.2,-1.8);
+	  \node[rotulo, right] at (4.2,-1.8) {erro medido};
+	  \draw[previsto] (6.6,-1.8) -- (7.2,-1.8);
+	  \node[rotulo, right] at (7.2,-1.8) {erro previsto a partir do passado};
+
+	  % ---------- triagem diária ----------
+	  \node[caixa] (c1) at (1.55,-2.8)  {3000 malhas PID\\analisadas toda noite};
+	  \node[caixa] (c2) at (5.55,-2.8)  {PI de cada malha\\em janelas de tempo};
+	  \node[caixa] (c3) at (9.55,-2.8)  {filtros: atuador se move\\e PI baixo persiste};
+	  \node[caixa] (c4) at (13.55,-2.8) {relatório da manhã: cerca\\de 150 malhas sinalizadas};
+	  \draw[fluxo] (c1) -- (c2);
+	  \draw[fluxo] (c2) -- (c3);
+	  \draw[fluxo] (c3) -- (c4);
+	\end{tikzpicture}
+	\fonte{Elaborado pelo autor, com base em \citeonline{Bradu2018}. Sinais ilustrativos.}
+	\label{fig:cern_pi}
 \end{figure}
+
+Um PI baixo não prova que a malha está mal sintonizada: ele apenas a sinaliza para investigação. Para evitar alarmes falsos, uma malha só é sinalizada se o atuador estiver de fato se movendo, o que exclui malhas saturadas ou em modo manual, e se o PI ficar abaixo de um limite em mais de $N$ janelas de tempo ao longo de 24 horas. Os parâmetros do método, como o tamanho da janela, o horizonte de previsão e o limite do PI, foram definidos por grupos de malhas (temperatura, pressão, vazão e nível), e não malha a malha. Em 2017, o método passou a analisar 3000 dessas malhas toda noite e a entregar um relatório à equipe de operação toda manhã, com cerca de 150 malhas sinalizadas por dia. Para cada malha sinalizada, a causa ainda precisa ser investigada: pode ser a sintonia, um problema no processo, ruído na medição ou um falso positivo \cite{Bradu2018}.
+
+O caso da malha de nível citado na Seção~\ref{sec:plantwide} mostra por que a decisão não pode ficar só com o índice. Depois de uma nova sintonia, o PI dessa malha caiu de cerca de 0,7 para 0,1, abaixo do limite de 0,4, porque o nível passou a oscilar mais. Mesmo assim, a equipe preferiu a nova sintonia, porque ela poupava o atuador e o nível podia oscilar desde que ficasse acima de 50\% \cite{Bradu2018}. Detectar um desempenho suspeito, diagnosticar a causa e decidir o que fazer são, portanto, três problemas diferentes. Objetivos como o de poupar o atuador são do tipo que cabe declarar na política de operação.
 
 \subsection{Detecção de Padrões Dinâmicos e Anomalias}
 
@@ -342,108 +419,330 @@ Além de índices globais de desempenho, trabalhos do mesmo grupo investigam a d
 
 \citeonline{Tilaro2018} estendem essa direção com métodos de aprendizado de modelos sobre dados históricos de controle, explorando relações físicas e lógicas entre sinais para detectar desvios coerentes em relação ao comportamento histórico esperado. Desvios persistentes funcionam como sinais de aviso de possíveis anomalias futuras, ativando verificações por especialistas antes que falhas se manifestem.
 
-A mesma lógica de transformar séries temporais em estados de saúde supervisionáveis estende-se ao monitoramento de condição de equipamentos. \citeonline{Lessmeier2016} demonstram que sinais de corrente elétrica de motores, disponíveis nos inversores de frequência já presentes na instalação sem necessidade de sensores adicionais, carregam informação sobre danos em mancais do sistema de acionamento. O estado relevante --- dano no mancal, sua localização e extensão --- não é medido diretamente: ele é um estado latente inferido a partir de assinaturas espectrais e estatísticas extraídas da série temporal de corrente. Esse trabalho é particularmente relevante no contexto de atuadores de processo, como bombas e compressores, cujos defeitos mecânicos incipientes podem se manifestar como degradação de desempenho de malhas de controle antes de qualquer alarme de processo --- ou seja, como uma das categorias \textit{process} do PI de \citeonline{Bradu2018}.
+A mesma lógica de transformar séries temporais em estados de saúde supervisionáveis estende-se ao monitoramento de condição de equipamentos. \citeonline{Lessmeier2016} montaram uma base de dados com mancais danificados e mostraram que a corrente do motor, medida pelo próprio inversor de frequência, sem sensores adicionais, carrega informação sobre esses danos. O artigo descreve em detalhe a localização e a extensão de cada dano, mas os classificadores testados distinguem três classes: mancal saudável, dano no anel interno e dano no anel externo. O dano não é medido diretamente: ele é inferido a partir de atributos extraídos da série temporal de corrente. A forma clássica de procurar esse tipo de dano é passar o sinal para o domínio da frequência e procurar as frequências características do mancal (Figura~\ref{fig:fourier}). Nos dados de Lessmeier et al., porém, essas frequências ficam mascaradas por ruído, e por isso os autores recorrem a atributos e a algoritmos de aprendizado de máquina \cite{Lessmeier2016}. Uma relação que este trabalho propõe, mas que o artigo não demonstra, é que defeitos mecânicos incipientes em atuadores como bombas e compressores podem aparecer primeiro como piora no desempenho das malhas, o que corresponderia à categoria \textit{process} de \citeonline{Bradu2018}.
 
-Em trabalho de iniciação científica desenvolvido pelo autor sob orientação do Prof.\ Dr.\ Luiz Alberto Pinto, a análise via transformada \textit{wavelet} foi investigada como extensão dessa abordagem. A decomposição \textit{wavelet} permite decompor o sinal de corrente em múltiplas escalas de frequência e tempo simultaneamente, capturando assinaturas transitórias de falha que métodos baseados exclusivamente em análise de Fourier podem deixar passar. Os resultados obtidos nessa investigação indicam ganho de cobertura diagnóstica sobre descritores puramente espectrais, especialmente em condições de operação variáveis e regimes não estacionários \cite{Lessmeier2016}.
+Em trabalho de iniciação científica desenvolvido pelo autor sob orientação do Prof.\ Dr.\ Luiz Alberto Pinto, um problema parecido foi estudado a partir de sinais de vibração: atributos extraídos com a transformada \textit{wavelet} foram usados para classificar o estado de mancais com os algoritmos SVM, KNN e árvore de decisão. A transformada \textit{wavelet} decompõe o sinal em escalas de tempo e frequência ao mesmo tempo, o que permite captar eventos transitórios que a análise de Fourier, feita sobre o sinal inteiro, tende a espalhar pelo espectro. Essa experiência anterior é a origem do interesse deste trabalho em transformar sinais físicos em indicadores que uma camada supervisória possa acompanhar.
 
-\subsection{Relevância para a Arquitetura Supervisória Proposta}
+\begin{figure}[htbp]
+	\centering
+	\caption{Ideia clássica da análise de Fourier aplicada à corrente de um motor: no tempo, os dois sinais quase não se distinguem; no espectro, o dano no mancal aparece como picos laterais em torno da frequência de alimentação.}
+	\begin{tikzpicture}[
+	    font=\small,
+	    rotulo/.style={font=\scriptsize},
+	    sinal/.style={black, thin},
+	    fluxo/.style={-{Latex[length=2mm]}, thick},
+	    pico/.style={line width=3pt}
+	]
+	  % títulos das colunas
+	  \node at (2.8,1.45) {corrente no tempo};
+	  \node at (9.65,1.45) {espectro};
 
-Esses trabalhos estabelecem a viabilidade de uma camada intermediária entre sinais crus da planta e decisões supervisórias. Índices como Harris e PI, métodos de detecção de oscilações e modelos de anomalia permitem transformar séries temporais de baixo nível em estados diagnósticos de maior abstração: malha saudável, malha degradada, comportamento oscilatório, variável ruidosa, relação sensor--atuador incoerente. Do ponto de vista arquitetural, esses estados são consumíveis por uma camada supervisória sem que ela precise atuar diretamente sobre os sinais crus do controlador.
+	  % ---------- motor saudável ----------
+	  \node[anchor=east, align=right] at (-0.25,0) {motor\\saudável};
+	  \draw (0,-0.95) -- (0,0.95);
+	  \draw[-{Latex[length=1.5mm]}] (0,0) -- (5.7,0);
+	  \draw[sinal] plot[domain=0:5.4, samples=400] (\x, {0.8*sin(12.566*\x r)});
+	  \draw[fluxo] (6.0,0) -- node[above, rotulo] {Fourier} (7.2,0);
+	  \draw[-{Latex[length=1.5mm]}] (7.4,-0.8) -- (11.9,-0.8);
+	  \draw[pico, blue!70!black] (9.65,-0.8) -- (9.65,0.9);
+	  \node[rotulo, below] at (9.65,-0.8) {$f_0$};
 
-Uma observação crítica que emerge dessa literatura é que PI baixo não implica em ``resintonizar o PID''. Ele implica em ``a malha apresenta comportamento não explicado pelo modelo de predição; é necessário investigar a causa''. Essa separação entre detecção de anomalia e ação corretiva é estruturalmente importante para a arquitetura proposta: o componente que observa o estado divergente e o componente que executa a ação corretiva são distintos, e a ação só ocorre quando autorizada pela política operacional vigente.
-
-No contexto deste trabalho, o TEP oferece um ambiente adequado para investigar essas métricas, pois disponibiliza múltiplas variáveis medidas e manipuladas sob condições de operação programáveis. A calibração dos parâmetros de diagnóstico para as variáveis XMEAS e XMV do TEP será tratada na metodologia experimental.
+	  % ---------- mancal com dano ----------
+	  \begin{scope}[yshift=-2.7cm]
+	    \node[anchor=east, align=right] at (-0.25,0) {mancal\\com dano};
+	    \draw (0,-0.95) -- (0,0.95);
+	    \draw[-{Latex[length=1.5mm]}] (0,0) -- (5.7,0);
+	    \draw[sinal] plot[domain=0:5.4, samples=400] (\x, {0.8*(1 + 0.15*sin(2.513*\x r))*sin(12.566*\x r)});
+	    \draw[fluxo] (6.0,0) -- node[above, rotulo] {Fourier} (7.2,0);
+	    \draw[-{Latex[length=1.5mm]}] (7.4,-0.8) -- (11.9,-0.8);
+	    \draw[pico, blue!70!black] (9.65,-0.8) -- (9.65,0.9);
+	    \draw[pico, red!70!black] (9.0,-0.8) -- (9.0,-0.45);
+	    \draw[pico, red!70!black] (10.3,-0.8) -- (10.3,-0.45);
+	    \node[rotulo, below] at (9.65,-0.8) {$f_0$};
+	    \node[rotulo, red!70!black, anchor=west, align=left] at (10.45,-0.2) {picos laterais:\\assinatura do dano};
+	    \node[rotulo] at (2.8,-1.25) {tempo};
+	    \node[rotulo, anchor=north east] at (11.9,-0.85) {frequência};
+	  \end{scope}
+	\end{tikzpicture}
+	\fonte{Elaborado pelo autor. Sinais ilustrativos: $f_0$ é a frequência de alimentação do motor. Em dados reais, \citeonline{Lessmeier2016} observam que essas frequências características costumam ficar mascaradas por ruído.}
+	\label{fig:fourier}
+\end{figure}
 
 % -------------------------------------------------------------------------
 
-\section{Integração e Modelagem Industrial: OPC UA e a Família IEC~62541}
+\section{Cloud-Native como Paradigma de Orquestração Industrial}
+\label{sec:cloudnative}
+
+Tudo o que foi discutido até aqui depende de algo que fica em segundo plano nesses trabalhos: a integração. A função de custo só pode ser calculada se as medições chegarem a quem calcula. O índice de Harris e o PI só dizem alguma coisa se alguém coletar os sinais das malhas, guardar o histórico e rodar a análise em janelas de tempo. No próprio CERN, a análise das malhas roda numa máquina virtual da nuvem privada do centro de computação: toda meia-noite, um programa extrai os dados de cada malha, calcula o índice e prepara o relatório da manhã \cite{Bradu2018}. E a política de operação só pode ser verificada se a planta, quem guarda os sinais e quem avalia conversarem entre si, de forma contínua e confiável. Na Figura~\ref{fig:camadas_integracao}, são as setas entre as camadas. Sem elas, o que se tem são boas ideias isoladas. Construir essas setas é um problema de comunicação, de software e de infraestrutura, o mesmo que a engenharia de software e a infraestrutura de TI enfrentam há anos para manter sistemas distribuídos funcionando. É desse campo que vem o paradigma \textit{cloud-native}, e é nele que este trabalho vai buscar a camada supervisória.
+
+\subsection{O que é \textit{cloud-native}}
+\label{subsec:oque_cloud}
+
+\textit{Cloud-native} não quer dizer apenas rodar software na infraestrutura remota de um grande provedor. O termo descreve também uma cultura de construir e operar sistemas que se formou na década de 2010 (Figura~\ref{fig:linha_cloud}). Em 2011, Adam Wiggins, cofundador da plataforma Heroku, publicou \textit{The Twelve-Factor App}, uma metodologia de doze regras para construir aplicações que funcionem bem na nuvem, como guardar a configuração fora do código e tratar cada processo como descartável \cite{Wiggins2011}. Na mesma época, ganhou força a analogia entre \textit{pets} e \textit{cattle}: servidores tratados como animais de estimação, únicos e que nunca podem cair, contra servidores tratados como gado, criados por ferramentas automáticas e projetados para falhar e ser substituídos. Randy Bias levou a analogia para a nuvem, e um dos que a difundiram foi Tim Bell, do CERN \cite{Bias2016}. As ferramentas vieram em seguida: o Docker foi apresentado publicamente em 2013 \cite{Johnston2022}, o Kubernetes foi lançado como código aberto em 2014 \cite{Shuiguang2023} e, em 2015, foi criada a \textit{Cloud Native Computing Foundation} (CNCF), que definiu \textit{cloud-native} como aplicações empacotadas em \textit{containers}, agendadas dinamicamente e orientadas a microsserviços \cite{CNCF2015}.
+
+\begin{figure}[htbp]
+	\centering
+	\caption{Linha do tempo: da cultura de desenvolvimento às ferramentas \textit{cloud-native}.}
+	\begin{tikzpicture}[
+	    font=\small,
+	    evento/.style={draw, fill=gray!10, rounded corners=2pt, align=center, font=\scriptsize, text width=3.1cm, inner sep=3pt,
+	      execute at begin node={\hyphenpenalty=10000\exhyphenpenalty=10000}},
+	    marca/.style={fill=blue!70!black}
+	]
+	  % eixo do tempo, com quebra entre os anos 2000 e 2011
+	  \draw[thick] (0,0) -- (1.5,0);
+	  \draw[thick] (1.5,0.12) -- (1.65,-0.12);
+	  \draw[thick] (1.75,0.12) -- (1.9,-0.12);
+	  \draw[thick, -{Latex[length=2mm]}] (1.9,0) -- (12.4,0);
+
+	  % marcas no eixo
+	  \foreach \x in {0.7, 3.0, 4.8, 7.0, 9.0, 11.0}
+	    \fill[marca] (\x,0) circle (0.08);
+
+	  % eventos (alternando acima e abaixo)
+	  \node[evento, anchor=north] (borg) at (0.7,-0.35) {\textbf{anos 2000}\\Borg: o Google gerencia \textit{containers} internamente};
+	  \node[evento, anchor=south] (tf)   at (3.0,0.35)  {\textbf{2011}\\\textit{The Twelve-Factor App}: 12 regras para apps na nuvem};
+	  \node[evento, anchor=north] (pc)   at (4.8,-0.35) {\textbf{2011--2012}\\\textit{pets} vs.\ \textit{cattle}: servidores descartáveis};
+	  \node[evento, anchor=south] (dk)   at (7.0,0.35)  {\textbf{2013}\\Docker é apresentado publicamente};
+	  \node[evento, anchor=north] (k8)   at (9.0,-0.35) {\textbf{2014}\\Kubernetes vira código aberto};
+	  \node[evento, anchor=south] (cn)   at (11.0,0.35) {\textbf{2015}\\CNCF define \textit{cloud-native}};
+
+	  \foreach \n/\x in {borg/0.7, pc/4.8, k8/9.0}
+	    \draw[gray!70] (\x,-0.08) -- (\n.north);
+	  \foreach \n/\x in {tf/3.0, dk/7.0, cn/11.0}
+	    \draw[gray!70] (\x,0.08) -- (\n.south);
+
+	  % faixas: cultura e ferramentas
+	  \draw[decorate, decoration={brace, amplitude=5pt}] (1.9,2.15) -- (5.9,2.15)
+	    node[midway, above=5pt, font=\scriptsize] {práticas e cultura};
+	  \draw[decorate, decoration={brace, amplitude=5pt}] (6.1,2.15) -- (12.3,2.15)
+	    node[midway, above=5pt, font=\scriptsize] {ferramentas};
+	\end{tikzpicture}
+	\fonte{Elaborado pelo autor, com base em \citeonline{Burns2016}, \citeonline{Wiggins2011}, \citeonline{Bias2016}, \citeonline{Johnston2022}, \citeonline{Shuiguang2023} e \citeonline{CNCF2015}.}
+	\label{fig:linha_cloud}
+\end{figure}
+
+Na literatura acadêmica, \citeonline{Shuiguang2023} descrevem uma aplicação \textit{cloud-native} como um sistema distribuído, elástico e escalável, formado por microsserviços empacotados em \textit{containers} leves e espalhados por vários servidores. Para que esses \textit{containers} funcionem como uma aplicação só, alguém precisa cuidar do ciclo de vida deles: colocá-los no ar, decidir em que servidor cada um roda, aumentar ou diminuir o número de cópias, configurar a rede e distribuir a carga. Os autores chamam esse trabalho automatizado de orquestração, e é ele que mantém a aplicação elástica e disponível.
+
+Talvez o recurso mais notável dessa indústria seja o Kubernetes, hoje a plataforma de código aberto mais influente do ecossistema \textit{cloud-native} e um padrão de fato na indústria \cite{Shuiguang2023}. Ele nasceu da experiência do Google com o Borg e o Omega, seus gerenciadores internos de \textit{containers} \cite{Burns2016}. A Figura~\ref{fig:k8s} mostra a ideia central. O usuário não diz ao Kubernetes o que fazer, passo a passo: ele declara o estado que deseja, por exemplo, que três cópias de uma aplicação estejam rodando. Esse estado desejado fica no campo \textit{Spec} de um objeto, e o estado observado fica no campo \textit{Status}. Um controlador de reconciliação compara os dois o tempo todo e age para aproximá-los \cite{Burns2016}. Se uma das cópias cai, o \textit{Status} passa a mostrar duas, e o controlador cria outra no lugar.
+
+\begin{figure}[htbp]
+	\centering
+	\caption{Ideia do Kubernetes: o usuário declara o estado desejado, e um controlador compara esse estado com o observado e age para aproximá-los.}
+	\begin{tikzpicture}[
+	    font=\small,
+	    rotulo/.style={font=\scriptsize},
+	    estado/.style={draw, rounded corners=3pt, align=center, minimum width=3.2cm, minimum height=1.1cm},
+	    pod/.style={draw, rounded corners=2pt, fill=blue!10, minimum width=1.0cm, minimum height=0.75cm, font=\scriptsize},
+	    fluxo/.style={-{Latex[length=2mm]}, thick}
+	]
+	  % usuário e estados
+	  \node (usr) at (0,2.65) {usuário};
+	  \node[estado, fill=blue!8] (spec) at (0,1.2) {\textbf{Spec} (desejado)\\[1pt]\texttt{réplicas: 3}};
+	  \node[estado, fill=gray!10] (status) at (0,-1.2) {\textbf{Status} (observado)\\[1pt]\texttt{rodando: 2}};
+	  \draw[fluxo] (usr) -- node[right, rotulo] {declara} (spec);
+
+	  % controlador de reconciliação
+	  \node[draw, circle, fill=orange!15, align=center, minimum size=2.3cm, font=\scriptsize] (ctl) at (4.2,0) {controlador de\\reconciliação\\[2pt]\textit{compara}};
+	  \draw[fluxo] (spec.east) -- (ctl);
+	  \draw[fluxo] (status.east) -- (ctl);
+
+	  % cluster com os pods
+	  \draw[dashed, gray!70, rounded corners=3pt] (7.2,-1.75) rectangle (12.4,1.75);
+	  \node[rotulo, gray!50!black, anchor=north east] at (12.4,1.75) {\textit{cluster}};
+	  \node[pod] (p1) at (8.2,0.6) {pod};
+	  \node[pod] (p2) at (9.8,0.6) {pod};
+	  \node[pod, fill=red!10] (p3) at (11.4,0.6) {pod};
+	  \draw[red!70!black, thick] (p3.south west) -- (p3.north east);
+	  \draw[red!70!black, thick] (p3.north west) -- (p3.south east);
+	  \node[rotulo, red!70!black, below] at (p3.south) {caiu};
+	  \node[pod, dashed, fill=green!12, draw=green!45!black] (p4) at (11.4,-1.05) {pod};
+	  \node[rotulo, green!45!black, left] at (p4.west) {novo};
+
+	  % ação e observação
+	  \draw[fluxo] (ctl.east) -- node[above, rotulo, align=center] {ação na \\infra} (7.2,0);
+	  \draw[fluxo, gray!70!black] (9.0,-1.75) -- ++(0,-0.65) -| node[pos=0.25, below, rotulo, black] {o que está rodando} (status.south);
+	\end{tikzpicture}
+	\fonte{Elaborado pelo autor, com base em \citeonline{Burns2016}.}
+	\label{fig:k8s}
+\end{figure}
+
+É aqui que a cultura da seção anterior encontra a ferramenta. As cópias da aplicação são tratadas como gado: nenhuma é especial, e qualquer uma pode cair e ser substituída sem que alguém precise intervir. Para isso funcionar, a aplicação precisa ser construída para ser substituível, como pedem as regras do \textit{Twelve-Factor App} \cite{Wiggins2011}. \citeonline{Burns2016} resumem a mudança dizendo que, com \textit{containers}, gerenciar o \textit{data center} deixa de ser gerenciar máquinas e passa a ser gerenciar aplicações.
+
+O mesmo mecanismo pode ser estendido a tipos de objeto novos, com controladores próprios, no que se chama de padrão \textit{Operator}. É assim que este trabalho declara a política de operação no Kubernetes (Seção~\ref{sec:proposta}). A diferença é que, aqui, o controlador só compara: ele diz se a planta cumpre a política, mas não age sobre ela, como definido no P5.
+
+\subsection{\textit{Containers} e Kubernetes na automação industrial}
+
+Já há trabalhos que levam essas ideias para a automação industrial. Dois deles interessam aqui: um usa o Kubernetes para recompor controladores quando eles falham, e o outro reorganiza o próprio CLP em \textit{containers}.
+
+\citeonline{Johansson2022}, da ABB e da Universidade de Mälardalen, montaram um \textit{cluster} Kubernetes em que os controladores de um sistema de controle distribuído rodam em \textit{containers}, os chamados nós controladores virtualizados (VDCNs). A lógica de controle fica dentro dos VDCNs, que trocam variáveis por OPC~UA; o Kubernetes só decide em que nó cada um roda e o recria quando o nó cai (Figura~\ref{fig:johansson}). Os autores testaram duas configurações. Com redundância, quando o nó do controlador primário falha, o \textit{backup} assume em cerca de 110~ms, abaixo dos cerca de 500~ms que a automação de processos costuma tolerar, e o Kubernetes recria um novo \textit{backup} em outro nó, sem intervenção manual. Sem redundância, o Kubernetes recriou o controlador em cerca de 55~s. Os resultados vêm de dez horas de teste, com 200 falhas de nó provocadas \cite{Johansson2022}.
+
+\begin{figure}[htbp]
+	\centering
+	\caption{Caso de Johansson et al.: controladores virtualizados (VDCNs) orquestrados pelo Kubernetes. Quando o nó do primário falha, o \textit{backup} assume, e o Kubernetes recria um novo \textit{backup} em outro nó.}
+	\begin{tikzpicture}[
+	    font=\small,
+	    rotulo/.style={font=\scriptsize},
+	    no/.style={draw, rounded corners=3pt, minimum width=3.4cm, minimum height=2.2cm},
+	    cont/.style={draw, rounded corners=2pt, minimum width=2.5cm, minimum height=0.85cm, font=\scriptsize, align=center},
+	    fluxo/.style={-{Latex[length=2mm]}, thick}
+	]
+	  % orquestrador
+	  \node[draw, rounded corners=3pt, fill=orange!15, minimum width=13.2cm, minimum height=0.8cm, font=\scriptsize] (k8s) at (5.0,2.45)
+	    {Kubernetes: decide em que nó cada controlador roda e recria o que cair};
+
+	  % nós do cluster
+	  \foreach \n/\x in {1/0, 2/5.0, 3/10.0} {
+	    \node[no] (n\n) at (\x,0) {};
+	    \node[rotulo, anchor=north west] at (n\n.north west) {nó \n};
+	  }
+
+	  % controladores
+	  \node[cont, fill=red!8] (c1) at (0,-0.1) {VDCN\\primário};
+	  \draw[red!70!black, very thick] (c1.south west) -- (c1.north east);
+	  \draw[red!70!black, very thick] (c1.north west) -- (c1.south east);
+	  \node[rotulo, red!70!black] at (0,-0.8) {nó falha};
+	  \node[cont, fill=blue!10] (c2) at (5.0,-0.1) {VDCN \textit{backup}\\$\rightarrow$ vira primário};
+	  \node[cont, dashed, fill=green!12, draw=green!45!black] (c3) at (10.0,-0.1) {novo VDCN\\\textit{backup}};
+
+	  % ações
+	  \draw[fluxo] (c1.east) -- node[above, rotulo, align=center, fill=white, inner sep=1pt] {assume em\\$\approx$110~ms} (c2.west);
+	  \draw[fluxo, green!45!black] (10.0,2.05) -- node[right, rotulo] {recria} (n3.north);
+
+	  % rede OPC UA
+	  \draw[thick, gray!70!black] (-1.7,-1.75) -- (11.7,-1.75);
+	  \foreach \x in {0, 5.0, 10.0}
+	    \draw[gray!70!black] (\x,-1.1) -- (\x,-1.75);
+	  \node[rotulo, anchor=north] at (5.0,-1.8) {variáveis trocadas por OPC~UA};
+	\end{tikzpicture}
+	\fonte{Elaborado pelo autor, com base em \citeonline{Johansson2022}.}
+	\label{fig:johansson}
+\end{figure}
+
+\citeonline{Mellado2022} foram por outro caminho: em vez de orquestrar controladores, reorganizaram o próprio CLP. No IoT-PLC, cada função roda num \textit{container} separado: as interfaces com os dispositivos de campo, uma por protocolo, como Zigbee e Bluetooth; um filtro de dados; um banco de dados; os controladores; uma IHM; e um gerente que representa sensores e controladores como dispositivos virtuais (Figura~\ref{fig:iotplc}). O IoT-PLC conversa com a nuvem por OPC~UA e com outros IoT-PLCs por CoAP, e uma malha de controle pode migrar de um IoT-PLC para outro sem reiniciar o controlador. O protótipo foi montado numa Raspberry Pi 4B \cite{Mellado2022}. O trabalho não usa Kubernetes, mas mostra que as funções de um CLP podem ser empacotadas em \textit{containers}, trocadas e gerenciadas de fora, que é a premissa da qual a orquestração parte.
+
+\begin{figure}[htbp]
+	\centering
+	\caption{Caso de Mellado e Núñez: no IoT-PLC, cada função do CLP roda num \textit{container} separado.}
+	\begin{tikzpicture}[
+	    font=\small,
+	    rotulo/.style={font=\scriptsize},
+	    cont/.style={draw, rounded corners=2pt, fill=blue!10, minimum width=2.5cm, minimum height=0.85cm, font=\scriptsize, align=center},
+	    fluxo/.style={{Latex[length=2mm]}-{Latex[length=2mm]}, thick}
+	]
+	  % IoT-PLC
+	  \draw[rounded corners=4pt, fill=gray!6] (0,0) rectangle (9.0,4.4);
+	  \node[rotulo, anchor=north west] at (0,4.4) {IoT-PLC (Raspberry Pi 4B)};
+
+	  \node[cont] (ctl) at (1.5,3.4) {controladores};
+	  \node[cont] (ger) at (4.5,3.4) {gerente de\\dispositivos virtuais};
+	  \node[cont] (ihm) at (7.5,3.4) {IHM};
+	  \node[cont] (fil) at (3.0,2.15) {filtro de dados};
+	  \node[cont] (bd)  at (6.0,2.15) {banco de dados};
+	  \node[cont] (zig) at (1.5,0.9) {interface\\Zigbee};
+	  \node[cont] (blu) at (4.5,0.9) {interface\\Bluetooth};
+	  \node[cont] (coap) at (7.5,0.9) {interface\\CoAP};
+
+	  % nuvem
+	  \node[draw, rounded corners=10pt, minimum width=2.6cm, minimum height=0.9cm] (nuvem) at (4.5,5.7) {nuvem};
+	  \draw[fluxo] (4.5,4.4) -- node[right, rotulo] {OPC~UA} (nuvem.south);
+
+	  % campo
+	  \node[draw, rounded corners=3pt, align=center, font=\scriptsize, minimum width=4.0cm] (campo) at (3.0,-1.3) {sensores e atuadores (sem fio)};
+	  \draw[fluxo] (zig.south) -- (zig.south |- campo.north);
+	  \draw[fluxo] (blu.south) -- (blu.south |- campo.north);
+
+	  % outro IoT-PLC
+	  \node[draw, rounded corners=3pt, fill=gray!6, align=center, minimum width=2.0cm, minimum height=1.1cm, font=\scriptsize] (outro) at (11.6,0.9) {outro\\IoT-PLC};
+	  \draw[fluxo] (coap.east) -- node[above, rotulo] {CoAP} (outro.west);
+	  \draw[-{Latex[length=2mm]}, thick, dashed, green!45!black] (9.0,3.0) to[out=0, in=90] node[above right, rotulo, align=left] {migração de\\uma malha} (outro.north);
+	\end{tikzpicture}
+	\fonte{Elaborado pelo autor, com base em \citeonline{Mellado2022}.}
+	\label{fig:iotplc}
+\end{figure}
+
+Os dois casos também mostram os limites. O Kubernetes não foi feito para controle determinístico em tempo real: no trabalho de Johansson et al., quem garante a troca em milissegundos é a redundância do próprio controlador, e o Kubernetes entra depois, recompondo o sistema em segundos \cite{Johansson2022}. A contribuição mais defensável do \textit{cloud-native} está, portanto, na camada supervisória, e não nas malhas. Além disso, para conversar com equipamentos industriais, essas arquiteturas dependem de uma camada de comunicação que represente medições, comandos e estados de forma estruturada, papel que o OPC~UA cumpre nos dois casos e que é tratado na próxima seção.
+
+% -------------------------------------------------------------------------
+
+\section{OPC UA e a Família IEC~62541}
 \label{sec:opcua}
 
-O diagnóstico de qualidade de malhas transformou séries temporais de processo em estados reconhecíveis --- malha saudável, malha degradada, comportamento oscilatório, condição anômala. Essa transformação é necessária, mas insuficiente. O CLPM produz indicadores sobre o comportamento das malhas; ele não modela a planta como um sistema acessível a agentes externos, nem expõe variáveis, equipamentos, alarmes e históricos em uma forma que qualquer cliente externo possa navegar e interpretar. A mesma instituição que aplica diagnóstico de malhas no sistema criogênico do LHC desenvolveu o \textit{framework} UNICOS \cite{Gayet2004} exatamente para endereçar essa lacuna: organizar a planta como uma hierarquia de objetos de controle (\textit{Process Control Objects} --- PCOs) com atributos de modo, estado e intertravamento, tornando-a acessível a sistemas supervisórios de forma estruturada. Para que uma camada supervisória possa observar o estado da planta, subscrever mudanças, consultar históricos e solicitar ações sobre equipamentos, é necessário que a planta exponha suas entidades em um modelo de informação estruturado, padronizado e independente de implementação. Esse é o problema que o OPC UA endereça.
+\subsection{De onde vem o OPC UA}
 
-\subsection{Contexto e Motivação}
+Em 1995, um grupo de fabricantes de automação se reuniu para padronizar os \textit{drivers} que davam acesso a dados de equipamentos em sistemas Windows. O resultado foi a especificação OPC \textit{Data Access}, publicada em agosto de 1996 e mantida desde então pela OPC Foundation, que passou a reunir quase todos os fornecedores de automação \cite{Mahnke2009intro}. 
 
-O \textbf{OPC UA} (\textit{OPC Unified Architecture}), formalizado como família de normas internacionais \textbf{IEC~62541} \cite{IEC62541_1}, surgiu da necessidade de substituir os padrões clássicos OPC --- baseados em COM/DCOM da Microsoft, restritos ao ecossistema Windows --- por uma arquitetura independente de plataforma, orientada a serviços e com segurança nativa por criptografia de chave pública \cite{Mahnke2009intro}. A norma unifica funções antes fragmentadas em padrões distintos: acesso a dados em tempo real (DA), alarmes e eventos (AE) e acesso histórico (HDA). O elemento mais importante dessa arquitetura não é a camada de transporte --- a especificação separa explicitamente os serviços abstratos de interação cliente-servidor dos mapeamentos concretos de comunicação \cite{Mahnke2009services} --- mas o \textbf{modelo de informação}: o OPC UA define como entidades industriais são representadas, organizadas e expostas, não apenas como são transportadas.
+Esse padrão, hoje chamado de OPC Clássico, foi construído sobre as tecnologias COM e DCOM, da Microsoft. Isso acelerou a adoção, mas trouxe duas limitações: a dependência do Windows e os problemas do DCOM na comunicação remota, que é difícil de configurar, tem tempos de espera longos e fixos e não funciona pela internet. Além disso, dados atuais, alarmes e históricos eram tratados por especificações separadas \cite{Mahnke2009intro}.
 
-\subsection{Espaço de Endereçamento e Modelo de Informação}
+Uma primeira tentativa de sair do COM, o OPC XML-DA, trocou o DCOM por serviços web, mas não atendeu aos requisitos de desempenho das aplicações típicas. O OPC UA (\textit{Unified Architecture}) nasceu dessas lições: uma arquitetura independente de plataforma, que reúne dados, alarmes e históricos num só padrão, publicada como a família de normas IEC~62541 \cite{Mahnke2009intro, IEC62541_1}.
 
-O conceito central da IEC~62541-3 \cite{IEC62541_3} é o \textbf{espaço de endereçamento} (\textit{Address Space}): uma estrutura de nós (\textit{Nodes}) interconectados por referências tipadas (\textit{References}), que organiza de forma uniforme todos os dados, metadados, métodos e eventos expostos por um servidor OPC UA. Cada nó possui uma classe (\textit{NodeClass}) que define seu papel:
+\subsection{O que o OPC UA oferece}
 
-\begin{itemize}
-	\item \textbf{Object}: representa uma entidade industrial (e.g., reator, malha de controle, compressor).
-	\item \textbf{Variable}: expõe um valor observável com \textit{timestamp}, qualidade e tipo de dado.
-	\item \textbf{Method}: define uma operação invocável por clientes autorizados.
-	\item \textbf{ObjectType / VariableType}: tipos reutilizáveis que permitem modelar entidades de domínio.
-\end{itemize}
+Três características do OPC UA importam para este trabalho. A primeira é a separação entre serviços e transporte. A norma define quais interações existem entre cliente e servidor, como navegar, ler, escrever, acompanhar mudanças e chamar métodos, e separa essa definição da forma concreta de levar as mensagens pela rede \cite{Mahnke2009services}.
 
-Essa estrutura transforma a planta de uma coleção plana de \textit{tags} numéricas para um \textbf{modelo de informação navegável}: um cliente externo pode descobrir a hierarquia do servidor com o serviço \texttt{Browse}, ler atributos e valores com \texttt{Read}, escrever variáveis autorizadas com \texttt{Write}, subscrever mudanças de valor e eventos com \texttt{Subscription}/\texttt{MonitoredItems}, e invocar operações com \texttt{Call} --- tudo por serviços padronizados, independentes da implementação interna do servidor \cite{Mahnke2009services}. Um cliente OPC UA não precisa conhecer previamente os detalhes de implementação do servidor; ele descobre a estrutura navegando o espaço de endereçamento e acessando os metadados associados a cada nó.
+A segunda é o modelo de informação. O servidor organiza o que expõe num espaço de endereçamento (\textit{AddressSpace}): nós ligados por referências, em que cada nó é um objeto, uma variável, um método ou um tipo \cite{IEC62541_3}. Um cliente não precisa conhecer o servidor de antemão: ele descobre a estrutura navegando por esse espaço com o serviço \texttt{Browse} \cite{Mahnke2009services}. É isso que diferencia o OPC UA de uma lista plana de \textit{tags}.
 
-\begin{figure}[htbp]
-	\centering
-	\missingfigure[figwidth=0.88\textwidth]{Diagrama do espaço de endereçamento OPC UA aplicado ao TEP: grafo de nós e referências tipadas. Nó raiz \texttt{TEP\_Plant} (Object) com filhos \texttt{Reactor} (Object), \texttt{Compressor} (Object), \texttt{ControlLoop\_001} (Object); cada objeto com filhos do tipo Variable (e.g., \texttt{Pressure}: AnalogItemType, \texttt{Temperature}: AnalogItemType) e Method (e.g., \texttt{ApplyDisturbance}). Referências tipadas: \texttt{HasComponent}, \texttt{HasProperty}, \texttt{HasTypeDefinition}. Contraste com lista plana de tags à esquerda para evidenciar a diferença. Baseado em \citeauthor{IEC62541_3} (\citeyear{IEC62541_3}).}
-	\caption{Espaço de endereçamento OPC UA: a planta como grafo navegável de objetos tipados.}
-	\label{fig:opcua_addressspace}
-\end{figure}
+A terceira é a padronização dos dados de automação. A Parte~8 da norma define tipos para variáveis de processo, como o \texttt{AnalogItemType}, que carrega a unidade de engenharia e a faixa de operação junto com o valor, e cada leitura traz um código de qualidade e um carimbo de tempo \cite{IEC62541_8}. A norma também cobre segurança, alarmes, acesso histórico e publicação por assinatura (PubSub), em partes próprias \cite{IEC62541_1}.
 
-\subsection{Família de Normas IEC~62541}
+\subsection{O que foi adotado neste trabalho}
 
-A IEC~62541 é composta por múltiplas partes, cada uma cobrindo um aspecto distinto da especificação. A Tabela~\ref{tab:iec62541} apresenta as partes mais relevantes para este trabalho.
-
-\begin{table}[ht!]
-	\centering
-	\caption{Partes selecionadas da família IEC~62541 e sua relevância para o projeto TEP}
-	\label{tab:iec62541}
-	\begin{tabular}{|c|l|p{5cm}|p{3.2cm}|}
-		\hline
-		\textbf{Parte} & \textbf{Título}          & \textbf{Versa sobre}                                                                                                            & \textbf{Edições} \\
-		\hline
-		1              & Visão Geral e Conceitos  & Fundamentos, terminologia e motivação do padrão                                                                                 & 2009, 2025       \\
-		\hline
-		3              & Modelo do Espaço de End. & Nós, referências, navegação --- base de todo modelo de informação \cite{IEC62541_3}                                             & 2010, 2020, 2025 \\
-		\hline
-		4              & Serviços                 & Serviços abstratos cliente-servidor: Browse, Read, Write, Subscribe, Call                                                       & 2010, 2020       \\
-		\hline
-		8              & Acesso a Dados           & Tipos de variáveis de processo: \texttt{AnalogItemType}, \texttt{DiscreteItemType}, unidade, faixa, qualidade \cite{IEC62541_8} & 2011, 2020, 2025 \\
-		\hline
-		9              & Alarmes e Condições      & Modelo de alarmes e condições operacionais; estados, reconhecimento, limites e interlocks                                       & 2012, 2020       \\
-		\hline
-		11             & Acesso Histórico         & Séries temporais: leitura e agregação de dados históricos                                                                       & 2015, 2020       \\
-		\hline
-		14             & PubSub                   & Publish-subscribe sobre MQTT/AMQP/UDP --- complemento IIoT                                                                      & 2020, 2026       \\
-		\hline
-	\end{tabular}
-	\fonte{Elaborado pelo autor com base em \citeonline{IEC62541_1} e \citeonline{Mahnke2009intro}.}
-\end{table}
-
-A \textbf{Parte~8 (Acesso a Dados)} \cite{IEC62541_8} é particularmente relevante para expor variáveis de processo. Ela define o tipo \texttt{DataItemType} como base para dados vivos de automação, a partir do qual derivam três famílias: \texttt{AnalogItemType}, para grandezas contínuas com unidade de engenharia (\textit{EngineeringUnits}), faixa operacional (\textit{EURange}) e faixa instrumental (\textit{InstrumentRange}); \texttt{DiscreteItemType}, para estados discretos como modos operacionais ou sinalizadores; e \texttt{ArrayItemType}, para dados estruturados como espectros ou janelas de histórico. Cada leitura OPC UA carrega um \textit{StatusCode} (\textit{Good}/\textit{Uncertain}/\textit{Bad}) e \textit{timestamp}, permitindo que clientes distingam valor numérico de confiabilidade da medição. As medições contínuas do TEP podem ser mapeadas conceitualmente a variáveis do tipo \texttt{AnalogItemType}, preservando unidade de engenharia e faixa operacional; medições provenientes de analisadores amostrados, com atraso inerente, requerem metadados temporais adicionais.
-
-\subsection{Arquitetura de Sistema}
-
-A arquitetura de sistema do OPC UA é projetada para operar em múltiplas camadas industriais, de dispositivos de campo até sistemas corporativos \cite{Mahnke2009arch}. O padrão básico é cliente-servidor: um cliente consome serviços oferecidos por um servidor. Para cenários com múltiplas fontes de informação, a norma descreve o padrão \textbf{Aggregating Server}: um servidor intermediário que incorpora um cliente OPC UA interno e consulta múltiplos servidores subjacentes, processando ou preparando os dados recebidos antes de devolvê-los ao cliente solicitante \cite{Mahnke2009arch}. Para uma camada supervisória que precisa consolidar variáveis de processo, diagnósticos de malha e restrições operacionais em um estado de mais alto nível, esse padrão oferece uma referência arquitetural importante: o orquestrador não precisa consumir diretamente cada sinal cru da planta, mas pode operar sobre um estado consolidado produzido por uma camada intermediária. O mecanismo de \textbf{Discovery} complementa essa arquitetura ao permitir que clientes localizem servidores disponíveis sem conhecer previamente todos os \textit{endpoints}, reduzindo o acoplamento entre os componentes do sistema.
-
-\subsection{Integração Empresarial e o Domínio MOM --- IEC~62264}
-
-A norma \textbf{IEC~62264} \cite{IEC62264} (\textit{Enterprise-Control System Integration}) organiza as funções industriais em níveis hierárquicos derivados do Modelo Purdue. O Nível~3 é o domínio do \textit{Manufacturing Operations Management} (MOM): monitoramento de processos, gestão de produção, qualidade, manutenção e desempenho operacional. A norma organiza a informação desse domínio em quatro categorias: \textit{schedule} (o que deve ser executado), \textit{performance} (o que foi realizado), \textit{definition} (como executar) e \textit{capability} (quais recursos estão disponíveis) \cite{IEC62264}. Essa estrutura é relevante para o projeto porque posiciona a camada supervisória proposta no Nível~3 --- acima do controle regulatório direto (Níveis~0 a~2) --- e porque aproxima a lógica industrial da lógica declarativa: a distinção entre o que deve ser feito (\textit{schedule}/\textit{definition}) e o que está sendo feito e o que é viável (\textit{performance}/\textit{capability}) guarda semelhança estrutural com a separação entre estado desejado e estado observado que fundamenta a reconciliação supervisória.
+Desse conjunto, o trabalho usa uma parte pequena, escolhida pelo que a integração precisava. A planta simulada tem um servidor OPC UA genérico, que não conhece o TEP.\footnote{O servidor usa a biblioteca de código aberto \textit{async-opcua}, escrita em Rust (\url{https://github.com/freeopcua/async-opcua}). Do lado dos clientes, o \textit{historian} e a IHM usam a biblioteca \textit{asyncua}, escrita em Python (\url{https://github.com/FreeOpcUa/opcua-asyncio}). As duas são mantidas pelo projeto FreeOpcUa.} No espaço de endereçamento, ele cria uma pasta \texttt{Signals} com uma variável para cada sensor, só de leitura; uma variável para cada atuador, de leitura e escrita; e métodos para controlar a simulação, como pausar, retomar e reiniciar (Figura~\ref{fig:opcua_tep}). Os nomes das variáveis seguem um padrão legível, como \texttt{xmeas.reactor.pressure}. Do lado dos clientes, o \textit{historian} e a IHM usam o \texttt{Browse} para descobrir os sinais da pasta e o \texttt{Read} para lê-los em lote, periodicamente. É essa descoberta por navegação que permite ao \textit{historian} coletar os sinais sem conhecer o TEP: qualquer planta que publique variáveis sob \texttt{Signals} seria coletada do mesmo jeito.
 
 \begin{figure}[htbp]
 	\centering
-	\missingfigure[figwidth=0.75\textwidth]{Pirâmide de automação IEC~62264: Nível~0 (processo físico), Nível~1 (sensores/atuadores), Nível~2 (controle regulatório --- PIDs), Nível~3 (MOM --- supervisor K8s-CPS proposto, com as quatro categorias: \textit{schedule}/\textit{definition}/\textit{performance}/\textit{capability}), Nível~4 (ERP). Seta lateral indicando o alcance vertical do OPC UA (Níveis~0 ao~4). Baseado em \citeauthor{IEC62264} (\citeyear{IEC62264}) e \citeauthor{Mahnke2009intro} (\citeyear{Mahnke2009intro}).}
-	\caption{Hierarquia IEC~62264: posicionamento do supervisor proposto no Nível~3 (MOM) e alcance vertical do OPC UA.}
-	\label{fig:iec62264_pyramid}
+	\caption{Espaço de endereçamento do servidor OPC UA da planta e os serviços usados pelos clientes.}
+	\begin{tikzpicture}[
+	    font=\small,
+	    rotulo/.style={font=\scriptsize},
+	    item/.style={anchor=west, font=\scriptsize\ttfamily},
+	    tipo/.style={anchor=west, font=\scriptsize, gray!40!black},
+	    cliente/.style={draw, rounded corners=3pt, fill=blue!8, minimum width=2.6cm, minimum height=0.8cm, align=center, font=\scriptsize},
+	    fluxo/.style={{Latex[length=2mm]}-{Latex[length=2mm]}, thick}
+	]
+	  % servidor
+	  \draw[rounded corners=4pt, fill=gray!6] (0,0.2) rectangle (10.2,5.5);
+	  \node[rotulo, anchor=north west] at (0,5.5) {servidor OPC UA da planta (genérico)};
+
+	  % árvore do espaço de endereçamento
+	  \node[item] (obj) at (0.3,4.75) {Objects};
+	  \node[item] (sig) at (0.8,4.15) {Signals};
+	  \node[tipo] at (2.1,4.15) {(pasta)};
+	  \draw[gray!60] (0.55,4.55) |- (0.8,4.15);
+	  \draw[gray!60] (1.05,3.95) -- (1.05,0.75);
+	  \foreach \y/\nome/\t in {
+	      3.55/xmeas.reactor.pressure/{variável, só leitura},
+	      3.05/xmeas.reactor.temperature/{variável, só leitura},
+	      2.55/{\dots}/{demais sensores},
+	      2.05/valve.purge.position/{variável, leitura e escrita},
+	      1.55/clock.t\_h/{variável, só leitura},
+	      0.95/{control.pause, \dots}/{métodos}} {
+	    \draw[gray!60] (1.05,\y) -- (1.3,\y);
+	    \node[item] at (1.3,\y) {\nome};
+	    \node[tipo] at (6.0,\y) {\t};
+	  }
+
+	  % clientes
+	  \node[cliente] (his) at (13.8,4.2) {\textit{historian}};
+	  \node[cliente] (ihm) at (13.8,2.8) {IHM};
+	  \node[cliente, fill=gray!10] (ext) at (13.8,1.2) {outros clientes};
+	  \draw[fluxo] (10.2,4.2) -- node[above, rotulo] {Browse + Read} (his.west);
+	  \draw[fluxo] (10.2,2.8) -- node[above, rotulo] {Browse + Read} (ihm.west);
+	  \draw[fluxo] (10.2,1.2) -- node[above, rotulo] {Write + Call} (ext.west);
+	\end{tikzpicture}
+	\fonte{Elaborado pelo autor.}
+	\label{fig:opcua_tep}
 \end{figure}
 
-\subsection{OPC UA no Contexto deste Trabalho}
+O que ficou de fora também vale registrar. As variáveis são números simples, sem os tipos da Parte~8, então unidade e faixa não viajam com o valor. Os clientes leem por consulta periódica, sem acompanhar mudanças por assinatura. Alarmes, acesso histórico e PubSub não são usados, porque o \textit{historian} guarda o histórico e o supervisor emite o veredito por conta própria. E o servidor roda sem segurança, com acesso anônimo, o que só é aceitável num laboratório. Esses seriam os primeiros pontos a melhorar numa aplicação real.
 
-No âmbito deste referencial, o OPC UA e a IEC~62541 ocupam um papel específico: fornecem a linguagem padronizada pela qual a planta se torna um modelo de informação acessível a agentes externos. O CLPM define \textit{o que} observar; o OPC UA define \textit{como} esses observáveis são expostos em uma estrutura navegável, tipada e semanticamente organizada. A camada supervisória pode então operar sobre estados industriais interpretáveis --- em vez de sinais brutos --- sem assumir o papel de controlador regulatório da planta. A implementação concreta dessa interface, incluindo as decisões de mapeamento das variáveis do TEP e os mecanismos de comunicação adotados, é tratada nos capítulos subsequentes.
 
 % -------------------------------------------------------------------------
 
 \section{Considerações Finais}
 \label{sec:ref_conclusao}
 
-A revisão apresentada fundamenta as escolhas tecnológicas do trabalho segundo uma cadeia argumentativa coerente. O TEP provê o problema que força a pergunta sobre supervisão; o controle plant-wide (Skogestad, Larsson) fornece a teoria da resposta hierárquica; o diagnóstico de qualidade de malhas (Harris, Bradu) define o que o supervisor deve observar e em que termos; a analogia cloud-native (Shuiguang, Burns) e os precedentes industriais (Johansson, Mellado) mostram que o paradigma é viável para automação industrial; e o OPC UA (IEC~62541), com o enquadramento normativo da IEC~62264, define como a planta se torna um modelo de informação padronizado e acessível à camada de orquestração.
+Este capítulo passou por muitos assuntos, e todos servem ao mesmo problema. O TEP é a planta: tem modos de operação, limites, uma função de custo e distúrbios conhecidos (Seção~\ref{sec:tep}). O controle \textit{plant-wide} mostrou de onde vem a política de operação: a otimização diz qual é o ponto de operação e qual custo esperar, com a estabilidade como restrição (P1 e P2), e o \textit{self-optimizing} diz quais variáveis manter constantes para ficar perto desse ponto (P3) (Seção~\ref{sec:plantwide}). O diagnóstico de qualidade de malhas mostrou como saber se as malhas que executam essa política estão funcionando (P4), e que essa avaliação pode ser feita de forma automática e em escala, como no CERN (Seção~\ref{sec:diagnostico}). O paradigma \textit{cloud-native} e o Kubernetes trouxeram uma forma de comparar, o tempo todo, um estado declarado com o estado observado, e já chegam à automação industrial (Seção~\ref{sec:cloudnative}). O OPC~UA, por fim, mostrou como a planta pode expor o seu estado de forma padronizada, para que outros sistemas o acompanhem sem conhecer a planta (Seção~\ref{sec:opcua}).
 
-Para colocar essa arquitetura à prova, é necessário que o TEP deixe de operar como uma simulação em lote e passe a funcionar como um processo virtual contínuo, expondo sinais em tempo real e respondendo a comandos externos --- uma \textbf{simulação online}. Essa distinção carrega uma consequência conceitual importante: o TEP não existe como planta física. O conceito de gêmeo digital pressupõe uma contrapartida física sendo modelada e monitorada em tempo real \cite{Boschert2016}; no caso do TEP, não há planta real para espelhar --- o modelo executável é, ele mesmo, a referência do experimento. Chamar essa simulação de gêmeo digital seria conceitualmente impreciso: faltaria o objeto sendo geminado.
+O problema que interessa a este trabalho é o P5: acompanhar, com a planta rodando, se ela cumpre a política de operação, com a política declarada pelo usuário e sem que o supervisor precise conhecer a planta. Esta revisão mostra por que esse problema é relevante. A política não é arbitrária: ela reúne as respostas a P1 a P4, que a literatura já sabe dar para o TEP, e é ela que diz o que a planta deveria estar fazendo. Os trabalhos revisados dizem como chegar a essa política, e alguns mostram como avaliar partes dela, como as malhas. Acompanhar a política inteira, de forma contínua, é o que fica em aberto, e depende de integração: a planta precisa expor o seu estado, alguém precisa coletar e avaliar esse estado, e um supervisor precisa comparar o resultado com o que foi declarado.
 
-O que se configura é, portanto, um \textbf{ambiente experimental cyber-físico}. Sistemas Cyber-Físicos (CPS, \textit{Cyber-Physical Systems}) são caracterizados pela integração entre computação, redes e processos físicos, com ciclos contínuos de observação, decisão e atuação \cite{Hehenberger2016}. Neste trabalho, entretanto, a planta Tennessee Eastman não constitui uma instalação física real, mas uma planta virtual executada de forma contínua. A dimensão física do experimento está nos componentes reais de controle e comunicação eventualmente acoplados ao sistema, como CLPs, redes industriais e dispositivos de supervisão; a dimensão computacional está no modelo executável do TEP, nos serviços de diagnóstico, na orquestração e no modelo de informação. A fronteira entre essas dimensões --- mediada por sinais, comandos, estados observáveis, métricas de desempenho e, futuramente, por OPC UA --- constitui o objeto central de investigação deste trabalho.
-Os capítulos seguintes descrevem como esse ambiente foi construído e instrumentado: a arquitetura do simulador online do TEP, a implementação dos serviços de diagnóstico e do modelo de informação, e os experimentos realizados para avaliar a camada supervisória sob condições de perturbação e degradação de malhas.
+O Capítulo~\ref{cha:desenvolvimento} descreve como os componentes que fazem esse acompanhamento foram construídos.

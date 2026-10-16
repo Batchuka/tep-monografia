@@ -36,6 +36,9 @@
 %%% The \raggedbottom declaration makes all pages the height of the text on that page.
 %%% No extra vertical space is added.
 \raggedbottom
+%%% Com \raggedbottom, as notas ficariam logo abaixo do texto nas páginas curtas.
+%%% \feetatbottom (memoir) mantém as notas no pé da página.
+\feetatbottom
 
 
 
@@ -57,7 +60,11 @@
 %%% `lstlisting' terão uma borda simples.
 \lstset{ %
   backgroundcolor=\color{white},   % choose the background color
-  basicstyle=\footnotesize,        % size of fonts used for the code
+  basicstyle=\footnotesize\ttfamily, % size and family of fonts used for the code
+  columns=fullflexible,            % monospaced font: natural widths keep the alignment
+  keepspaces=true,
+  showstringspaces=false,          % no visible-space marks inside strings
+  upquote=true,                    % straight quotes and backticks, as typed in the code
   breaklines=true,                 % automatic line breaking only at whitespace
   captionpos=b,                    % sets the caption-position to bottom
   commentstyle=\color{mygreen},    % comment style
@@ -83,11 +90,14 @@
   {ű}{{\H{u}}}1 {Ű}{{\H{U}}}1 {ő}{{\H{o}}}1 {Ő}{{\H{O}}}1
   {ç}{{\c c}}1 {Ç}{{\c C}}1 {ø}{{\o}}1 {å}{{\r a}}1 {Å}{{\r A}}1
   {€}{{\EUR}}1 {£}{{\pounds}}1
+  {ã}{{\~a}}1 {õ}{{\~o}}1 {Ã}{{\~A}}1 {Õ}{{\~O}}1 {ñ}{{\~n}}1
 }
 
+%%% Os códigos aparecem como "Código N" (ABNT), na Lista de Códigos.
+\renewcommand{\lstlistingname}{Código}
 
 \lstdefinelanguage{Rust}{
-  keywords={fn,let,mut,pub,struct,impl,trait,use,mod,self,for,in,if,else,return,true,false,Box,Vec,dyn,Send,Sync,usize,f64,i32,u32,String},
+  keywords={fn,let,mut,pub,struct,impl,trait,use,mod,self,Self,for,in,if,else,return,true,false,Box,Vec,dyn,Send,Sync,usize,f64,i32,u32,String,const,static,match,as,crate,extern},
   sensitive=true,
   morecomment=[l]{//},
   morecomment=[s]{/*}{*/},
@@ -100,6 +110,32 @@
   morecomment=[l]{\#},
   morestring=[b]",
   morestring=[b]',
+}
+
+\lstdefinelanguage{JavaScript}{
+  keywords={function,const,let,var,return,if,else,for,of,in,new,class,this,null,true,false,async,await},
+  sensitive=true,
+  morecomment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  morestring=[b]",
+  morestring=[b]',
+  morestring=[b]`,
+}
+
+\lstdefinelanguage{Go}{
+  keywords={func,return,if,else,for,range,var,const,type,struct,interface,package,import,nil,true,false},
+  sensitive=true,
+  morecomment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  morestring=[b]",
+  morestring=[b]`,
+}
+
+\lstdefinelanguage{toml}{
+  keywords={true,false},
+  sensitive=false,
+  morecomment=[l]{\#},
+  morestring=[b]",
 }
 
 \newcommand{\ifestex}{\textsf{Ifes$8$}}
@@ -413,8 +449,8 @@
 
 % --------------------------------------------------------------------
 \settocpreprocessor{chapter}{}
-\include{trabalho/ApendiceA-otimizacao}
 \include{trabalho/ApendiceB-estados}
+\include{trabalho/ApendiceC-monjolo}
 
 
 

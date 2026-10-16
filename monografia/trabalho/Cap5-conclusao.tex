@@ -1,62 +1,64 @@
 \chapter[CONCLUSÕES FINAIS E TRABALHOS FUTUROS]{CONCLUSÕES FINAIS E TRABALHOS FUTUROS}
 \label{cha:conclusao}
 
-% -------------------------------------------------------------------------
 \section{Conclusões}
 \label{sec:conclusoes}
 
-Este trabalho investigou a viabilidade de utilizar o Kubernetes — especificamente o padrão de Operator e o mecanismo de Definições de Recursos Customizados (CRDs) — como plataforma de orquestração para aplicações de controle distribuído modeladas segundo os princípios do IEC~61499. A prova de conceito foi realizada sobre uma implementação do Processo Tennessee Eastman (TEP) em Rust, exposta via gRPC, com supervisão Kubernetes em Go/Kubebuilder e interface de operação em FastAPI/WebSocket.
+Este trabalho tratou do P5 aplicado ao TEP: acompanhar, com a planta rodando, se ela cumpre a política do Modo~1, com a política declarada pelo usuário e um supervisor que não conhece a planta. Para isso, o modelo de Downs e Vogel foi reescrito em Rust como uma planta contínua, exposta por OPC~UA; um \textit{historian} em Python transforma os sinais em estatísticas e no índice das malhas; um controlador próprio no Kubernetes compara a planta com a política declarada em manifestos; e uma IHM web mostra a planta e o veredito.
 
-Os principais resultados obtidos permitem afirmar:
+O objetivo geral foi atingido, com limites. O supervisor acompanhou a planta a partir da política declarada: ficou em conformidade na operação normal e acusou a degradação sob o IDV(6), sem mudança na política e na ordem física dos acontecimentos. O veredito ficou guardado no próprio Kubernetes e foi lido pelo \texttt{kubectl} e pela IHM. A planta simulada reproduziu o caso base de Downs e Vogel e, na versão com a água de resfriamento integrada, o ótimo do Modo~1 de \citeonline{Ricker1995}.
 
-\begin{enumerate}
+Os experimentos também mostraram onde esse acompanhamento falha. Um índice de qualidade de malha, sozinho, não diz se a malha segura o \textit{setpoint}; foi preciso acrescentar um critério de seguimento. O índice do código estava com a escala invertida, o que o deixou cego para a deriva causada pelo IDV(6). Na escala do artigo, ele teria acusado o distúrbio antes do veredito econômico, mas também acusa transitórios que não são problema. E o custo pode melhorar enquanto a planta se degrada: no Experimento~27, ele caiu enquanto o reator perdia líquido, e só um limite declarado percebeu, e tarde. Uma política útil precisa olhar também para os inventários e para as tendências, e não só para o custo e para as malhas.
 
-  \item \textbf{Viabilidade técnica da orquestração Kubernetes para controle industrial.}
-  O Operator Kubernetes demonstrou capacidade de observar continuamente o estado de uma planta industrial simulada, avaliar variáveis de processo contra uma política declarativa e aplicar ações corretivas via gRPC — tudo de forma autônoma e sem intervenção humana. A fase \texttt{Stable} foi mantida por horizonte indeterminado (validado em mais de 30.000~h simuladas), e a latência de reconciliação (escala de segundos) é compatível com a dinâmica lenta do TEP.
+Sobre a escolha do Kubernetes, o mecanismo de estado desejado e estado observado se mostrou adequado para a supervisão. A política virou um objeto como outro qualquer do \textit{cluster}, editável com o \texttt{kubectl}, e o veredito virou um \textit{status} que qualquer programa pode ler. O Kubernetes não executa nada em tempo real, e não precisou: uma avaliação a cada 30~s bastou para acompanhar a planta. A política é declarativa dentro do vocabulário que o supervisor conhece; um tipo novo de critério ainda exige mudar o código do controlador.
 
-  \item \textbf{O CRD \texttt{PLCMachine} como equivalente declarativo do modelo de dispositivo IEC~61499.}
-  A separação entre \textit{spec} (política desejada) e \textit{status} (estado observado) do CRD espelha a separação entre modelo de aplicação e estado de execução do IEC~61499. O Operator assume o papel do runtime de implantação e reconfiguração do padrão, tornando o Kubernetes uma infraestrutura viável para o gerenciamento de aplicações de controle distribuído.
+Por fim, usar a planta simulada para experimentar a supervisão também ensinou sobre a própria planta. A ação integral na pressão, sem uma malha de nível do reator, tirou a estabilidade da operação normal. Um achado desse tipo, que numa planta real custaria caro, foi possível porque a planta roda de forma contínua e pode ser acelerada.
 
-  \item \textbf{A separação entre modelo de planta e lógica de controle habilita gestão externa.}
-  A refatoração do Experimento~11, que extraiu os controladores para a trait \texttt{Controller} e o \texttt{ControllerBank}, foi o passo arquitetural que tornou possível a gestão dos controladores pelo Operator. Esse resultado reforça a importância da separação de responsabilidades em sistemas de controle distribuído — princípio central do IEC~61499.
+\section{Trabalhos futuros}
+\label{sec:trabalhos_futuros}
 
-  \item \textbf{Controladores P são insuficientes para rejeitar IDV(1) e IDV(2).}
-  Os Experimentos~15 e 16 demonstraram que os três controladores P do baseline, embora suficientes para estabilidade nominal, não possuem autoridade de controle suficiente para rejeitar distúrbios composicionais. IDV(1) colapsa a planta em $\approx$2,5~h por mecanismo cinético; IDV(2) causa colapso lento ($\approx$30~h) por acúmulo de inerte. Ambos os casos demandam lógica supervisória de nível mais alto — exatamente o papel do Operator.
+As frentes que ficaram abertas são muitas e cobrem várias áreas do curso. Elas estão agrupadas abaixo por área.
 
-  \item \textbf{IDV(3) é numericamente ineficaz nesta implementação.}
-  O Experimento~17 confirmou que a perturbação de entalpia do D~feed é diluída pelo reciclo antes de atingir o reator, não gerando resposta mensurável. Esse resultado é consistente com a análise do código FORTRAN original e delimita o espaço de distúrbios relevantes para validação do supervisor a IDV(1) e IDV(2).
+\noindent\textbf{Supervisão}
+\begin{itemize}
+	\item fazer o supervisor agir sobre a planta, a parte do P5 que ficou fora deste trabalho: escrever \textit{setpoints} ou trocar a política ativa pelo OPC~UA quando o veredito mudar, com salvaguardas e com o operador no circuito;
+	\item corrigir a escala do índice no \textit{historian}, recalibrar o limite e medir as janelas em tempo simulado, usando o sinal \texttt{clock.t\_h}, que a planta já publica;
+	\item acrescentar à política um teste de tendência, para derivas ainda dentro dos limites, e um limite de custo mínimo, para custos anormalmente baixos;
+	\item testar a mesma camada com outra planta e num \textit{cluster} com mais de um nó, e guardar o histórico do \textit{historian} em disco.
+\end{itemize}
 
-  \item \textbf{A arquitetura é extensível e substituível.}
-  A comunicação baseada em contratos gRPC tipados (\texttt{.proto}) garante que qualquer componente pode ser substituído — incluindo o simulador Rust por dados de uma planta física real — sem alteração dos demais. Isso valida a arquitetura como protótipo realista para cenários industriais.
+\noindent\textbf{Otimização}
+\begin{itemize}
+	\item reproduzir no \texttt{tep-optimizer} os trabalhos de otimização da literatura, inclusive para os outros modos do TEP, encontrar os pontos de operação e aplicá-los na planta;
+	\item declarar uma política para cada um desses pontos e trocar a política ativa no Kubernetes com a planta rodando, para ver como a planta e o veredito respondem;
+	\item levar para a política as variáveis \textit{self-optimizing} de \citeonline{Larsson2001};
+	\item implementar otimização em tempo real, em que o ponto de operação é recalculado com a planta rodando.
+\end{itemize}
 
-\end{enumerate}
+\noindent\textbf{Controle automático}
+\begin{itemize}
+	\item completar a camada regulatória com a malha de nível do reator e repetir o IDV(6) com as malhas PI;
+	\item projetar malhas para as dinâmicas que ainda não têm controle, como a temperatura do reator pela água de resfriamento;
+	\item implementar as estruturas de controle propostas nos trabalhos de otimização do TEP, como a de \citeonline{Larsson2001}.
+\end{itemize}
 
-Em síntese, o trabalho demonstra que o Kubernetes, com seu modelo declarativo e o padrão de Operator, constitui uma plataforma tecnicamente viável para orquestração de aplicações de controle distribuído compatíveis com os princípios do IEC~61499 — respondendo afirmativamente à questão de pesquisa proposta.
+\noindent\textbf{Dinâmica do processo}
+\begin{itemize}
+	\item acrescentar as dinâmicas que hoje estão simplificadas, como a troca de calor no reator, com a água de resfriamento integrada também nos experimentos, e a amostragem dos analisadores;
+	\item implementar os distúrbios propostos por \citeonline{DOWNS1993} que ainda faltam, em especial os aleatórios e as válvulas travadas;
+	\item acrescentar unidades novas à planta, o que muda o processo inteiro e exige rever o controle e a política;
+	\item modelar uma das plantas do laboratório de controle do curso, que existe fisicamente, e rodar o modelo ao lado dela; como discutido no Capítulo~1, só assim o laboratório seria um gêmeo digital de fato.
+\end{itemize}
 
-% -------------------------------------------------------------------------
-\section{Trabalhos Futuros}
-\label{sec:futuros}
+\noindent\textbf{Cálculo numérico}
+\begin{itemize}
+	\item implementar no monjolo um método iterativo para os acoplamentos algébricos entre componentes, o que permitiria modelar unidades com acoplamento verdadeiro (Seção~\ref{apC:ordem});
+	\item implementar outros métodos de integração, como os de passo variável e os implícitos, e comparar a precisão e o custo computacional com os do RK4.
+\end{itemize}
 
-A infraestrutura desenvolvida estabelece uma base sobre a qual as seguintes extensões são diretamente aplicáveis:
-
-\begin{enumerate}
-
-  \item \textbf{Avaliação automática de qualidade de malhas — Índice de Preditividade.}
-  A próxima evolução natural do Operator é incorporar o cálculo do Índice de Preditividade (PI) proposto pelo CERN \cite{CERN_WEAPL02} sobre as séries temporais das XMEAS. O Operator passaria de observador puro para avaliador de desempenho: identificaria automaticamente quais malhas estão oscilando ou com resposta degradada e registraria esse diagnóstico no \textit{status} da \texttt{PLCMachine}. O gêmeo digital, com controle total sobre os distúrbios, é o ambiente ideal para gerar os dados de operação degradada necessários para calibrar e validar o índice.
-
-  \item \textbf{Intervenção ativa via \texttt{UpdateController}.}
-  Com o diagnóstico de qualidade estabelecido, o Operator pode ser estendido para agir: detectar tendência de pressão crescente (IDV(1), IDV(2)) e ajustar setpoints ou ganhos dos controladores antes que o erro acumulado cause intertravamento. A infra\-estrutura gRPC e o método \texttt{UpdateController} já estão implementados — falta a lógica de decisão.
-
-  \item \textbf{Integração OPC UA para interoperabilidade.}
-  O OPC UA (\textit{Unified Architecture}), padronizado na IEC~62541, é o protocolo de interoperabilidade industrial amplamente adotado em ambientes heterogêneos. Desenvolver um servidor OPC UA sobre a planta simulada permitiria conectar controladores reais, ferramentas SCADA e sistemas de terceiros ao gêmeo digital sem alteração da camada de simulação — transformando o laboratório em uma plataforma de integração e teste de sistemas industriais reais.
-
-  \item \textbf{Exploração dos frameworks do CERN — EPICS e TANGO Controls.}
-  O CERN mantém dois ecossistemas de controle abertos amplamente usados em física experimental: EPICS (\textit{Experimental Physics and Industrial Control System}) e TANGO Controls. Ambos modelam dispositivos com variáveis de processo (PVs), comandos e estados — estrutura diretamente mapeável às XMEAS e XMV do TEP. Integrar o gêmeo digital a um desses frameworks abriria acesso a décadas de ferramentas de diagnóstico, arquivamento e supervisão já consolidadas na comunidade científica.
-
-  \item \textbf{Kubernetes na borda com KubeEdge ou k3s.}
-  Para uso em cenários industriais reais, o Operator deve executar próximo ao hardware de campo. Distribuições leves como k3s ou o framework KubeEdge são adequados para PLCs e gateways industriais, permitindo que a mesma lógica supervisória desenvolvida aqui seja implantada em produção sem reescrita.
-
-  \item \textbf{Modelagem completa do trocador de calor do reator.}
-  O Experimento~14 identificou que IDV(4) é ineficaz na implementação atual por limitação na modelagem do trocador de calor. Corrigir essa modelagem abriria acesso a distúrbios térmicos do benchmark e enriqueceria os cenários de teste do supervisor.
-
-\end{enumerate}
+\noindent\textbf{Integração industrial}
+\begin{itemize}
+	\item seguir implementando o OPC~UA conforme a IEC~62541: descrever os sinais com os tipos da Parte~8 \cite{IEC62541_8}, com unidades de engenharia e faixas, usar assinaturas no lugar da leitura periódica e acrescentar alarmes, histórico e segurança, com criptografia e usuários;
+	\item fazer os comandos da IHM chegarem à planta pelos métodos OPC~UA que ela já expõe;
+	\item ligar um CLP real à planta pelo OPC~UA e verificar se ele consegue controlá-la, o que faria do laboratório um sistema ciberfísico de fato.
+\end{itemize}

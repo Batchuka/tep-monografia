@@ -1,0 +1,88 @@
+\chapter[O FRAMEWORK MONJOLO]{O FRAMEWORK MONJOLO}
+\label{apendice:monjolo}
+
+Este apêndice é estritamente sobre engenharia de software. O monjolo foi desenvolvido durante este trabalho, mas saiu do corpo do texto porque está fora do escopo: o problema estudado é a supervisão da planta, e não a forma como o simulador foi construído. Não é preciso lê-lo para acompanhar a monografia. Ele existe para explicar os detalhes do código que aparecem no Capítulo~\ref{cha:desenvolvimento} e que não são óbvios.
+
+O monjolo é um \textit{framework} em Rust, desenvolvido pelo autor, para executar modelos dinâmicos de forma contínua.\footnote{\url{https://github.com/Green-Cinnamon-Labs/monjolo}.} Ele roda o modelo como um processo vivo: um laço de simulação integra o estado no tempo, os componentes trocam sinais pelo nome, e sensores e atuadores expõem esses sinais a protocolos industriais, hoje por um adaptador OPC~UA. Ele não sabe nada sobre o TEP: a química, a termodinâmica e a topologia da planta ficam no \texttt{tep-plant}, que é construído sobre ele. O nome vem do monjolo, a máquina hidráulica rústica usada para pilar grãos, que trabalha sozinha, movida pela água.
+
+\section{Origem}
+\label{apC:origem}
+
+O monjolo nasceu dentro do \texttt{tep-plant}. Quando a planta passou a ser exposta por OPC~UA, ficou claro que boa parte do código não tinha nada a ver com o TEP: o registro de estado, a integração numérica, a dinâmica de primeira ordem das válvulas, o gerador de distúrbios, a leitura da condição inicial e o ciclo de vida das \textit{threads} da planta e do servidor. Só a química, a termodinâmica e a topologia das unidades eram de fato do TEP. A parte genérica foi separada num repositório próprio, por dois motivos: outros alunos podem montar os seus próprios modelos dinâmicos sem reescrever essa maquinaria, e o \texttt{tep-plant} ficou mais fácil de entender, porque cada melhoria passou a ter um lugar claro.
+
+\section{Atributos e macros procedurais}
+\label{apC:atributos}
+
+Em Rust, um texto como \texttt{\#[monjolo::sensor(...)]}, escrito sobre uma estrutura, é um atributo. Ele lembra os decoradores do Python ou as anotações do Java, mas funciona de outro jeito: é uma macro procedural, um programa que roda durante a compilação, recebe o código da estrutura como uma árvore sintática e devolve código novo, que é compilado no lugar. Tudo o que um componente precisa para funcionar dentro do monjolo, como se registrar, ler e escrever os seus sinais e oferecer métodos de acesso aos seus campos, é gerado nesse momento. Quem escreve a planta não vê esse código.
+
+O monjolo tem seis macros principais: \texttt{dynamic\_model} e \texttt{tasks}, para as unidades; \texttt{sensor}; \texttt{actuator}; \texttt{controller}; e \texttt{disturbance}. Dentro delas, atributos menores marcam os campos e os métodos. O \texttt{\#[state]} marca um estado integrado; o \texttt{\#[config]} diz de qual chave do arquivo de configuração vem o valor inicial; o \texttt{\#[offer]} publica o campo com um nome; e o \texttt{\#[task]} marca um método como uma tarefa. Nos controladores, o \texttt{\#[sensor]} e o \texttt{\#[actuator]} dizem qual medição a malha lê e qual atuador ela comanda. Nos atuadores, o \texttt{\#[command]} marca o campo que recebe o comando.
+
+\section{Registro de estado por nome}
+\label{apC:registro}
+
+Os componentes não se chamam diretamente. Eles trocam valores por um registro central, o \texttt{StateRegistry}, em que cada valor tem um nome, como \texttt{reactor.temperature}. Um componente declara o que oferece e o que precisa, e o registro devolve, para cada nome, um \texttt{Proxy}: um objeto pequeno que aponta para a posição do valor. O casamento entre nomes e posições é feito uma vez só, na montagem da planta. Depois disso, ler ou escrever é um acesso direto a um vetor, sem busca por texto, o que mantém o laço de simulação rápido.
+
+O registro guarda dois conjuntos de valores. O estado de avaliação é a cópia de trabalho de uma rodada e pode conter valores hipotéticos, porque o método de Runge-Kutta avalia o modelo em pontos intermediários. O estado corrente é o último estado confirmado e é lido pelos sensores, por meio de um \texttt{ReadProxy}, que não permite escrita. Ao fim de cada passo, o estado de avaliação é copiado para o corrente. É por isso que um sensor nunca mostra um valor intermediário do integrador.
+
+Essa é a principal diferença em relação ao FORTRAN, em que um estado é \texttt{YY(37)} e uma grandeza intermediária é uma variável global. No monjolo, as duas coisas são nomes, e é possível saber quem oferece e quem usa cada um.
+
+\section{Por que os métodos não têm parâmetros}
+\label{apC:parametros}
+
+Nas unidades, uma tarefa é um método sem parâmetros e sem retorno. As entradas são lidas com \texttt{need::nome}, e as saídas são escritas com \texttt{offer::nome = valor}, dentro do corpo. O nome do sinal é o próprio identificador, com \texttt{\_\_} no lugar do ponto: \texttt{need::reactor\_\_temperature} lê o sinal \texttt{reactor.temperature}. A macro \texttt{tasks} percorre o corpo de cada tarefa, encontra esses usos, registra os sinais e reescreve o corpo, trocando cada \texttt{need::x} por uma leitura e cada \texttt{offer::x = v} por uma escrita no \texttt{Proxy} correspondente.
+
+Assim, a lista de entradas e saídas de cada tarefa sai do próprio corpo. É como numa planilha: a fórmula \texttt{=B2+C2} não declara de quais células depende, e o programa descobre isso olhando a fórmula. Se as entradas fossem parâmetros, quem escreve a planta teria de declarar cada dependência duas vezes, no parâmetro e no uso, e manter as duas iguais. Uma composição química inteira é lida ou escrita como um valor só, com \texttt{::<Mixture>} no fim do nome, e a macro publica as oito frações por baixo. Algumas regras ficaram: uma tarefa não pode ler e escrever o mesmo sinal, e \texttt{offer::x += v} não é permitido.
+
+\section{Ordem de avaliação inferida}
+\label{apC:ordem}
+
+Com as entradas e as saídas de todas as tarefas conhecidas, o monjolo monta um grafo: uma tarefa que lê \texttt{reactor.pressure} precisa rodar depois da tarefa que o oferece. A ordem de avaliação é a ordenação desse grafo, calculada uma vez, na partida. Quem escreve a planta não precisa pensar em ordem e pode escrever as tarefas em qualquer arquivo e em qualquer posição. A cada partida, a ordem calculada é gravada no arquivo \texttt{execution\_order.txt}, na raiz do projeto, para conferência.
+
+Isso tem um limite. Cada tarefa roda uma vez por avaliação, então o grafo não pode ter ciclos. Se dois componentes precisassem do valor um do outro no mesmo instante, como numa rede hidráulica em que a pressão e a vazão dependem uma da outra, uma passada só não resolveria, e seria preciso um método iterativo, que o monjolo ainda não tem. O modelo do TEP não tem esse problema.
+
+\section{Misturas e reações}
+\label{apC:mistura}
+
+Em todas as unidades, a mesma forma de código se repetia: um vetor de oito posições, às vezes com mols, às vezes com frações molares, e um laço refazendo as mesmas contas, como somar, normalizar ou fazer o produto escalar com as massas molares. O tipo \texttt{Mixture}, do módulo \texttt{chemistry} do monjolo, dá nome a isso. Uma mistura sabe o nome de cada componente, e as operações, como \texttt{mole\_fractions}, \texttt{total}, \texttt{dot} e as somas e subtrações entre misturas, devolvem novas misturas. No reator, por exemplo, a derivada dos inventários é escrita como a mistura que entra, menos a que sai, mais a que reage.
+
+As reações também são declaradas pelo nome. O \texttt{Reactions} recebe cada reação como texto, por exemplo \texttt{A + C + D -> G}, junto com o calor de reação e a fórmula da velocidade, e devolve, a cada avaliação, as taxas de cada componente e o calor total. A constante dos gases e a fórmula de Arrhenius também ficam no monjolo, porque não são do TEP.
+
+\section{Auto-registro dos componentes}
+\label{apC:registro_auto}
+
+{\sloppy Nenhum arquivo do \texttt{tep-plant} lista as unidades, os sensores ou os atuadores da planta. Cada macro gera, escondida, uma chamada \texttt{inventory::submit!}, da biblioteca \texttt{inventory}, que registra o componente numa lista global montada na compilação. Na partida, o monjolo percorre essa lista e monta a planta com tudo o que encontrou. Para acrescentar um sensor, basta criar o arquivo e declará-lo como módulo; nenhuma lista de componentes precisa ser alterada.\par}
+
+Esse mecanismo explica a linha \texttt{extern crate tennessee\_eastman\_process;} da função \texttt{main} (Código~\ref{cod:rust_main}). Como a \texttt{main} não chama nenhuma função da biblioteca da planta pelo nome, sem essa linha o \textit{linker} deixaria a biblioteca de fora do executável, os registros escondidos nunca rodariam, e o monjolo encontraria uma planta vazia.
+
+\section{Distúrbios por interceptação}
+\label{apC:disturbios}
+
+Um distúrbio é declarado com a macro \texttt{disturbance}, que diz qual sinal ele intercepta. Toda vez que alguém publica esse sinal, o valor passa pelos distúrbios registrados para ele, na ordem de registro, antes de ser gravado, e cada distúrbio só age se estiver ligado. Quem publica e quem consome o sinal não sabem que o distúrbio existe. Vários distúrbios podem interceptar o mesmo sinal: é assim que o IDV(1) e o IDV(2), que no FORTRAN se somam sobre a mesma composição, convivem sem um apagar o outro.
+
+O método \texttt{disturb} é uma função pura: lê o valor original com \texttt{self.raw()} e devolve o valor perturbado, sem guardar nada. Por isso o mecanismo só cobre os distúrbios em degrau. Os aleatórios e a deriva lenta precisam de um estado que avance no tempo, como os polinômios cúbicos sorteados pelo FORTRAN, e esse mecanismo ainda não foi reconstruído. Cada distúrbio também se registra como um atuador, com a chave \texttt{disturbance.idvN}; é assim que ele aparece no OPC~UA e pode ser ligado e desligado de fora.
+
+\section{Partida por convenção}
+\label{apC:bootstrap}
+
+A função \texttt{Runtime::bootstrap} segue a ideia de convenção em vez de configuração, a mesma do \texttt{SpringApplication.run} do Spring, em Java. O arquivo de configuração tem sempre o mesmo nome, \texttt{application.toml}, e fica sempre na raiz do projeto, então ninguém precisa passar o caminho. Do mesmo arquivo saem duas leituras independentes: a condição inicial, nas seções \texttt{[state.*]}, que cada componente lê pelas suas próprias chaves, com o atributo \texttt{\#[config]}; e a configuração do monjolo, na seção \texttt{[monjolo]}, com o modo de execução, o método de integração e os endereços. Arquivo ausente não é erro: valem os valores padrão. Arquivo presente com um valor inválido, como um método de integração que não existe, é erro.
+
+O \texttt{Runtime} vive durante todo o processo. Ele é dono do servidor OPC~UA e da simulação atual. Quando alguém pede um reinício pelo OPC~UA, o \texttt{Runtime} encerra a simulação, monta uma nova do zero e só então troca a simulação para a qual o servidor aponta. O servidor, as conexões dos clientes e a árvore de nós não caem no reinício.
+
+\section{Integração numérica e concorrência}
+\label{apC:integracao}
+
+A integração usa o método de Runge-Kutta de quarta ordem, que avalia o modelo quatro vezes por passo, em pontos intermediários. O integrador não conhece os componentes: recebe um vetor de estados e uma função que calcula as derivadas e devolve o próximo estado. O passo é de 1~s de processo. O ritmo em tempo de relógio é outro parâmetro, independente: por padrão, a \textit{thread} da planta espera 500~ms entre os passos, e o fator de velocidade divide esse intervalo. Na velocidade 5, usada nos experimentos, a planta dá um passo a cada 100~ms, ou seja, avança 10~s de processo por segundo de relógio.
+
+Como o modelo é avaliado em pontos hipotéticos, nenhum componente pode acumular valores durante a avaliação. É por isso que a integral dos controladores PI é um estado: o controlador devolve a derivada, e o integrador cuida da soma. Se a integral fosse somada dentro de \texttt{control}, ela seria somada quatro vezes por passo, inclusive em pontos que o integrador descarta.
+
+A simulação e o servidor OPC~UA rodam em \textit{threads} separadas, e o registro de estado não é compartilhado entre elas. A ponte são os sensores e os atuadores, feitos para serem usados com segurança por mais de uma \textit{thread} (os tipos implementam \texttt{Send} e \texttt{Sync}). O servidor lê os sensores, que mostram o último estado confirmado, e escreve nos atuadores, que funcionam como uma caixa de correio em que vale o último comando. A \textit{thread} da planta recolhe esses comandos a cada passo.
+
+\section{Adaptador OPC~UA}
+\label{apC:opcua}
+
+O adaptador OPC~UA usa a biblioteca \texttt{async-opcua}, na versão 0.18, e só é compilado quando a planta pede, porque traz dependências pesadas. Ele cria a pasta \texttt{Signals} e coloca nela um nó para cada sensor e cada atuador registrado, com o nome da chave. Os nós dos atuadores aceitam escrita. A pasta também tem o nó \texttt{clock.t\_h}, com o tempo simulado, e cinco métodos, chamados com o serviço \textit{Call}: \texttt{control.pause}, \texttt{control.resume}, \texttt{control.set\_speed}, \texttt{control.reset} e \texttt{control.shutdown}. O servidor usa a política de segurança \texttt{None}, sem criptografia, e aceita conexões anônimas, o que serve para um laboratório local, mas não para uma planta real.
+
+\section{Modo função}
+\label{apC:funcao}
+
+Além do modo de simulação, o monjolo tem um modo função, em que o modelo não é integrado no tempo. A planta é montada uma vez e servida por HTTP: quem chama escreve valores em algumas chaves, como estados e posições de válvulas, e lê de volta outras, como as derivadas e as medições, num ponto qualquer. Cada chamada parte do mesmo ponto base, então o resultado depende só do que foi pedido nela. É esse o modo que o \texttt{tep-optimizer} usa para procurar pontos de equilíbrio e o ótimo econômico do Modo~1, sem tempo, sem \textit{threads} e sem OPC~UA. Como o adaptador OPC~UA, o modo função só é compilado quando a planta pede. Compilado com ele, o mesmo executável sobe num modo ou no outro, conforme a configuração ou a variável de ambiente \texttt{MONJOLO\_MODE}.

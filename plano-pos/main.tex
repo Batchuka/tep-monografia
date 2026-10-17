@@ -1,0 +1,95 @@
+% Plano de pesquisa — Mestrado PPGCC/IC-Unicamp (ingresso 1s2027)
+% Limite do edital: 2 páginas sem contar a bibliografia; PDF de até 1 MB.
+% A bibliografia vem do references.bib da raiz (não duplicar).
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[a4paper,margin=2.5cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazilian]{babel}
+\usepackage{mathptmx}
+\usepackage{microtype}
+\usepackage{titlesec}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage[hidelinks,hyperfootnotes=false]{hyperref}
+\usepackage[alf]{abntex2cite}
+
+\titleformat{\section}{\normalsize\bfseries}{\thesection.}{0.5em}{}
+\titlespacing*{\section}{0pt}{4pt}{1pt}
+\setlist{nosep,leftmargin=*}
+\setlength{\parskip}{0pt}
+
+\newcommand{\cmark}{\rule{0.9em}{0.9em}}
+
+\begin{document}
+
+\begin{center}
+  {\large\bfseries Kubernetes na supervisão de plantas industriais:\\
+  entrega progressiva de mudanças de operação com gêmeo digital}\\[4pt]
+  Matheus Corteletti Delfino {\small\,·\, Plano de pesquisa, Mestrado PPGCC/IC-Unicamp, ingresso 1s2027}
+\end{center}
+
+\section{Contexto e problema}
+
+Plantas industriais de processo, como refinarias e estações de tratamento de água, operam em camadas \cite{Skogestad2004}: controladores industriais (CLPs) mantêm variáveis como nível e pressão em valores pedidos, as referências (\textit{setpoints}), e a supervisão escolhe essas referências. Trocar uma referência é arriscado: no caminho, uma variável pode passar do limite, como um tanque que transborda, mesmo que o valor final seja seguro.
+
+Na computação, o Kubernetes resolve um problema parecido para software distribuído \cite{Burns2016}: o usuário declara o estado desejado, controladores aproximam dele o estado observado, e mudanças em produção são aplicadas aos poucos, com verificação e recuo automático. Este projeto propõe o Kubernetes como camada de supervisão de uma planta real. A política de operação (alvo, referência de retorno e condições) é declarada como um recurso do Kubernetes, separada dos mecanismos de observação, previsão e atuação. Um operador do Kubernetes conduz cada troca de referência em degraus, testando-a antes num gêmeo digital, um modelo sincronizado com a planta \cite{Kritzinger2018}, e recua se uma condição falhar. O CLP e o gêmeo ficam na borda, junto da planta; o supervisor roda num \textit{cluster} remoto.
+
+\section{Lacuna}
+
+O Kubernetes já chegou à automação industrial, mas como infraestrutura para o software de controle: \citeonline{Johansson2022} o usam para recuperar controladores que falham, e \citeonline{Mellado2022}, para rodar um CLP em contêineres. Usá-lo para supervisionar o próprio processo, decidindo e aplicando mudanças de operação, não é o foco desses trabalhos. No controle, os \textit{reference governors} já ajustam referências para respeitar limites \cite{Gilbert1995,Garone2017}, e gêmeos digitais apoiam o controle preditivo \cite{Zhao2023}; na computação, sistemas autonômicos organizam monitorar, analisar, planejar e executar \cite{Kephart2003}. Sem reivindicar ineditismo, o projeto avalia esse papel do Kubernetes numa planta real, comparando três estratégias do operador: aplicar a mudança de uma vez (E1), em degraus (E2) e em degraus testados no gêmeo (E3). E2 contra E1 mede o ganho dos degraus; E3 contra E2, o do gêmeo.
+
+\section{Pergunta, hipóteses e objetivos}
+
+\textbf{Pergunta.} Um operador do Kubernetes, longe da planta, consegue conduzir trocas de referência sem violar limites? Testar cada degrau no gêmeo (E3) reduz as violações em relação a degraus sem gêmeo (E2)? Quanto custa em latência, processamento e duração, e quanto depende da precisão do gêmeo?
+
+\textbf{Hipóteses.} H1: nos cenários de risco definidos antes dos ensaios, E3 reduz, em relação a E2, a área do excesso além dos limites ao longo do tempo, dividida pela faixa de cada variável. H2: essa redução se mantém enquanto o erro de previsão do gêmeo fica numa faixa aceitável, fixada antes dos ensaios finais a partir das margens de operação. As hipóteses serão julgadas pela diferença entre estratégias, com intervalos de confiança, separando refutação de resultado inconclusivo. Mudanças concluídas, recusadas e paradas serão analisadas juntas, para que uma estratégia não pareça segura só por recusar mudanças. A latência e os custos serão medidos sem limite fixado de antemão, e não se provará segurança formal.
+
+\textbf{Objetivos.} Desenvolver e avaliar a arquitetura: (1) validar, no \texttt{monjolo}, a dinâmica do gêmeo da planta de nível do Ifes; (2) implementar a política como recurso do Kubernetes e o operador que observa, prevê, atua e registra as decisões; (3) comparar E1, E2 e E3, com e sem distúrbios, com o supervisor remoto e a planta e o gêmeo na borda, medindo o efeito do erro do gêmeo, a latência e os custos.
+
+\section{Metodologia}
+
+\textbf{Planta.} A planta didática de nível do Ifes tem duas unidades com tanques interligados; em cada uma, uma bomba enche um tanque e uma válvula de saída o esvazia. Um algoritmo PID no CLP Omron comanda a bomba, e o KEPServerEX expõe na rede, por OPC, a referência que hoje a tela de supervisão (InTouch) escreve. O operador do Kubernetes só mudará essa referência; o controle e as proteções ficam no CLP, mesmo se o supervisor falhar. Antes dos ensaios, serão testadas a escrita por OPC e as proteções.
+
+\textbf{Gêmeo.} O gêmeo será um modelo da água que entra pela bomba e sai pela válvula, escrito no \texttt{monjolo}, o simulador feito no TCC. Ele será ajustado com um conjunto de ensaios e avaliado com outro, pelo erro das trajetórias e dos picos previstos. Para simular a partir do instante atual, ele precisa do estado completo da planta, incluindo o estado interno do PID e o da bomba; será verificado se o CLP os expõe.
+
+\textbf{Operador.} Em E3, antes de cada degrau, o operador sincroniza o gêmeo com a planta e simula o degrau em tempo acelerado. Se a simulação viola uma condição da política, a referência não muda e a recusa é registrada; senão, o degrau é aplicado. Os degraus crescem enquanto as condições se mantêm e diminuem após um recuo. As condições cobrem margem aos limites, bomba fora dos extremos, desempenho do PID \cite{Bradu2018} e nível acompanhando a referência. Se uma condição falha na planta, o operador recua para a referência de retorno e espera as condições voltarem; se não voltarem, pede a parada da planta. Política, previsão e atuação terão interfaces separadas, e cada decisão ficará registrada no Kubernetes.
+
+\textbf{Atrasos da rede.} Longe da planta, o operador decide com dados atrasados; por isso, cada decisão registrará os instantes de leitura, decisão e escrita. Antes de escrever, o operador lê a planta de novo e, se ela se afastou do estado simulado além de uma tolerância, simula outra vez. O intervalo entre avaliações, hoje de 30~s, será revisto em ensaios-piloto frente à resposta da planta, de cerca de 1~min, e às latências.
+
+\textbf{Experimentos.} Os cenários são a partida com o tanque vazio, trocas de referência perto do transbordo e a abertura da válvula de saída como distúrbio, dentro das proteções verificadas. Para testar H2, os parâmetros do gêmeo serão alterados dentro da variação vista entre ensaios repetidos, e o erro será medido nas previsões. E1, E2 e E3 usarão o mesmo código, condições iniciais, alvos e distúrbios. Rodadas rápidas, só no modelo, indicarão os casos a repetir na planta, em ordem sorteada. Medidas: violações (área, duração e pico), mudanças concluídas e recusadas, recuos necessários e desnecessários, recuperações, paradas, aprovações erradas do gêmeo e tempo de simulação, CPU e memória. Serão medidos em separado o tempo de decisão (da leitura à decisão), o atraso até a escrita, o tempo de transição até o alvo e o total desde o pedido. Tolerâncias e horizonte de previsão serão fixados antes dos ensaios finais, e transições não concluídas também serão relatadas.
+
+\section{Viabilidade e resultados preliminares}
+
+O TCC (Controle e Automação, Ifes, 2026)\footnote{\url{https://github.com/Green-Cinnamon-Labs}; entrada: \texttt{spec-tennessee-eastman}.} construiu uma camada de supervisão no Kubernetes para uma planta química simulada, o Tennessee Eastman, \textit{benchmark} clássico de controle \cite{DOWNS1993}. A simulação reproduziu os custos de operação publicados (170,63 contra 170,61~\$/h na operação padrão e 114,32 contra 114,31~\$/h na ótima) \cite{Ricker1995}, o que confere o equilíbrio do modelo, não sua dinâmica. O \texttt{monjolo} já se comunica por OPC~UA e simula mais rápido que o tempo real. O supervisor já é um operador do Kubernetes que verifica, a cada 30~s, se a planta cumpre a política declarada, sem atuar. Faltam a atuação, o gêmeo da planta de nível e a integração com a planta real.
+
+\section{Cronograma}
+
+{\centering
+\footnotesize\renewcommand{\arraystretch}{0.9}
+\begin{tabular}{@{}lcccccccc@{}}
+\toprule
+Atividade (trimestres) & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 \\
+\midrule
+Disciplinas e revisão sistemática da literatura                       & \cmark & \cmark & \cmark &        &        &        &        &        \\
+Gêmeo e validação dinâmica; integração e proteções                  &        & \cmark & \cmark &        &        &        &        &        \\
+Arquitetura, atuação, pilotos e protocolo experimental              &        &        & \cmark & \cmark &        &        &        &        \\
+Experimentos sem distúrbio                                            &        &        &        & \cmark & \cmark &        &        &        \\
+Experimentos com distúrbio e com gêmeo degradado                      &        &        &        &        & \cmark & \cmark &        &        \\
+Análise estatística e artigo                                          &        &        &        &        &        & \cmark & \cmark &        \\
+Redação e defesa da dissertação                                       &        &        &        &        &        &        & \cmark & \cmark \\
+\bottomrule
+\end{tabular}\par}
+
+\section{Aderência ao programa}
+
+Principal: Engenharia da Informação --- Arquitetura de Software, pela separação entre política e mecanismos de supervisão. Secundária: Sistemas de Computação --- Sistemas Distribuídos; Computação em Nuvem e na Borda, pela integração entre borda e supervisor remoto. Possíveis orientadores por afinidade temática: Prof.~Breno Bernard Nicolau de França e Prof.~Luiz Fernando Bittencourt.
+
+% Marca, no log, a página em que o conteúdo termina (o edital conta só até aqui).
+\typeout{PLANO-CONTEUDO-TERMINA-NA-PAGINA \thepage}
+\clearpage
+
+\bibliography{../references}
+
+\end{document}
